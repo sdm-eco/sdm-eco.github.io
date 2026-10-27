@@ -1,12 +1,14 @@
-// 분리배출 3D 체험 (페트병·음식물 장면 공통 장치)
+// 분리배출 3D 체험 (페트병·음식물·일반쓰레기·대형폐기물 장면 공통 장치)
 // 단계 버튼은 3D 없이도 동작하고, Three.js는 장면이 화면 근처에 왔을 때만 불러옵니다.
 //  [data-eco-lab="이름"]   단계 버튼으로 직접 조작하는 체험
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
 import pet from "./scene-pet.js";
 import food from "./scene-food.js";
+import general from "./scene-general.js";
+import bulky from "./scene-bulky.js";
 
-const SCENES = { pet: pet, food: food };
+const SCENES = { pet: pet, food: food, general: general, bulky: bulky };
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 document.querySelectorAll("[data-eco-lab]").forEach(initLab);

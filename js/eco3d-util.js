@@ -68,6 +68,66 @@ export function stickerTexture(THREE, w, h, stroke, draw) {
   });
 }
 
+// 정해진 순서로 나오는 난수 (매번 같은 배치를 만들 때)
+export function seeded(seed) {
+  return function () {
+    seed = (seed * 16807) % 2147483647;
+    return seed / 2147483647;
+  };
+}
+
+// 위가 열린 둥근 수거함 (앞에 스티커)
+export function binGroup(THREE, top, bottom, height, color, rimColor, stickerMap) {
+  const g = new THREE.Group();
+  const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.5, side: THREE.DoubleSide });
+  const wall = new THREE.Mesh(new THREE.CylinderGeometry(top, bottom, height, 48, 1, true), mat);
+  wall.position.y = height / 2;
+  const floor = new THREE.Mesh(new THREE.CircleGeometry(bottom, 48), mat);
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = 0.01;
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(top, 0.045, 10, 64), new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.4 }));
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = height;
+  const sw = top * 0.95;
+  const sticker = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw * 0.62), new THREE.MeshStandardMaterial({ map: stickerMap, roughness: 0.5, transparent: true }));
+  const mid = (top + bottom) / 2;
+  sticker.position.set(0, height * 0.52, mid + 0.02);
+  sticker.rotation.x = -Math.atan((top - bottom) / height);
+  g.add(wall, floor, rim, sticker);
+  g.visible = false;
+  return g;
+}
+
+// 집 앞 벽(문·창문·불 켜진 등). signMap 텍스처를 문 옆 벽에 붙임. 바닥이 y=0
+export function houseFront(THREE, signMap) {
+  const g = new THREE.Group();
+  function box(w, h, d, color, x, y, z, emissive) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({
+      color: color, roughness: 0.8, emissive: emissive || 0x000000, emissiveIntensity: emissive ? 0.7 : 0
+    }));
+    m.position.set(x, y, z);
+    g.add(m);
+    return m;
+  }
+  box(4.6, 2.5, 0.2, 0xefe6d6, 0, 1.25, 0);
+  box(4.8, 0.14, 0.4, 0xa58f74, 0, 2.55, 0.05);
+  box(4.6, 0.16, 0.3, 0xbdb19c, 0, 0.08, 0.06);
+  box(0.82, 1.62, 0.08, 0x7a5236, -1.05, 0.81, 0.12);
+  box(0.94, 0.08, 0.12, 0x5c3d28, -1.05, 1.66, 0.12);
+  box(0.95, 0.72, 0.06, 0xffd98a, 1.45, 1.45, 0.11, 0xffc861);
+  box(1.05, 0.08, 0.12, 0xa58f74, 1.45, 1.06, 0.13);
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.045, 12, 8), new THREE.MeshStandardMaterial({ color: 0xd8b25a, metalness: 0.7, roughness: 0.3 }));
+  knob.position.set(-0.76, 0.8, 0.18);
+  const lamp = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 10), new THREE.MeshStandardMaterial({ color: 0xfff1c4, emissive: 0xffd36b, emissiveIntensity: 1 }));
+  lamp.position.set(-1.05, 1.95, 0.2);
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 0.72), new THREE.MeshStandardMaterial({ map: signMap, roughness: 0.6, transparent: true }));
+  sign.position.set(0.25, 1.82, 0.11);
+  g.add(knob, lamp, sign);
+  g.userData.sign = sign;
+  g.visible = false;
+  return g;
+}
+
 // 떨어지는 물방울 (중력으로 떨어지다 바닥에서 사라짐)
 export function createDrops(THREE, scene, material, count, size) {
   const mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(size, 8, 6), material, count);

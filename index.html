@@ -121,10 +121,10 @@
       </div>
       <div class="guide-grid">
         <article class="guide-card">
-          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 7h14l-1.2 13H6.2zM9 7V4h6v3M3 7h18"/></svg></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general"></div></div>
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
-          <span class="soon" data-i18n="common.soon">준비 중</span>
+          <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span><span aria-hidden="true">→</span></button>
         </article>
         <article class="guide-card">
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food"></div></div>
@@ -139,10 +139,10 @@
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span><span aria-hidden="true">→</span></button>
         </article>
         <article class="guide-card">
-          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10h16v8H4zM6 18v2M18 18v2M6 10V6h12v4"/></svg></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky"></div></div>
           <h3 data-i18n="cat.bulky">대형 폐기물</h3>
           <p data-i18n="cat.bulky.sub">신고 후 배출</p>
-          <span class="soon" data-i18n="common.soon">준비 중</span>
+          <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span><span aria-hidden="true">→</span></button>
         </article>
       </div>
     </div>
@@ -255,7 +255,7 @@
     <div class="eco-panel">
       <span class="section-kicker">FOOD · 3D</span>
       <h3 id="food-dialog-title" data-i18n="food.title">음식물 쓰레기, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="food.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="food.s1.title">물기 빼기</strong><small data-i18n="food.s1.desc">물기를 꼭 짜서 최대한 빼요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="food.s2.title">일반쓰레기 골라내기</strong><small data-i18n="food.s2.desc">뼈, 조개·달걀 껍데기, 복숭아 씨는 일반쓰레기예요.</small></span></button></li>
@@ -266,6 +266,60 @@
         <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
       </div>
       <p class="eco-note" data-i18n="food.note">딱딱한 껍데기(호두·밤), 양파·마늘 껍질, 차·한약재 찌꺼기도 일반쓰레기로 버려요.</p>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="eco-dialog" id="general-dialog" aria-labelledby="general-dialog-title">
+  <button type="button" class="eco-close" data-eco-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
+  <div class="eco-lab" data-eco-lab="general">
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="section-kicker">GENERAL · 3D</span>
+      <h3 id="general-dialog-title" data-i18n="general.title">일반 쓰레기, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="general.s1.title">재활용품 골라내기</strong><small data-i18n="general.s1.desc">캔·병·종이·플라스틱은 종량제 봉투에 넣지 말고 품목별로 따로 내놓아요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="general.s2.title">종량제 봉투에 담아 묶기</strong><small data-i18n="general.s2.desc">휴지·스펀지·낙엽 같은 타는 쓰레기는 종량제 봉투에 담아 입구를 묶어요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="general.s3.title">저녁 6~11시, 집 앞에 내놓기</strong><small data-i18n="general.s3.desc">18시~23시에 내 집 앞이나 내 점포 앞에 내놓아요. 배출 요일은 동마다 달라요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span><span aria-hidden="true">→</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="general.note">깨진 유리·도자기·흙은 특수(PP) 마대에 담아요. 규격 봉투를 쓰지 않으면 과태료가 20만 원이에요.</p>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="eco-dialog" id="bulky-dialog" aria-labelledby="bulky-dialog-title">
+  <button type="button" class="eco-close" data-eco-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
+  <div class="eco-lab" data-eco-lab="bulky">
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="section-kicker">BULKY · 3D</span>
+      <h3 id="bulky-dialog-title" data-i18n="bulky.title">대형 폐기물, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="bulky.s1.title">배출 신고하고 수수료 내기</strong><small data-i18n="bulky.s1.desc">구청 홈페이지에서 신고하거나 동별 대행업체에 전화하고 수수료를 내요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="bulky.s2.title">신고필증 붙이기</strong><small data-i18n="bulky.s2.desc">신고필증을 출력해 버릴 물건에 잘 보이게 붙여요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="bulky.s3.title">정한 날 집 앞에 내놓기</strong><small data-i18n="bulky.s3.desc">신고한 배출일에 집 앞에 내놓으면 5일 안에 수거해 가요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span><span aria-hidden="true">→</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="bulky.note">버리기 전에 재사용할 수 있는지 먼저 확인해요. 새 가전을 사면 판매자가 같은 종류의 헌 가전을 무료로 가져가요. 무단투기는 과태료 최대 100만 원이에요.</p>
     </div>
   </div>
 </dialog>

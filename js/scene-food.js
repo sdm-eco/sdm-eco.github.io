@@ -1,7 +1,7 @@
 // 음식물 쓰레기 장면
 // 서대문구청 안내: 물기 제거 후 배출, 뼈·조개/달걀 껍데기·핵과류 씨 등은 일반쓰레기,
 // 단독주택은 음식물 전용 봉투, 공동주택은 전용 수거함
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops } from "./eco3d-util.js";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, binGroup, seeded } from "./eco3d-util.js";
 
 const BASE = GROUND + 0.12;   // 바구니 다리 높이만큼 띄움
 const G_BIN = [-1.85, 0.25];   // 일반쓰레기통 위치 (x, z)
@@ -200,13 +200,6 @@ function build(THREE, scene, spin) {
   return { update: update, reset: drops.clear };
 }
 
-function seeded(seed) {
-  return function () {
-    seed = (seed * 16807) % 2147483647;
-    return seed / 2147483647;
-  };
-}
-
 function holesTexture(THREE) {
   const tex = canvasTexture(THREE, 1024, 256, function (g, w, h) {
     g.fillStyle = "#fff";
@@ -221,27 +214,6 @@ function holesTexture(THREE) {
     }
   }, false);
   return tex;
-}
-
-function binGroup(THREE, top, bottom, height, color, rimColor, stickerMap) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.5, side: THREE.DoubleSide });
-  const wall = new THREE.Mesh(new THREE.CylinderGeometry(top, bottom, height, 48, 1, true), mat);
-  wall.position.y = height / 2;
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(bottom, 48), mat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = 0.01;
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(top, 0.045, 10, 64), new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.4 }));
-  rim.rotation.x = Math.PI / 2;
-  rim.position.y = height;
-  const sw = top * 0.95;
-  const sticker = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw * 0.62), new THREE.MeshStandardMaterial({ map: stickerMap, roughness: 0.5, transparent: true }));
-  const mid = (top + bottom) / 2;
-  sticker.position.set(0, height * 0.52, mid + 0.02);
-  sticker.rotation.x = -Math.atan((top - bottom) / height);
-  g.add(wall, floor, rim, sticker);
-  g.visible = false;
-  return g;
 }
 
 function trashSticker(THREE) {
