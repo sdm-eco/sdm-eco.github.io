@@ -87,7 +87,13 @@
           <span class="map-label">LEARNING PATH</span>
           <span class="map-domain">sdm-eco</span>
         </div>
-        <p class="path-wordmark">Sort it <span>right</span><small data-i18n="panel.lead">3단계로 배워요</small></p>
+        <div class="path-top" data-pet-widget>
+          <p class="path-wordmark">Sort it <span>right</span><small data-i18n="panel.lead">3단계로 배워요</small></p>
+          <div class="hero-pet" aria-hidden="true">
+            <div class="pet-mini" data-pet-loop></div>
+            <ol class="pet-ticker"><li data-pet-mark="1"><span>1</span><b data-i18n="pet.s1.title">내용물 비우기</b></li><li data-pet-mark="2"><span>2</span><b data-i18n="pet.s2.title">라벨 떼기</b></li><li data-pet-mark="3"><span>3</span><b data-i18n="pet.s3.title">찌그러뜨리기</b></li><li data-pet-mark="4"><span>4</span><b data-i18n="pet.s4.title">뚜껑 닫기</b></li><li data-pet-mark="5"><span>5</span><b data-i18n="pet.s5.title">전용 수거함에 넣기</b></li></ol>
+          </div>
+        </div>
         <div class="map-root">
           <div>
             <strong data-i18n="panel.root.title">분리배출 기초 교육</strong>
@@ -127,10 +133,10 @@
           <span class="soon" data-i18n="common.soon">준비 중</span>
         </article>
         <article class="guide-card">
-          <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7 19H4l3-5M17 19h3l-3-5M9 5l3-2 3 2M7.5 14L12 6l4.5 8M8 19h8"/></svg></div>
+          <div class="card-pet" aria-hidden="true"><div class="pet-mini" data-pet-loop></div></div>
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
-          <span class="soon" data-i18n="common.soon">준비 중</span>
+          <button type="button" class="pet-open" data-pet-open><span data-i18n="pet.try">3D로 배우기</span><span aria-hidden="true">→</span></button>
         </article>
         <article class="guide-card">
           <div class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10h16v8H4zM6 18v2M18 18v2M6 10V6h12v4"/></svg></div>
@@ -208,6 +214,35 @@
   </section>
 </main>
 
+<dialog class="pet-dialog" id="pet-dialog" aria-labelledby="pet-dialog-title">
+  <button type="button" class="pet-close" data-pet-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
+  <div class="pet-lab" id="pet-lab">
+    <div class="pet-stage">
+      <canvas class="pet-canvas" aria-hidden="true"></canvas>
+      <span class="pet-badge" aria-hidden="true">3D</span>
+      <p class="pet-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="pet.hint">드래그해서 돌려 보세요</span></p>
+      <p class="pet-fallback" data-i18n="pet.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="pet-panel">
+      <span class="section-kicker">PET · 3D</span>
+      <h3 id="pet-dialog-title" data-i18n="pet.title">투명 페트병, 이렇게 버려요</h3>
+      <p class="pet-lead" data-i18n="pet.lead">단계를 누르면 3D 페트병이 직접 보여 줘요.</p>
+      <ol class="pet-steps">
+        <li><button type="button" data-step="1"><span class="pet-num">1</span><span><strong data-i18n="pet.s1.title">내용물 비우기</strong><small data-i18n="pet.s1.desc">뚜껑을 열고 남은 음료를 모두 비워요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="pet-num">2</span><span><strong data-i18n="pet.s2.title">라벨 떼기</strong><small data-i18n="pet.s2.desc">겉에 붙은 비닐 라벨을 떼어 내요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="pet-num">3</span><span><strong data-i18n="pet.s3.title">찌그러뜨리기</strong><small data-i18n="pet.s3.desc">부피가 줄도록 눌러서 찌그러뜨려요.</small></span></button></li>
+        <li><button type="button" data-step="4"><span class="pet-num">4</span><span><strong data-i18n="pet.s4.title">뚜껑 닫기</strong><small data-i18n="pet.s4.desc">뚜껑은 따로 버리지 말고 다시 닫아요.</small></span></button></li>
+        <li><button type="button" data-step="5"><span class="pet-num">5</span><span><strong data-i18n="pet.s5.title">전용 수거함에 넣기</strong><small data-i18n="pet.s5.desc">플라스틱류와 따로, 투명 페트병 전용 수거함에 넣어요.</small></span></button></li>
+      </ol>
+      <div class="pet-actions">
+        <button type="button" class="action-link" id="pet-next"><span data-i18n="pet.next">다음 단계</span><span aria-hidden="true">→</span></button>
+        <button type="button" class="pet-reset" id="pet-reset" data-i18n="pet.reset">처음부터</button>
+      </div>
+      <p class="pet-note" data-i18n="pet.note">색이 있는 페트병은 투명 페트병이 아니라 플라스틱류로 버려요.</p>
+    </div>
+  </div>
+</dialog>
+
 <footer class="footer">
   <div class="wrap footer-inner">
     <div>
@@ -224,5 +259,7 @@
 <script src="js/config.js"></script>
 <script src="js/i18n.js"></script>
 <script src="js/main.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module" src="js/pet3d.js"></script>
 </body>
 </html>
