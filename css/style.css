@@ -96,10 +96,26 @@ nav{display:flex;align-items:center;gap:18px}
 @keyframes art-rise{from{opacity:.35;transform:translateY(22px)}}
 /* 그림 뒤 연한 서대문·서울 실루엣(독립문, N서울타워): 머리 위로 살짝 보이게 그림보다 위로 뻗음 */
 .hero-skyline{position:absolute;left:-8%;right:-8%;bottom:45%;width:116%;height:auto;fill:none;stroke:var(--fresh);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:.32}
-/* 처음 열 때 선이 펜으로 그리듯 나타남 (배경 넝쿨의 vine-grow와 같은 방식) */
-.sky-line{stroke-dasharray:1;stroke-dashoffset:1;animation:vine-grow 1.6s cubic-bezier(.16,1,.3,1) var(--d,0s) forwards}
-/* N서울타워 꼭대기 불빛: 선이 다 그려진 뒤 천천히 깜빡임 (배경 넝쿨 점의 node-glow와 같은 방식) */
-.tower-light{fill:var(--glow);stroke:none;opacity:.25;transform-box:fill-box;transform-origin:center;animation:node-glow 4.5s ease-in-out 2.8s infinite both}
+/* 처음 열 때 선이 펜으로 그리듯 천천히 나타남, 전체 약 7.5초 (배경 넝쿨의 vine-grow와 같은 방식) */
+.sky-line{stroke-dasharray:1;stroke-dashoffset:1;animation:vine-grow 3.2s cubic-bezier(.45,.05,.3,1) var(--d,0s) forwards}
+/* N서울타워 꼭대기 불빛: 선이 다 그려진 뒤 켜지고, 빛무리가 숨 쉬듯 커졌다 작아지며 고리가 퍼져 나감 */
+.tower-light{opacity:0;animation:light-on 1.2s ease-out 7s forwards}
+.tower-light stop:first-child{stop-color:var(--glow);stop-opacity:.95}
+.tower-light stop:last-child{stop-color:var(--glow);stop-opacity:0}
+.glow-halo{stroke:none;transform-box:fill-box;transform-origin:center;animation:glow-breathe 3.6s ease-in-out 8s infinite}
+.glow-ping{fill:none;stroke:var(--glow);stroke-width:1.5;stroke-opacity:1;transform-box:fill-box;transform-origin:center;opacity:0;animation:glow-ping 3.6s ease-out 8s infinite}
+.glow-core{fill:#fff4c2;stroke:var(--glow);stroke-width:1.2;stroke-opacity:1}
+@keyframes light-on{to{opacity:1}}
+@keyframes glow-breathe{0%,100%{opacity:.55;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+@keyframes glow-ping{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(3.4)}}
+/* 나뭇잎: 그림 둘레에서 바람에 날리듯 비스듬히 떠올랐다 사라짐 (잎마다 속도·시작 시점이 다름) */
+.hero-leaf{position:absolute;z-index:2;width:26px;fill:var(--meadow);opacity:0;animation:leaf-float 11s ease-in-out infinite;pointer-events:none}
+.hero-leaf svg{display:block;width:100%;height:auto}
+.leaf-1{left:-6%;top:58%;width:24px;animation-delay:-1s}
+.leaf-2{left:30%;top:-6%;width:20px;animation-duration:13s;animation-delay:-6s}
+.leaf-3{right:4%;top:40%;width:28px;animation-duration:12s;animation-delay:-3.5s}
+.leaf-4{left:58%;top:62%;width:18px;animation-duration:14s;animation-delay:-9s}
+@keyframes leaf-float{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:.85}50%{transform:translate(46px,-38px) rotate(40deg)}85%{opacity:.85}100%{opacity:0;transform:translate(92px,-20px) rotate(80deg)}}
 
 .learn{padding:32px 0 0}
 .learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),var(--wash))}
@@ -295,5 +311,6 @@ nav{display:flex;align-items:center;gap:18px}
   html{scroll-behavior:auto}
   *,*:before,*:after{animation:none!important;transition:none!important}
   .vine,.sky-line{stroke-dashoffset:0}
-  .tower-light{opacity:.8}
+  .tower-light{opacity:1}
+  .hero-leaf{opacity:.7}
 }
