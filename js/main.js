@@ -172,32 +172,27 @@
     });
   });
 
-  // 배너 그림 위 인사 말풍선: 언어는 순서대로, 자리는 매번 다른 학생 머리 위로
-  // (언어와 학생을 묶지 않으려고 자리를 무작위로 고름. 움직임 줄이기 설정이면 띄우지 않음)
-  function setupHello() {
-    var art = document.querySelector("[data-hello]");
-    if (!art || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var bubble = art.querySelector(".hello");
-    var words = [["ko", "안녕하세요"], ["en", "Hello"], ["zh-CN", "你好"], ["vi", "Xin chào"]];
-    var spots = [[18, 1], [41, 10], [63, 2], [84, 9]]; // 그림 안 머리 위치(가로 %, 세로 %)
-    var i = 0, last = -1;
-    function next() {
-      var spot;
-      do { spot = Math.floor(Math.random() * spots.length); } while (spot === last);
-      last = spot;
-      bubble.lang = words[i][0];
-      bubble.textContent = words[i][1];
-      bubble.style.left = spots[spot][0] + "%";
-      bubble.style.top = spots[spot][1] + "%";
-      bubble.classList.add("is-on");
-      setTimeout(function () { bubble.classList.remove("is-on"); }, 2000);
-      i = (i + 1) % words.length;
+  // 새로고침하면 항상 맨 위에서 시작: 브라우저가 이전 위치나 주소의 #섹션으로 내려가지 않게 함
+  // (처음 방문과 메뉴 이동은 그대로. 한계: 새로고침 전에 보던 위치는 기억하지 않음)
+  function startAtTopOnReload() {
+    var entry = performance.getEntriesByType ? performance.getEntriesByType("navigation")[0] : null;
+    if (!entry || entry.type !== "reload") return;
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    function toTop() {
+      // html의 부드러운 스크롤 때문에 위로 미끄러지는 모습이 보이지 않게 잠시 끔
+      var root = document.documentElement;
+      root.style.scrollBehavior = "auto";
+      window.scrollTo(0, 0);
+      root.style.scrollBehavior = "";
     }
-    setTimeout(function () { next(); setInterval(next, 2600); }, 900);
+    toTop();
+    // 브라우저는 다 불러온 뒤에 #섹션으로 한 번 더 내려가므로, 그 다음 차례에 다시 올림
+    window.addEventListener("load", function () { toTop(); setTimeout(toTop, 0); });
   }
 
+  startAtTopOnReload();
   setupGame();
-  setupHello();
   progress = setupProgress();
   applyLang(detectLang());
 })();
