@@ -14,7 +14,7 @@
   --lime-ink:#173404;--leaf-ink:#2c5a1e;--card-line:#d9e9cc;
   --on-dark:#f5fbef;
   --wash:#f7fbf2;--mist:#eef2e6;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
-  --focus:#1f6b44;--danger:#b42318;
+  --glow:#f2b632;--focus:#1f6b44;--danger:#b42318;
   --bin-grey:#7a8b80;--bin-amber:#c9893a;--bin-blue:#3b8fd0;
   /* 카테고리 타일·게임 배너: 구청 시안 색 그대로(실제 봉투 색 확인 전 임시값) */
   --tile-sky:#e3eefb;--tile-leaf:#e8f4d6;--tile-mint:#dcf2ec;--tile-sun:#fbf1cf;--banner:#fdf4c8;--banner-2:#fbecb2;
@@ -95,15 +95,11 @@ nav{display:flex;align-items:center;gap:18px}
 .hero-art img{position:relative;z-index:1;display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,#000 84%,transparent);mask-image:linear-gradient(to bottom,#000 84%,transparent);animation:art-rise .8s cubic-bezier(.16,1,.3,1) both}
 @keyframes art-rise{from{opacity:.35;transform:translateY(22px)}}
 /* 그림 뒤 연한 서대문·서울 실루엣(독립문, N서울타워): 머리 위로 살짝 보이게 그림보다 위로 뻗음 */
-.hero-skyline{position:absolute;left:-8%;right:-8%;bottom:45%;width:116%;height:auto;fill:none;stroke:var(--fresh);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.3}
-/* 그림 바깥쪽에서 천천히 흔들리는 나뭇잎 */
-.hero-leaf{position:absolute;z-index:2;width:28px;fill:var(--meadow);opacity:.7;animation:leaf-drift 12s ease-in-out infinite alternate;pointer-events:none}
-.hero-leaf svg{display:block;width:100%;height:auto}
-.leaf-1{left:-7%;top:12%;width:24px}
-.leaf-2{right:-3%;top:-10%;width:30px;animation-duration:14s;animation-delay:-4s}
-.leaf-3{right:-7%;top:46%;width:22px;animation-duration:11s;animation-delay:-7s}
-.leaf-4{left:6%;top:-20%;width:20px;animation-duration:15s;animation-delay:-2s}
-@keyframes leaf-drift{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(10px,-8px) rotate(14deg)}100%{transform:translate(-6px,6px) rotate(-10deg)}}
+.hero-skyline{position:absolute;left:-8%;right:-8%;bottom:45%;width:116%;height:auto;fill:none;stroke:var(--fresh);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:.32}
+/* 처음 열 때 선이 펜으로 그리듯 나타남 (배경 넝쿨의 vine-grow와 같은 방식) */
+.sky-line{stroke-dasharray:1;stroke-dashoffset:1;animation:vine-grow 1.6s cubic-bezier(.16,1,.3,1) var(--d,0s) forwards}
+/* N서울타워 꼭대기 불빛: 선이 다 그려진 뒤 천천히 깜빡임 (배경 넝쿨 점의 node-glow와 같은 방식) */
+.tower-light{fill:var(--glow);stroke:none;opacity:.25;transform-box:fill-box;transform-origin:center;animation:node-glow 4.5s ease-in-out 2.8s infinite both}
 
 .learn{padding:32px 0 0}
 .learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),var(--wash))}
@@ -298,5 +294,6 @@ nav{display:flex;align-items:center;gap:18px}
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*:before,*:after{animation:none!important;transition:none!important}
-  .vine{stroke-dashoffset:0}
+  .vine,.sky-line{stroke-dashoffset:0}
+  .tower-light{opacity:.8}
 }
