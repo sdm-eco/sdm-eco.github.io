@@ -76,36 +76,31 @@
         <h1 data-i18n-html="hero.title">서울 생활의 첫 습관,<br><em>올바른 분리배출</em></h1>
         <p class="hero-desc" data-i18n="hero.desc">서대문구에서 공부하는 유학생을 위한 분리배출 교육입니다. 짧은 영상을 보고, 배출 방법을 읽고, 게임으로 익혀 보세요.</p>
         <div class="hero-actions">
-          <a class="btn" href="#videos"><span data-i18n="hero.cta2">교육 영상 보기</span></a>
-          <a class="btn btn-ghost" href="#guide"><span data-i18n="hero.cta1">배출방법 보기</span></a>
+          <a class="btn" href="#videos"><svg class="btn-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1l7 4-7 4z"/></svg><span data-i18n="hero.cta2">교육 영상 보기</span></a>
+          <a class="btn btn-ghost" href="#guide"><svg class="btn-icon btn-icon-line" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="hero.cta1">배출방법 보기</span></a>
         </div>
       </div>
 
-      <div class="path-map">
-        <div class="map-head">
-          <span class="map-label">Learning path</span>
-          <span class="map-domain">sdm-eco</span>
-        </div>
-        <div class="path-top" data-eco-widget>
-          <p class="path-wordmark">Sort it <span>right</span><small data-i18n="panel.lead">3단계로 배워요</small></p>
-          <div class="hero-pet" aria-hidden="true">
-            <div class="eco-mini" data-eco-loop="pet"></div>
-            <ol class="eco-ticker"><li data-eco-mark="1"><span>1</span><b data-i18n="pet.s1.title">내용물 비우기</b></li><li data-eco-mark="2"><span>2</span><b data-i18n="pet.s2.title">라벨 떼기</b></li><li data-eco-mark="3"><span>3</span><b data-i18n="pet.s3.title">찌그러뜨리기</b></li><li data-eco-mark="4"><span>4</span><b data-i18n="pet.s4.title">뚜껑 닫기</b></li><li data-eco-mark="5"><span>5</span><b data-i18n="pet.s5.title">전용 수거함에 넣기</b></li></ol>
-          </div>
-        </div>
-        <div class="map-root">
-          <div>
-            <strong data-i18n="panel.root.title">분리배출 기초 교육</strong>
-            <small data-i18n="panel.root.sub">약 10분 · 4개 언어</small>
-          </div>
-          <svg class="map-sprout" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 29V15M16 17c0-6-4-9-10-9 0 6 4 9 10 9zm0 3c0-6 4-10 10-10 0 6-4 10-10 10z"/></svg>
-        </div>
-        <div class="map-branches">
-          <a class="map-branch" href="#videos"><span class="num">01</span><strong data-i18n="nav.video">교육 영상</strong><small data-i18n="step2.sub">3분 영상 2편</small></a>
-          <a class="map-branch" href="#guide"><span class="num">02</span><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small></a>
-          <a class="map-branch" href="#game"><span class="num">03</span><strong data-i18n="nav.game">게임</strong><small data-i18n="step3.sub">직접 분류해 보기</small></a>
-        </div>
+      <!-- 시안의 유학생 일러스트 자리: 일러스트 원본을 받기 전까지 페트병 3D가 대신함 -->
+      <div class="hero-scene" data-eco-widget aria-hidden="true">
+        <svg class="scene-leaves" viewBox="0 0 400 360"><path d="M48 70c26-22 58-20 74 0-26 20-56 22-74 0z"/><path d="M330 46c18-24 46-28 62-12-18 24-46 28-62 12z"/><path d="M342 268c22-16 50-12 60 6-22 16-50 12-60-6z"/><path d="M20 250c14-24 42-32 60-20-14 24-42 32-60 20z"/></svg>
+        <div class="eco-mini" data-eco-loop="pet"></div>
+        <ol class="eco-ticker"><li data-eco-mark="1"><span>1</span><b data-i18n="pet.s1.title">내용물 비우기</b></li><li data-eco-mark="2"><span>2</span><b data-i18n="pet.s2.title">라벨 떼기</b></li><li data-eco-mark="3"><span>3</span><b data-i18n="pet.s3.title">찌그러뜨리기</b></li><li data-eco-mark="4"><span>4</span><b data-i18n="pet.s4.title">뚜껑 닫기</b></li><li data-eco-mark="5"><span>5</span><b data-i18n="pet.s5.title">전용 수거함에 넣기</b></li></ol>
       </div>
+    </div>
+  </section>
+
+  <section class="learn" aria-labelledby="learn-title">
+    <div class="wrap learn-inner">
+      <div class="learn-head">
+        <h2 id="learn-title" data-i18n="panel.root.title">분리배출 기초 교육</h2>
+        <p data-i18n="panel.root.sub">약 10분 · 4개 언어</p>
+      </div>
+      <ol class="learn-steps">
+        <li><a href="#videos"><span class="learn-num">1</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="23" rx="3"/><path d="M3 38h42"/><path d="M21 17l8 4.5-8 4.5z"/></svg><strong data-i18n="nav.video">교육 영상</strong><small data-i18n="step2.sub">3분 영상 2편</small></a></li>
+        <li><a href="#guide"><span class="learn-num">2</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V11c-6-2-13-2-18 2z"/><path d="M24 13v26"/><path d="M11 19h7M11 25h7M30 19h7M30 25h7"/></svg><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small></a></li>
+        <li><a href="#game"><span class="learn-num">3</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="15" width="38" height="20" rx="10"/><path d="M15 21v8M11 25h8"/><circle cx="32" cy="22.5" r="1.6"/><circle cx="36" cy="27.5" r="1.6"/></svg><strong data-i18n="nav.game">게임</strong><small data-i18n="step3.sub">직접 분류해 보기</small></a></li>
+      </ol>
     </div>
   </section>
 
@@ -159,28 +154,28 @@
         <p class="section-lead" data-i18n="guide.lead">품목별 상세 안내는 준비 중입니다.</p>
       </div>
       <div class="guide-grid">
-        <article class="guide-card">
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general"></div></div>
+        <article class="guide-card tile-general">
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general"></div></div>
           <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
-        <article class="guide-card">
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food"></div></div>
+        <article class="guide-card tile-food">
           <h3 data-i18n="cat.food">음식물 쓰레기</h3>
           <p data-i18n="cat.food.sub">전용 수거함·봉투</p>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food"></div></div>
           <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
-        <article class="guide-card">
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet"></div></div>
+        <article class="guide-card tile-recycle">
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet"></div></div>
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
-        <article class="guide-card">
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky"></div></div>
+        <article class="guide-card tile-bulky">
           <h3 data-i18n="cat.bulky">대형 폐기물</h3>
           <p data-i18n="cat.bulky.sub">신고 후 배출</p>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky"></div></div>
           <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
       </div>
@@ -200,10 +195,14 @@
           <div class="bins" aria-hidden="true">
             <span class="bin bin-a"></span><span class="bin bin-b"></span><span class="bin bin-c"></span><span class="bin bin-d"></span>
           </div>
-          <h3 data-i18n="game.card.title">곧 게임이 열려요</h3>
-          <p data-i18n="game.card.desc">게임이 완성되면 이곳에서 바로 플레이할 수 있습니다.</p>
-          <button type="button" class="action-link" id="game-play"><span data-i18n="game.play">게임 시작</span></button>
-          <p class="game-status" id="game-status" role="status" hidden data-i18n="common.soon">준비 중</p>
+          <div class="game-copy">
+            <h3 data-i18n="game.card.title">곧 게임이 열려요</h3>
+            <p data-i18n="game.card.desc">게임이 완성되면 이곳에서 바로 플레이할 수 있습니다.</p>
+          </div>
+          <div class="game-cta">
+            <button type="button" class="action-link" id="game-play"><span data-i18n="game.play">게임 시작</span></button>
+            <p class="game-status" id="game-status" role="status" hidden data-i18n="common.soon">준비 중</p>
+          </div>
         </div>
       </div>
     </div>
