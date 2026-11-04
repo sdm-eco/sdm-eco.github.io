@@ -27,6 +27,7 @@
 :lang(zh){--font:"Pretendard Std Variable","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+img{max-width:100%;height:auto}
 html{scroll-behavior:smooth;scroll-padding-top:110px;overflow-x:clip}
 body{margin:0;background:var(--white);color:var(--ink);font-family:var(--font);font-size:18px;line-height:1.7;word-break:keep-all;overflow-wrap:break-word;overflow-x:clip}
 a{color:inherit;text-decoration:none}
@@ -78,7 +79,7 @@ nav{display:flex;align-items:center;gap:18px}
 @keyframes node-glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.9;transform:scale(1.7)}}
 @keyframes garden-lean{0%,100%{transform:skewX(0)}35%{transform:skewX(-3deg)}70%{transform:skewX(2deg)}}
 
-.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center;padding:64px 0 76px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:60px;align-items:center;padding:64px 0 76px}
 .hero h1{font-size:clamp(38px,4.2vw,58px);letter-spacing:-2.5px;line-height:1.24;margin:0 0 24px;font-weight:850;text-wrap:balance}
 .hero h1 em{font-style:normal;color:var(--fresh-strong);font-size:1.16em}
 .hero-desc{font-size:20px;color:var(--ink-2);line-height:1.85;max-width:560px}
@@ -89,8 +90,8 @@ nav{display:flex;align-items:center;gap:18px}
 .btn-ghost:hover{background:var(--white);border-color:var(--fresh-strong)}
 .btn-icon{width:12px;height:12px;flex:none;fill:currentColor}
 .btn-icon-line{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-/* 그림 밑단이 잘린 모양이라 배너 아래 끝에 붙여 서 있는 것처럼 보이게 함 (hero-grid 아래 여백 + 그림 아래 투명 여백만큼 내림) */
-.hero-art{align-self:end;justify-self:center;width:min(560px,100%);margin:0 0 -92px}
+/* 그림 밑단이 잘린 모양이라 배너 아래 끝에 붙여 서 있는 것처럼 보이게 함 (hero-grid 아래 여백만큼 내림) */
+.hero-art{align-self:end;justify-self:center;width:min(520px,100%);margin:0 0 -76px}
 .hero-art img{display:block;width:100%;height:auto}
 
 .learn{padding:32px 0 0}
@@ -243,7 +244,7 @@ nav{display:flex;align-items:center;gap:18px}
 @media(max-width:1000px){
   .wrap{width:calc(100% - 48px)}
   .hero-grid{grid-template-columns:1fr;gap:40px;padding:60px 0 90px}
-  .hero-art{margin-bottom:-99px}
+  .hero-art{margin-bottom:-90px}
   .learn-inner{grid-template-columns:1fr;gap:12px}
   .game-placeholder{flex-direction:column;text-align:center;gap:18px;padding:40px 24px}
 }
