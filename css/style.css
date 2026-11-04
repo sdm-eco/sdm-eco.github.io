@@ -126,6 +126,14 @@ nav{display:flex;align-items:center;gap:18px}
 .section h2{font-size:37px;line-height:1.4;letter-spacing:-1.4px;margin:0;font-weight:850;text-wrap:balance}
 .section-lead{font-size:17px;color:var(--muted)}
 
+/* 넓은 화면: 왼쪽 제목 기둥 + 오른쪽 타일 (구청 시안 구성). 좁아지면 제목이 위로 */
+@media(min-width:1201px){
+  .section-split{display:grid;grid-template-columns:230px minmax(0,1fr);align-items:center;gap:32px}
+  .section-split .section-head{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:0}
+  /* 타일이 좁아진 만큼 3D 칸을 세로로 늘려 크기를 유지 */
+  .section-split .guide-card{padding:20px}
+  .section-split .card-3d{aspect-ratio:4/3}
+}
 .guide-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .guide-card{position:relative;display:flex;flex-direction:column;align-items:center;padding:24px;border-radius:var(--radius);background:var(--white);text-align:center;overflow:hidden;box-shadow:0 16px 32px -24px color-mix(in srgb,var(--ink) 50%,transparent)}
 .guide-card h3{margin:0 0 2px;font-size:24px;letter-spacing:-.6px;line-height:1.35}
