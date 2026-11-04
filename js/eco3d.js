@@ -2,6 +2,7 @@
 // 단계 버튼은 3D 없이도 동작하고, Three.js는 장면이 화면 근처에 왔을 때만 불러옵니다.
 //  [data-eco-lab="이름"]   단계 버튼으로 직접 조작하는 체험
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
+//    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
 import pet from "./scene-pet.js";
 import food from "./scene-food.js";
@@ -35,6 +36,8 @@ function initLab(lab) {
     });
     next.disabled = n >= last;
     if (view) view.goTo(n);
+    // 마지막 단계까지 보면 알림 → 학습 띠의 배출방법 단계를 완료로 표시 (main.js)
+    if (n === last) document.dispatchEvent(new CustomEvent("eco:lab-done", { detail: lab.dataset.ecoLab }));
   }
 
   buttons.forEach(function (btn) {
@@ -62,7 +65,7 @@ function initLoop(stage) {
   }
   function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
-  mount(stage, canvas, def, { interactive: false }, async function (view) {
+  mount(stage, canvas, def, { interactive: false, zoom: Number(stage.dataset.ecoZoom) || 1 }, async function (view) {
     view.goTo(0, true);
     if (reduced) return;
     await wait(1200);
@@ -236,7 +239,7 @@ function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
     // 세로로 긴 화면에서도 장면이 잘리지 않도록 거리를 맞춤
     const fit = 2.65 / Math.tan((camera.fov * Math.PI) / 360);
     const cam = def.camera || [0.6, 0.1];
-    camera.position.set(0, cam[0], Math.max(fit, fit * 0.95 / camera.aspect));
+    camera.position.set(0, cam[0], Math.max(fit, fit * 0.95 / camera.aspect) / (opts.zoom || 1));
     camera.lookAt(0, cam[1], 0);
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);

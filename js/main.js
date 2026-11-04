@@ -2,8 +2,10 @@
   var LANGS = ["ko", "zh", "en", "vi"];
   var HTML_LANG = { ko: "ko", zh: "zh-CN", en: "en", vi: "vi" };
   var STORAGE_KEY = "sdm-eco-lang";
+  var PROGRESS_KEY = "sdm-eco-progress";
   var config = window.SITE_CONFIG || {};
   var current = "ko";
+  var progress = null;
 
   function t(key) {
     var dict = window.I18N[current] || window.I18N.ko;
@@ -48,6 +50,68 @@
     });
 
     renderVideos();
+    if (progress) progress.render();
+  }
+
+  // 학습 띠: 이 브라우저에서 끝낸 단계를 ✓로, 다음에 할 단계를 강조해서 보여줌
+  // (기록은 브라우저마다 따로 남고, 다른 기기와 공유되지 않음)
+  function setupProgress() {
+    var steps = Array.prototype.slice.call(document.querySelectorAll("[data-learn-step]"));
+    if (!steps.length) return null;
+    var done = {};
+    try { done = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) {}
+    var ready = {
+      video: (config.videos || []).some(function (v) { return v && v.youtubeId; }),
+      guide: true,
+      game: !!(config.game && config.game.url)
+    };
+    var countEl = document.querySelector("[data-learn-count]");
+    var barEl = document.querySelector("[data-learn-bar]");
+
+    function render() {
+      var finished = 0, nextFound = false;
+      steps.forEach(function (li) {
+        var key = li.dataset.learnStep;
+        var state = "";
+        if (done[key]) state = "done";
+        else if (!ready[key]) state = "soon";
+        else if (!nextFound) { state = "next"; nextFound = true; }
+        if (state === "done") finished++;
+        li.dataset.state = state;
+        var link = li.querySelector("a");
+        if (state === "next") link.setAttribute("aria-current", "step");
+        else link.removeAttribute("aria-current");
+        var tag = li.querySelector("[data-learn-tag]");
+        var label = { done: "learn.done", next: "learn.next", soon: "common.soon" }[state];
+        tag.hidden = !label;
+        tag.textContent = label ? t(label) : "";
+      });
+      countEl.textContent = t("learn.progress").replace("{n}", finished).replace("{total}", steps.length);
+      barEl.style.width = (finished / steps.length) * 100 + "%";
+    }
+
+    function mark(key) {
+      if (done[key]) return;
+      done[key] = true;
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(done)); } catch (e) {}
+      render();
+    }
+
+    // 배출방법: 3D 체험 하나를 마지막 단계까지 보면 완료 (eco3d.js가 알림)
+    document.addEventListener("eco:lab-done", function () { mark("guide"); });
+
+    // 영상: 실제 영상이 연결된 뒤, 영상 칸이 화면에 절반 이상 3초 보이면 완료로 봄
+    // 한계: 재생했는지는 알 수 없음. 정확히 하려면 YouTube IFrame API의 재생 종료(ENDED)로 바꿀 것
+    if (ready.video && "IntersectionObserver" in window) {
+      var timer = null;
+      new IntersectionObserver(function (entries) {
+        var seen = entries[entries.length - 1].isIntersecting;
+        clearTimeout(timer);
+        if (seen) timer = setTimeout(function () { mark("video"); }, 3000);
+      }, { threshold: 0.5 }).observe(document.querySelector(".video-grid"));
+    }
+
+    return { render: render, mark: mark };
   }
 
   function renderVideos() {
@@ -81,6 +145,7 @@
         status.hidden = false;
         return;
       }
+      if (progress) progress.mark("game");
       if (!game.embed) {
         window.open(game.url, "_blank", "noopener");
         return;
@@ -108,5 +173,6 @@
   });
 
   setupGame();
+  progress = setupProgress();
   applyLang(detectLang());
 })();

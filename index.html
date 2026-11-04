@@ -22,11 +22,7 @@
 <header class="header">
   <div class="wrap header-inner">
     <a class="brand" href="#top" aria-label="Seodaemun Eco">
-      <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="24" r="23"/>
-        <path d="M14 33c0-11 8-19 21-19 0 13-8 21-19 21"/>
-        <path d="M13 36c5-6 10-10 17-15" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
+      <img class="brand-mark" src="img/seodaemun-logo.png" alt="" width="215" height="192">
       <span>
         <strong class="brand-title" data-i18n="brand.title">서대문구 분리배출 교육</strong>
         <span class="brand-sub" data-i18n="brand.sub">서대문구 기후환경과</span>
@@ -95,11 +91,13 @@
       <div class="learn-head">
         <h2 id="learn-title" data-i18n="panel.root.title">분리배출 기초 교육</h2>
         <p data-i18n="panel.root.sub">약 10분 · 4개 언어</p>
+        <div class="learn-meter" aria-hidden="true"><span data-learn-bar></span></div>
+        <p class="learn-count" data-learn-count></p>
       </div>
       <ol class="learn-steps">
-        <li><a href="#videos"><span class="learn-num">1</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="23" rx="3"/><path d="M3 38h42"/><path d="M21 17l8 4.5-8 4.5z"/></svg><strong data-i18n="nav.video">교육 영상</strong><small data-i18n="step2.sub">3분 영상 2편</small></a></li>
-        <li><a href="#guide"><span class="learn-num">2</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V11c-6-2-13-2-18 2z"/><path d="M24 13v26"/><path d="M11 19h7M11 25h7M30 19h7M30 25h7"/></svg><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small></a></li>
-        <li><a href="#game"><span class="learn-num">3</span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="15" width="38" height="20" rx="10"/><path d="M15 21v8M11 25h8"/><circle cx="32" cy="22.5" r="1.6"/><circle cx="36" cy="27.5" r="1.6"/></svg><strong data-i18n="nav.game">게임</strong><small data-i18n="step3.sub">직접 분류해 보기</small></a></li>
+        <li data-learn-step="video"><a href="#videos"><span class="learn-num"><span class="learn-n">1</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="23" rx="3"/><path d="M3 38h42"/><path d="M21 17l8 4.5-8 4.5z"/></svg><strong data-i18n="nav.video">교육 영상</strong><small data-i18n="step2.sub">3분 영상 2편</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
+        <li data-learn-step="guide"><a href="#guide"><span class="learn-num"><span class="learn-n">2</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V11c-6-2-13-2-18 2z"/><path d="M24 13v26"/><path d="M11 19h7M11 25h7M30 19h7M30 25h7"/></svg><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
+        <li data-learn-step="game"><a href="#game"><span class="learn-num"><span class="learn-n">3</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="15" width="38" height="20" rx="10"/><path d="M15 21v8M11 25h8"/><circle cx="32" cy="22.5" r="1.6"/><circle cx="36" cy="27.5" r="1.6"/></svg><strong data-i18n="nav.game">게임</strong><small data-i18n="step3.sub">직접 분류해 보기</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
       </ol>
     </div>
   </section>
@@ -157,25 +155,25 @@
         <article class="guide-card tile-general">
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general" data-eco-zoom="1.6"></div></div>
           <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card tile-food">
           <h3 data-i18n="cat.food">음식물 쓰레기</h3>
           <p data-i18n="cat.food.sub">전용 수거함·봉투</p>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food" data-eco-zoom="1.4"></div></div>
           <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card tile-recycle">
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.4"></div></div>
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card tile-bulky">
           <h3 data-i18n="cat.bulky">대형 폐기물</h3>
           <p data-i18n="cat.bulky.sub">신고 후 배출</p>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.4"></div></div>
           <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
       </div>
