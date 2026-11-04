@@ -79,7 +79,7 @@ nav{display:flex;align-items:center;gap:18px}
 @keyframes node-glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.9;transform:scale(1.7)}}
 @keyframes garden-lean{0%,100%{transform:skewX(0)}35%{transform:skewX(-3deg)}70%{transform:skewX(2deg)}}
 
-.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:60px;align-items:center;padding:64px 0 76px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);gap:70px;align-items:center;padding:64px 0 76px}
 .hero h1{font-size:clamp(38px,4.2vw,58px);letter-spacing:-2.5px;line-height:1.24;margin:0 0 24px;font-weight:850;text-wrap:balance}
 .hero h1 em{font-style:normal;color:var(--fresh-strong);font-size:1.16em}
 .hero-desc{font-size:20px;color:var(--ink-2);line-height:1.85;max-width:560px}
@@ -91,9 +91,19 @@ nav{display:flex;align-items:center;gap:18px}
 .btn-icon{width:12px;height:12px;flex:none;fill:currentColor}
 .btn-icon-line{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 /* 그림 밑단이 잘린 모양이라 아래쪽을 흐리게 해서 풀밭에 녹아들게 함 */
-.hero-art{position:relative;align-self:end;justify-self:center;width:min(520px,100%);margin:0 0 -28px}
-.hero-art img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,#000 84%,transparent);mask-image:linear-gradient(to bottom,#000 84%,transparent);animation:art-rise .8s cubic-bezier(.16,1,.3,1) both}
+.hero-art{position:relative;align-self:end;justify-self:start;width:min(520px,100%);margin:0 0 -28px}
+.hero-art img{position:relative;z-index:1;display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,#000 84%,transparent);mask-image:linear-gradient(to bottom,#000 84%,transparent);animation:art-rise .8s cubic-bezier(.16,1,.3,1) both}
 @keyframes art-rise{from{opacity:.35;transform:translateY(22px)}}
+/* 그림 뒤 연한 서대문·서울 실루엣(독립문, N서울타워): 머리 위로 살짝 보이게 그림보다 위로 뻗음 */
+.hero-skyline{position:absolute;left:-8%;right:-8%;bottom:45%;width:116%;height:auto;fill:none;stroke:var(--fresh);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;opacity:.3}
+/* 그림 바깥쪽에서 천천히 흔들리는 나뭇잎 */
+.hero-leaf{position:absolute;z-index:2;width:28px;fill:var(--meadow);opacity:.7;animation:leaf-drift 12s ease-in-out infinite alternate;pointer-events:none}
+.hero-leaf svg{display:block;width:100%;height:auto}
+.leaf-1{left:-7%;top:12%;width:24px}
+.leaf-2{right:-3%;top:-10%;width:30px;animation-duration:14s;animation-delay:-4s}
+.leaf-3{right:-7%;top:46%;width:22px;animation-duration:11s;animation-delay:-7s}
+.leaf-4{left:6%;top:-20%;width:20px;animation-duration:15s;animation-delay:-2s}
+@keyframes leaf-drift{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(10px,-8px) rotate(14deg)}100%{transform:translate(-6px,6px) rotate(-10deg)}}
 
 .learn{padding:32px 0 0}
 .learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),var(--wash))}
@@ -246,6 +256,7 @@ nav{display:flex;align-items:center;gap:18px}
   .wrap{width:calc(100% - 48px)}
   .hero-grid{grid-template-columns:1fr;gap:40px;padding:60px 0 90px}
   .hero-art{margin-bottom:-36px}
+  .hero-skyline{bottom:25%}
   .learn-inner{grid-template-columns:1fr;gap:12px}
   .game-placeholder{flex-direction:column;text-align:center;gap:18px;padding:40px 24px}
 }
