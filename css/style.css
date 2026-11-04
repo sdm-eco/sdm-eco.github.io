@@ -234,7 +234,6 @@ nav{display:flex;align-items:center;gap:18px}
 .ep{font-size:14px;font-weight:700;color:var(--link)}
 .duration{padding:1px 10px;border-radius:999px;background:var(--lime-soft);color:var(--leaf-ink);font-size:13px;font-weight:700}
 .video-card h3{margin:6px 8px 4px;font-size:24px;letter-spacing:-.6px}
-.video-card p{margin:0 8px;font-size:16px;color:var(--muted)}
 
 .game-stage{position:relative;border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 55%,transparent),transparent 55%),linear-gradient(90deg,var(--banner),var(--banner-2));overflow:hidden}
 .game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
