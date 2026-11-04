@@ -172,7 +172,32 @@
     });
   });
 
+  // 배너 그림 위 인사 말풍선: 언어는 순서대로, 자리는 매번 다른 학생 머리 위로
+  // (언어와 학생을 묶지 않으려고 자리를 무작위로 고름. 움직임 줄이기 설정이면 띄우지 않음)
+  function setupHello() {
+    var art = document.querySelector("[data-hello]");
+    if (!art || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var bubble = art.querySelector(".hello");
+    var words = [["ko", "안녕하세요"], ["en", "Hello"], ["zh-CN", "你好"], ["vi", "Xin chào"]];
+    var spots = [[18, 1], [41, 10], [63, 2], [84, 9]]; // 그림 안 머리 위치(가로 %, 세로 %)
+    var i = 0, last = -1;
+    function next() {
+      var spot;
+      do { spot = Math.floor(Math.random() * spots.length); } while (spot === last);
+      last = spot;
+      bubble.lang = words[i][0];
+      bubble.textContent = words[i][1];
+      bubble.style.left = spots[spot][0] + "%";
+      bubble.style.top = spots[spot][1] + "%";
+      bubble.classList.add("is-on");
+      setTimeout(function () { bubble.classList.remove("is-on"); }, 2000);
+      i = (i + 1) % words.length;
+    }
+    setTimeout(function () { next(); setInterval(next, 2600); }, 900);
+  }
+
   setupGame();
+  setupHello();
   progress = setupProgress();
   applyLang(detectLang());
 })();

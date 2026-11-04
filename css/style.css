@@ -90,9 +90,14 @@ nav{display:flex;align-items:center;gap:18px}
 .btn-ghost:hover{background:var(--white);border-color:var(--fresh-strong)}
 .btn-icon{width:12px;height:12px;flex:none;fill:currentColor}
 .btn-icon-line{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
-/* 그림 밑단이 잘린 모양이라 배너 아래 끝에 붙여 서 있는 것처럼 보이게 함 (hero-grid 아래 여백만큼 내림) */
-.hero-art{align-self:end;justify-self:center;width:min(520px,100%);margin:0 0 -76px}
-.hero-art img{display:block;width:100%;height:auto}
+/* 그림 밑단이 잘린 모양이라 아래쪽을 흐리게 해서 풀밭에 녹아들게 함 */
+.hero-art{position:relative;align-self:end;justify-self:center;width:min(520px,100%);margin:0 0 -28px}
+.hero-art img{display:block;width:100%;height:auto;-webkit-mask-image:linear-gradient(to bottom,#000 84%,transparent);mask-image:linear-gradient(to bottom,#000 84%,transparent);animation:art-rise .8s cubic-bezier(.16,1,.3,1) both}
+@keyframes art-rise{from{opacity:.35;transform:translateY(22px)}}
+/* 4개 언어 인사 말풍선: main.js가 언어 순서대로, 자리는 무작위로 하나씩 띄움 (특정 학생과 언어를 묶지 않음) */
+.hello{position:absolute;z-index:1;padding:5px 14px;border:1.5px solid var(--card-line);border-radius:999px;background:var(--white);color:var(--ink);font-family:var(--font);font-size:15px;font-weight:800;white-space:nowrap;box-shadow:0 8px 18px -10px color-mix(in srgb,var(--ink) 45%,transparent);opacity:0;transform:translate(-50%,-100%) scale(.85);transform-origin:50% 100%;transition:opacity .3s,transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none}
+.hello:after{content:"";position:absolute;left:50%;bottom:-6px;width:10px;height:10px;margin-left:-5px;border-right:1.5px solid var(--card-line);border-bottom:1.5px solid var(--card-line);background:var(--white);transform:rotate(45deg)}
+.hello.is-on{opacity:1;transform:translate(-50%,-100%) scale(1)}
 
 .learn{padding:32px 0 0}
 .learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),var(--wash))}
@@ -244,7 +249,7 @@ nav{display:flex;align-items:center;gap:18px}
 @media(max-width:1000px){
   .wrap{width:calc(100% - 48px)}
   .hero-grid{grid-template-columns:1fr;gap:40px;padding:60px 0 90px}
-  .hero-art{margin-bottom:-90px}
+  .hero-art{margin-bottom:-36px}
   .learn-inner{grid-template-columns:1fr;gap:12px}
   .game-placeholder{flex-direction:column;text-align:center;gap:18px;padding:40px 24px}
 }
@@ -263,6 +268,7 @@ nav{display:flex;align-items:center;gap:18px}
   .lang-switch{width:100%;gap:4px}
   .lang-switch button{flex:1;min-height:34px;padding:0 4px}
   .hero-art{width:min(340px,100%)}
+  .hello{padding:4px 11px;font-size:13px}
   .hero h1{letter-spacing:-1.5px}
   .hero-desc{font-size:18px}
   .section{padding:60px 0}
