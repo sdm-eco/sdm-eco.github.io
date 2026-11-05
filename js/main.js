@@ -87,7 +87,7 @@
         tag.textContent = label ? t(label) : "";
       });
       countEl.textContent = t("learn.progress").replace("{n}", finished).replace("{total}", steps.length);
-      barEl.style.width = (finished / steps.length) * 100 + "%";
+      barEl.style.transform = "scaleX(" + finished / steps.length + ")";
     }
 
     function mark(key) {
