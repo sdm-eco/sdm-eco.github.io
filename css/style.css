@@ -15,9 +15,8 @@
   --on-dark:#f5fbef;
   --wash:#f7fbf2;--mist:#eef2e6;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
   --glow:#f2b632;--focus:#1f6b44;--danger:#b42318;
-  --bin-grey:#7a8b80;--bin-amber:#c9893a;--bin-blue:#3b8fd0;
   /* 카테고리 타일·게임 배너: 구청 시안 색 그대로(실제 봉투 색 확인 전 임시값) */
-  --tile-sky:#e3eefb;--tile-leaf:#e8f4d6;--tile-mint:#dcf2ec;--tile-sun:#fbf1cf;--banner:#fdf4c8;--banner-2:#fbecb2;
+  --general:#7b5bd6;--general-bg:#f1ebfd;--general-hi:#e2d6fb;--food:#f2b705;--food-bg:#fdf5d3;--food-hi:#fae9a5;--food-ink:#3d2f00;--recycle:#2f7fd6;--recycle-bg:#e4effc;--recycle-hi:#cde1f9;--bulky:#e0558f;--bulky-bg:#fde8f0;--bulky-hi:#fad0e1;--banner:#fdf4c8;--banner-2:#fbecb2;
   --radius:24px;
   /* Pretendard에는 베트남어 성조 글자가, Pretendard Std에는 한글이 없어서 둘을 이어 씀 */
   --font:"Pretendard Variable","Pretendard Std Variable","Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
@@ -172,17 +171,22 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .guide-card{position:relative;display:flex;flex-direction:column;align-items:center;padding:24px;border-radius:var(--radius);background:var(--white);text-align:center;overflow:hidden;box-shadow:0 16px 32px -24px color-mix(in srgb,var(--ink) 50%,transparent)}
 .guide-card h3{margin:0 0 2px;font-size:24px;letter-spacing:-.6px;line-height:1.35}
 .guide-card p{font-size:16px;color:var(--muted)}
-.tile-general{background:var(--tile-sky)}
-.tile-food{background:var(--tile-leaf)}
-.tile-recycle{background:var(--tile-mint)}
-.tile-bulky{background:var(--tile-sun)}
+/* 카테고리 색: 쓰레기 봉투 실물 색을 상징하는 파스텔 배경 + 진한 색 픽토그램. 카드와 3D 팝업이 함께 씀 */
+.cat-general{--cat:var(--general);--cat-bg:var(--general-bg);--cat-hi:var(--general-hi);--cat-ink:var(--white)}
+.cat-food{--cat:var(--food);--cat-bg:var(--food-bg);--cat-hi:var(--food-hi);--cat-ink:var(--food-ink)}
+.cat-recycle{--cat:var(--recycle);--cat-bg:var(--recycle-bg);--cat-hi:var(--recycle-hi);--cat-ink:var(--white)}
+.cat-bulky{--cat:var(--bulky);--cat-bg:var(--bulky-bg);--cat-hi:var(--bulky-hi);--cat-ink:var(--white)}
+.guide-card[class*="cat-"]{background:var(--cat-bg)}
+.pic-sprite{position:absolute;width:0;height:0;overflow:hidden}
+.cat-pic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:10px;border-radius:50%;background:var(--cat);box-shadow:0 0 0 6px var(--cat-hi)}
+.cat-pic svg{width:30px;height:30px;fill:none;stroke:var(--cat-ink);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .icon{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--lime-soft);color:var(--link)}
 .icon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .soon{align-self:flex-start;margin-top:auto;padding:3px 12px;border:1px dashed var(--soon-line);border-radius:999px;font-size:13px;font-weight:700;color:var(--soon-ink);background:var(--wash)}
 .guide-card .soon{margin-top:20px}
 
 .eco-lab{display:grid;grid-template-columns:1.1fr 1fr;margin-top:28px;border:2px solid var(--card-line);border-radius:28px;overflow:hidden;background:var(--white)}
-.eco-stage{position:relative;min-height:540px;background:radial-gradient(ellipse at 50% 38%,var(--white),transparent 62%),radial-gradient(ellipse at 50% 100%,var(--mint-hi),transparent 55%),var(--mint)}
+.eco-stage{position:relative;min-height:540px;background:radial-gradient(ellipse at 50% 38%,var(--white),transparent 62%),radial-gradient(ellipse at 50% 100%,var(--cat-hi,var(--mint-hi)),transparent 55%),var(--cat-bg,var(--mint))}
 .eco-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;opacity:0;transition:opacity .6s}
 .eco-canvas:active{cursor:grabbing}
 .eco-stage.is-ready .eco-canvas{opacity:1}
@@ -193,6 +197,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-fallback{display:none;position:absolute;inset:0;align-items:center;justify-content:center;padding:32px;text-align:center;color:var(--ink-2);font-size:16px;font-weight:700}
 .eco-stage.is-fallback .eco-fallback{display:flex}
 .eco-panel{padding:32px}
+.eco-panel .cat-pic{width:48px;height:48px;margin-bottom:12px}
+.eco-panel .cat-pic svg{width:26px;height:26px}
 .eco-panel h3{margin:0 0 4px;padding-right:40px;font-size:28px;letter-spacing:-.8px;line-height:1.35;text-wrap:balance}
 .eco-lead{font-size:16px;color:var(--muted)}
 .eco-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:8px}
@@ -245,7 +251,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .bins{display:flex;gap:14px;margin-top:10px}
 .bin{position:relative;width:52px;height:64px;border-radius:8px 8px 12px 12px;animation:bin-bob 3.2s ease-in-out infinite}
 .bin:before{content:"";position:absolute;left:-5px;right:-5px;top:-9px;height:9px;border-radius:6px 6px 2px 2px;background:inherit;filter:brightness(.85)}
-.bin-a{background:var(--bin-grey)}.bin-b{background:var(--bin-amber);animation-delay:.3s}.bin-c{background:var(--bin-blue);animation-delay:.6s}.bin-d{background:var(--green);animation-delay:.9s}
+/* 게임 수거함도 배출방법 카드와 같은 카테고리 색 (일반·음식물·재활용·대형) */
+.bin-a{background:var(--general)}.bin-b{background:var(--food);animation-delay:.3s}.bin-c{background:var(--recycle);animation-delay:.6s}.bin-d{background:var(--bulky);animation-delay:.9s}
 @keyframes bin-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 .game-placeholder h3{margin:0;font-size:30px;letter-spacing:-.8px;text-wrap:balance}
 .game-placeholder p{margin-top:6px;color:var(--muted);font-size:17px;text-wrap:balance}
