@@ -16,7 +16,7 @@
   --wash:#f7fbf2;--mist:#eef2e6;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
   --glow:#f2b632;--focus:#1f6b44;--danger:#b42318;
   /* 카테고리 타일·게임 배너: 구청 시안 색 그대로(실제 봉투 색 확인 전 임시값) */
-  --general:#7b5bd6;--general-bg:#f1ebfd;--general-hi:#e2d6fb;--food:#f2b705;--food-bg:#fdf5d3;--food-hi:#fae9a5;--food-ink:#3d2f00;--recycle:#2f7fd6;--recycle-bg:#e4effc;--recycle-hi:#cde1f9;--bulky:#e0558f;--bulky-bg:#fde8f0;--bulky-hi:#fad0e1;--banner:#fdf4c8;--video:#ef7d4f;--video-ink:#b4491f;--video-bg:#fdeee6;--video-hi:#fadccd;--video-line:#f6d6c6;--game-ink:#8a5a00;--banner-2:#fbecb2;
+  --general:#7b5bd6;--general-bg:#f6f2fe;--general-hi:#e2d6fb;--food:#f2b705;--food-bg:#fef9e2;--food-hi:#fae9a5;--food-ink:#3d2f00;--recycle:#2f7fd6;--recycle-bg:#edf5fd;--recycle-hi:#cde1f9;--bulky:#e0558f;--bulky-bg:#fef0f5;--bulky-hi:#fad0e1;--banner:#fdf4c8;--video:#ef7d4f;--video-ink:#b4491f;--video-bg:#fdeee6;--video-hi:#fadccd;--video-line:#f6d6c6;--game-ink:#8a5a00;--banner-2:#fbecb2;
   --radius:24px;
   /* Pretendard에는 베트남어 성조 글자가, Pretendard Std에는 한글이 없어서 둘을 이어 씀 */
   --font:"Pretendard Variable","Pretendard Std Variable","Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
@@ -252,7 +252,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .ep{font-size:14px;font-weight:700;color:var(--video-ink)}
 .video-card h3{margin:6px 8px 4px;font-size:24px;letter-spacing:-.6px}
 .video-card:has(.video-placeholder) .video-meta{position:absolute;top:26px;left:26px;margin:0}
-.video-card:has(.video-placeholder) .ep{padding:1px 10px;border-radius:999px;background:var(--video-ink);color:var(--white)}
+.video-card:has(.video-placeholder) .ep{padding:1px 10px;border:1px solid var(--video-line);border-radius:999px;background:var(--video-bg);color:var(--video-ink)}
 .video-card:has(.video-placeholder) h3{margin-top:14px}
 
 /* 바탕은 초록·크림으로 두고 색은 통 4개가 맡음 (노랑 = 음식물이라 넓은 노란 면은 피함) */
