@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261105i">
+<link rel="stylesheet" href="css/style.css?v=20261105j">
 </head>
 <body>
 <!-- 카테고리 픽토그램: 카드와 3D 팝업이 <use href="#pic-…">로 함께 씀 -->
@@ -219,8 +219,16 @@
       </div>
       <div class="game-stage" id="game-stage">
         <div class="game-placeholder">
-          <div class="bins" aria-hidden="true">
-            <span class="bin bin-a"></span><span class="bin bin-b"></span><span class="bin bin-c"></span><span class="bin bin-d"></span>
+          <!-- 게임 예고 장면: 물건이 알맞은 통으로 날아가 들어가고 점수가 오름 (main.js의 setupGameDemo) -->
+          <div class="game-demo" data-game-demo aria-hidden="true">
+            <div class="game-hud">
+              <span class="hud-score">SCORE <b data-demo-score>0</b></span>
+              <span class="hud-level">LEVEL 1</span>
+              <span class="hud-hearts"><svg viewBox="0 0 16 14"><path d="M8 13.2 1.9 7.4A3.6 3.6 0 0 1 8 2.6a3.6 3.6 0 0 1 6.1 4.8z"/></svg><svg viewBox="0 0 16 14"><path d="M8 13.2 1.9 7.4A3.6 3.6 0 0 1 8 2.6a3.6 3.6 0 0 1 6.1 4.8z"/></svg><svg viewBox="0 0 16 14"><path d="M8 13.2 1.9 7.4A3.6 3.6 0 0 1 8 2.6a3.6 3.6 0 0 1 6.1 4.8z"/></svg></span>
+            </div>
+            <div class="bins">
+              <span class="bin bin-a" data-bin="general"><span class="bin-face"><i></i><i></i><b></b></span></span><span class="bin bin-b" data-bin="food"><span class="bin-face"><i></i><i></i><b></b></span></span><span class="bin bin-c" data-bin="recycle"><span class="bin-face"><i></i><i></i><b></b></span></span><span class="bin bin-d" data-bin="bulky"><span class="bin-face"><i></i><i></i><b></b></span></span>
+            </div>
           </div>
           <div class="game-copy">
             <h3 data-i18n="game.card.title">곧 게임이 열려요</h3>
@@ -361,7 +369,7 @@
 
 <script src="js/config.js?v=20261104b"></script>
 <script src="js/i18n.js?v=20261105e"></script>
-<script src="js/main.js?v=20261105c"></script>
+<script src="js/main.js?v=20261105d"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="js/eco3d.js?v=20261104b"></script>
 </body>

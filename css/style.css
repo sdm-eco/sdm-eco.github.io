@@ -249,8 +249,29 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .game-placeholder{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:34px 44px;text-align:left}
-.bins{display:flex;gap:14px;margin-top:10px}
+/* 게임 예고 장면: 위에 점수판, 아래에 표정 있는 통 4개, 물건은 main.js가 띄워 날려 보냄 */
+.game-demo{position:relative;flex:none;width:280px;height:196px}
+.game-hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink-2)}
+.hud-score b{display:inline-block;min-width:3ch;margin-left:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--fresh-strong)}
+.hud-level{padding:2px 9px;border-radius:999px;background:var(--white);border:1px solid var(--card-line)}
+.hud-hearts{display:flex;gap:3px}
+.hud-hearts svg{width:15px;height:13px;fill:#e5484d}
+.bins{position:absolute;left:50%;bottom:4px;display:flex;gap:14px;transform:translateX(-50%)}
 .bin{position:relative;width:52px;height:64px;border-radius:8px 8px 12px 12px;animation:bin-bob 3.2s ease-in-out infinite}
+/* 통의 얼굴: 흰 눈에 검은 눈동자(가끔 깜빡임), 물건을 받으면 입을 벌리며 통통 뜀 */
+.bin-face{position:absolute;left:0;right:0;top:17px;height:26px}
+.bin-face i{position:absolute;top:0;left:12px;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 55% 55%,#1b2b22 0 2.6px,#fff 3.2px);transform-origin:center;animation:bin-blink 4.6s infinite}
+.bin-face i+i{left:auto;right:12px}
+.bin-b .bin-face i{animation-delay:1.2s}.bin-c .bin-face i{animation-delay:2.3s}.bin-d .bin-face i{animation-delay:3.4s}
+.bin-face b{position:absolute;left:50%;top:15px;width:14px;height:6px;margin-left:-7px;border:2px solid color-mix(in srgb,#000 55%,transparent);border-top:0;border-radius:0 0 10px 10px;transition:height .2s}
+.bin.is-happy{animation:bin-hop .55s cubic-bezier(.3,1.6,.5,1);animation-delay:0s}
+.bin.is-happy .bin-face b{height:10px;background:color-mix(in srgb,#000 45%,transparent)}
+@keyframes bin-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes bin-hop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.06,.95)}70%{transform:translateY(0) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
+/* 날아오는 물건과 +10 */
+.demo-item{position:absolute;left:0;top:0;z-index:2;width:34px;height:34px;pointer-events:none}
+.demo-item svg{display:block;width:100%;height:100%}
+.demo-pop{position:absolute;z-index:3;font-size:15px;font-weight:900;color:var(--fresh-strong);pointer-events:none}
 .bin:before{content:"";position:absolute;left:-5px;right:-5px;top:-9px;height:9px;border-radius:6px 6px 2px 2px;background:inherit;filter:brightness(.85)}
 /* 게임 수거함도 배출방법 카드와 같은 카테고리 색 (일반·음식물·재활용·대형) */
 .bin-a{background:var(--general)}.bin-b{background:var(--food);animation-delay:.3s}.bin-c{background:var(--recycle);animation-delay:.6s}.bin-d{background:var(--bulky);animation-delay:.9s}
