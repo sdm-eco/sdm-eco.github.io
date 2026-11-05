@@ -82,7 +82,8 @@ function initLab(lab) {
     auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
   }
   if (dialog) {
-    dialog.addEventListener("eco:open", function () { setStep(0); setPlaying(!reduced); });
+    // 열 때마다 "드래그해서 돌려 보세요" 안내를 다시 보임 (드래그하면 createView가 is-touched로 숨김)
+    dialog.addEventListener("eco:open", function () { stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); });
     dialog.addEventListener("close", function () { setPlaying(false); });
   }
   setStep(0);

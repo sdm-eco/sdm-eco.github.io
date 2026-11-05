@@ -199,7 +199,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-canvas:active{cursor:grabbing}
 .eco-stage.is-ready .eco-canvas{opacity:1}
 .eco-badge{position:absolute;left:20px;top:20px;padding:2px 12px;border:1px solid color-mix(in srgb,var(--fresh-strong) 40%,transparent);border-radius:999px;background:var(--white);color:var(--fresh-strong);font-size:13px;font-weight:800}
-.eco-hint{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--white) 90%,transparent);color:var(--ink-2);font-size:14px;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .4s}
+/* 안내는 3D 영역 위쪽(3D 배지와 같은 줄): 창이 화면보다 길어 아래가 잘려도 보이도록 */
+.eco-hint{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--white) 90%,transparent);color:var(--ink-2);font-size:14px;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .4s}
 .eco-hint svg{width:18px;height:18px;fill:none;stroke:var(--fresh-strong);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .eco-stage.is-touched .eco-hint,.eco-stage.is-fallback .eco-hint{opacity:0}
 .eco-fallback{display:none;position:absolute;inset:0;align-items:center;justify-content:center;padding:32px;text-align:center;color:var(--ink-2);font-size:16px;font-weight:700}
