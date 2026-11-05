@@ -46,8 +46,8 @@ p{margin:0;text-wrap:pretty}
 
 .header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--white) 96%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .header-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:88px}
-.brand{display:flex;gap:14px;align-items:center}
-.brand-mark{width:auto;height:48px;flex:none}
+.brand{display:flex;gap:12px;align-items:center}
+.brand-mark{width:auto;height:38px;flex:none}
 .brand-title{display:block;font-size:22px;font-weight:850;line-height:1.4;letter-spacing:-.6px}
 .brand-sub{display:block;color:var(--muted);font-size:13px;letter-spacing:.2px}
 nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
@@ -153,24 +153,25 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .learn-steps [data-state="soon"] .learn-tag{border:1px dashed var(--soon-line);background:var(--white);color:var(--soon-ink)}
 
 
-.section{padding:84px 0}
+.section{padding:56px 0}
 .section-tint{background:var(--paper)}
-.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:32px}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:20px}
 .section h2{font-size:37px;line-height:1.4;letter-spacing:-1.4px;margin:0;font-weight:850;text-wrap:balance}
 .section-lead{font-size:17px;color:var(--muted);text-wrap:balance}
 
 /* 넓은 화면: 왼쪽 제목 기둥 + 오른쪽 타일 (구청 시안 구성). 좁아지면 제목이 위로 */
 @media(min-width:1201px){
-  .section-split{display:grid;grid-template-columns:230px minmax(0,1fr);align-items:center;gap:32px}
+  .section-split{display:grid;grid-template-columns:230px minmax(0,1fr);align-items:start;gap:32px}
+  .section-split .section-head{padding-top:8px}
   .section-split .section-head{flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:0}
   /* 타일이 좁아진 만큼 3D 칸을 세로로 늘려 크기를 유지 */
-  .section-split .guide-card{padding:20px}
+  .section-split .guide-card{padding:18px 18px 20px}
   .section-split .card-3d{aspect-ratio:4/3}
 }
 .guide-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .guide-card{position:relative;display:flex;flex-direction:column;align-items:center;padding:24px;border-radius:var(--radius);background:var(--white);text-align:center;overflow:hidden;box-shadow:0 16px 32px -24px color-mix(in srgb,var(--ink) 50%,transparent)}
 .guide-card h3{margin:0 0 2px;font-size:24px;letter-spacing:-.6px;line-height:1.35}
-.guide-card p{margin-bottom:16px;font-size:16px;color:var(--muted)}
+.guide-card p{margin-bottom:12px;font-size:16px;color:var(--muted)}
 /* 카테고리 색: 쓰레기 봉투 실물 색을 상징하는 파스텔 배경 + 진한 색 픽토그램. 카드와 3D 팝업이 함께 씀 */
 .cat-general{--cat:var(--general);--cat-bg:var(--general-bg);--cat-hi:var(--general-hi);--cat-ink:var(--white)}
 .cat-food{--cat:var(--food);--cat-bg:var(--food-bg);--cat-hi:var(--food-hi);--cat-ink:var(--food-ink)}
@@ -178,7 +179,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .cat-bulky{--cat:var(--bulky);--cat-bg:var(--bulky-bg);--cat-hi:var(--bulky-hi);--cat-ink:var(--white)}
 .guide-card[class*="cat-"]{background:var(--cat-bg)}
 .pic-sprite{position:absolute;width:0;height:0;overflow:hidden}
-.cat-pic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:10px;border-radius:50%;background:var(--cat);box-shadow:0 0 0 6px var(--cat-hi)}
+.cat-pic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:6px;border-radius:50%;background:var(--cat);box-shadow:0 0 0 6px var(--cat-hi)}
 .cat-pic svg{width:30px;height:30px;fill:none;stroke:var(--cat-ink);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .icon{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--lime-soft);color:var(--link)}
 .icon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -221,11 +222,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-mini.is-ready canvas{opacity:1}
 .eco-mini.is-fading canvas{opacity:0}
 
-.card-3d{width:100%;aspect-ratio:16/10;margin-top:12px;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse 60% 55% at 50% 58%,color-mix(in srgb,var(--white) 75%,transparent),transparent)}
+.card-3d{width:100%;aspect-ratio:16/10;margin-top:4px;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse 60% 55% at 50% 58%,color-mix(in srgb,var(--white) 75%,transparent),transparent)}
 .card-3d .eco-mini{width:100%;height:100%}
 /* 카드 제목이 두 줄이 되는 언어에서도 버튼 높이를 카드끼리 맞춤 */
 .guide-card .eco-open{margin-top:auto}
-.guide-card .card-3d+h3{margin-top:10px}
+.guide-card .card-3d+h3{margin-top:6px}
 .eco-open{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:16px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--fresh-strong);color:var(--white);font-size:15px;font-weight:800;transition:background-color .2s}
 .eco-open:hover{background:var(--fresh-hover)}
 .eco-dialog{width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto}
@@ -234,7 +235,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-close{position:absolute;right:14px;top:14px;z-index:2;width:44px;height:44px;border:0;border-radius:50%;background:var(--white);color:var(--ink);font-size:26px;line-height:1;box-shadow:0 4px 14px color-mix(in srgb,var(--forest) 20%,transparent)}
 
 .video-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-.video-card{padding:16px 16px 24px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
+.video-card{position:relative;padding:14px 14px 18px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
 .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--mint) 0 18px,var(--mint-2) 18px 36px)}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--ink-2);font-size:16px;font-weight:700}
@@ -244,6 +245,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .ep{font-size:14px;font-weight:700;color:var(--link)}
 .duration{padding:1px 10px;border-radius:999px;background:var(--lime-soft);color:var(--leaf-ink);font-size:13px;font-weight:700}
 .video-card h3{margin:6px 8px 4px;font-size:24px;letter-spacing:-.6px}
+.video-card:has(.video-placeholder) .video-meta{position:absolute;top:26px;left:26px;margin:0}
+.video-card:has(.video-placeholder) .ep{padding:1px 10px;border-radius:999px;background:var(--white)}
+.video-card:has(.video-placeholder) h3{margin-top:14px}
 
 .game-stage{position:relative;border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 55%,transparent),transparent 55%),linear-gradient(90deg,var(--banner),var(--banner-2));overflow:hidden}
 .game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
@@ -319,7 +323,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* 휴대폰: 배너 제목이 첫 화면에 일찍 보이도록 헤더 간격·높이를 줄임 */
   .header-inner{padding:10px 0;gap:8px}
   nav{row-gap:8px}
-  .brand-mark{height:40px}
+  .brand-mark{height:32px}
   .brand-title{font-size:18px}
   .nav-links{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .nav-links a{min-height:40px;justify-content:center;padding:4px 8px;font-size:15px;line-height:1.3;text-align:center;white-space:normal}
@@ -328,7 +332,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-art{width:min(340px,100%)}
   .hero h1{letter-spacing:-1.5px}
   .hero-desc{font-size:18px}
-  .section{padding:60px 0}
+  .section{padding:44px 0}
   .section-head{flex-direction:column;align-items:flex-start;gap:8px}
   .section h2{font-size:30px}
   .guide-grid,.video-grid{grid-template-columns:1fr}
