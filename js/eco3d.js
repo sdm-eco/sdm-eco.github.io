@@ -41,12 +41,14 @@ function initLab(lab) {
   }
 
   // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 3D 움직임이 끝난 뒤 DWELL만큼 읽을 시간을 줌.
-  // 단계 버튼·다음 단계를 누르거나 3D를 드래그하면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
+  // 단계 버튼·다음 단계를 누르면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
+  // 3D를 드래그하는 동안에는 읽을 시간을 세지 않고, 손을 떼면 그 단계의 읽을 시간을 처음부터 다시 셈.
   // 움직임 줄이기 설정이면 자동 진행 없이 지금처럼 직접 누르는 방식만 씀.
   const DWELL = 3500;
   const auto = lab.querySelector("[data-eco-auto]");
   const dialog = lab.closest("dialog");
   let run = 0; // 진행 회차. 멈추거나 새로 시작하면 올라가서 이전 회차의 대기를 무효로 만듦
+  let held = false; // 3D를 누르고(드래그하고) 있는 동안 true
 
   function setPlaying(on) {
     run++;
@@ -58,7 +60,8 @@ function initLab(lab) {
     if (step >= last) setStep(0);
     while (id === run && step < last) {
       while (id === run && view && view.busy()) await wait(100);
-      await wait(step === 0 ? 1200 : DWELL);
+      const need = step === 0 ? 1200 : DWELL;
+      for (let t = 0; id === run && t < need; t = held ? 0 : t + 100) await wait(100);
       if (id !== run) return;
       setStep(step + 1);
     }
@@ -70,7 +73,10 @@ function initLab(lab) {
   });
   next.addEventListener("click", function () { setPlaying(false); setStep(Math.min(step + 1, last)); });
   reset.addEventListener("click", function () { setStep(0); setPlaying(!reduced); });
-  canvas.addEventListener("pointerdown", function () { setPlaying(false); });
+  canvas.addEventListener("pointerdown", function () { held = true; });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
+    canvas.addEventListener(type, function () { held = false; });
+  });
   if (auto) {
     auto.hidden = reduced;
     auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
