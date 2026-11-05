@@ -57,8 +57,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .nav-links{display:flex;gap:10px}
 .nav-links a{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1.5px solid var(--card-line);border-radius:10px;background:var(--wash);font-size:17px;font-weight:750;white-space:nowrap;text-wrap:balance;transition:background-color .2s,border-color .2s}
 .nav-links a:hover{background:var(--lime-soft);border-color:var(--leaf)}
-.nav-links a.nav-feature{background:var(--lime);border-color:var(--lime-3);color:var(--lime-ink)}
-.nav-links a.nav-feature:hover{background:var(--lime-hover)}
+/* 강조 메뉴도 사이트 주색(초록) 계열로: 연한 민트 바탕 + 진한 초록 글자·테두리 */
+.nav-links a.nav-feature{background:var(--mint);border-color:var(--fresh-strong);color:var(--fresh-strong)}
+.nav-links a.nav-feature:hover{background:var(--mint-hi)}
 .nav-play{width:10px;height:10px;fill:var(--link);margin-right:8px}
 /* 언어 전환: 처음 온 유학생이 바로 찾도록 메뉴와 다른 모양의 독립 영역으로, 언제나 위쪽 오른편(휴대폰은 맨 위)에 둠 */
 .lang-switch{order:3;display:flex;align-items:center;gap:2px;padding:4px 4px 4px 12px;border:2px solid var(--fresh-strong);border-radius:999px;background:var(--white);box-shadow:0 2px 10px color-mix(in srgb,var(--fresh-strong) 14%,transparent)}
@@ -230,6 +231,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 
 .card-3d{width:100%;aspect-ratio:16/10;margin-top:4px;border-radius:22px;overflow:hidden;background:radial-gradient(ellipse 60% 55% at 50% 58%,color-mix(in srgb,var(--white) 75%,transparent),transparent)}
 .card-3d .eco-mini{width:100%;height:100%}
+/* 카드 4장의 그림 크기·바닥선 맞춤: 확대값(index.html의 data-eco-zoom)으로 면적을 맞추고,
+   일반 쓰레기는 물건이 아래쪽에 몰려 있어 그림만 위로 올림 (반복 장면을 재서 정한 값) */
+.cat-general .card-3d canvas{translate:0 -8%}
 /* 카드 제목이 두 줄이 되는 언어에서도 버튼 높이를 카드끼리 맞춤 */
 .guide-card .eco-open{margin-top:auto}
 .guide-card .card-3d+h3{margin-top:6px}
@@ -259,9 +263,10 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 60%,transparent),transparent 55%),linear-gradient(90deg,var(--mint),var(--sun));overflow:hidden}
 .game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.game-placeholder{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:34px 44px;text-align:left}
+/* 왼쪽 = 시범 장면(점수판+통), 오른쪽 = 문구와 그 바로 아래 버튼 한 덩어리 */
+.game-placeholder{display:grid;grid-template-columns:280px minmax(0,auto);grid-template-areas:"demo copy" "demo cta";justify-content:center;align-items:center;column-gap:48px;row-gap:18px;padding:34px 44px;text-align:left}
 /* 게임 예고 장면: 위에 점수판, 아래에 표정 있는 통 4개, 물건은 main.js가 띄워 날려 보냄 */
-.game-demo{position:relative;flex:none;width:280px;height:196px}
+.game-demo{grid-area:demo;position:relative;width:280px;height:196px}
 .game-hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink-2)}
 .hud-score b{display:inline-block;min-width:3ch;margin-left:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--game-ink)}
 .hud-level{padding:2px 9px;border-radius:999px;background:var(--white);border:1px solid var(--card-line)}
@@ -292,8 +297,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .action-link{display:inline-flex;align-items:center;gap:10px;margin-top:24px;min-height:48px;padding:6px 24px;border:1.5px solid var(--link);border-radius:999px;background:var(--link);color:var(--on-dark);font-size:17px;font-weight:700;transition:background-color .2s,border-color .2s}
 .action-link:hover{background:var(--link-dark);border-color:var(--link-dark)}
 .game-status{margin-top:12px;font-size:15px;font-weight:700;color:var(--soon-ink)}
-.game-copy{flex:1}
-.game-cta{display:flex;flex-direction:column;align-items:center}
+.game-copy{grid-area:copy;align-self:end}
+.game-cta{grid-area:cta;align-self:start;display:flex;flex-direction:column;align-items:flex-start}
 .game-cta .action-link{margin-top:0;border-color:var(--fresh-strong);background:var(--fresh-strong)}
 .game-cta .action-link:hover{border-color:var(--fresh-hover);background:var(--fresh-hover)}
 
@@ -303,7 +308,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .footer p{margin-top:6px;font-size:15px;color:var(--muted)}
 .footer-meta{text-align:right}
 .footer-meta p{margin-top:0;font-size:14px}
-.draft-note{color:var(--danger)!important}
+.draft-note{color:var(--fresh-strong)!important;font-weight:700}
 
 @media(max-width:1200px){
   html{scroll-padding-top:170px}
@@ -320,7 +325,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-art{margin-bottom:-36px}
   .hero-skyline{bottom:25%}
   .learn-inner{grid-template-columns:1fr;gap:12px}
-  .game-placeholder{flex-direction:column;text-align:center;gap:18px;padding:40px 24px}
+  .game-placeholder{grid-template-columns:minmax(0,1fr);grid-template-areas:"demo" "copy" "cta";justify-items:center;row-gap:18px;padding:40px 24px;text-align:center}
+  .game-copy,.game-cta{align-self:auto}
+  .game-cta{align-items:center}
 }
 @media(max-width:700px){
   .wrap{width:calc(100% - 32px)}

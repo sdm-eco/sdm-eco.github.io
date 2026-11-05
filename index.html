@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261105s">
+<link rel="stylesheet" href="css/style.css?v=20261105t">
 </head>
 <body>
 <!-- 카테고리 픽토그램: 카드와 3D 팝업이 <use href="#pic-…">로 함께 씀 -->
@@ -119,7 +119,7 @@
     <div class="wrap learn-inner">
       <div class="learn-head">
         <h2 id="learn-title" data-i18n="panel.root.title">함께하는 분리배출 학습</h2>
-        <p data-i18n="panel.root.sub">4개 언어</p>
+        <p data-i18n="panel.root.sub">3단계로 배워요</p>
         <div class="learn-meter" aria-hidden="true"><span data-learn-bar></span></div>
         <p class="learn-count" data-learn-count></p>
       </div>
@@ -178,28 +178,28 @@
       <div class="guide-grid">
         <article class="guide-card cat-general">
           <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-general"/></svg></span>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general" data-eco-zoom="1.6"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general" data-eco-zoom="1.75"></div></div>
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
           <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-food">
           <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-food"/></svg></span>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food" data-eco-zoom="1.4"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food" data-eco-zoom="1.45"></div></div>
           <h3 data-i18n="cat.food">음식물 쓰레기</h3>
           <p data-i18n="cat.food.sub">전용 수거함·봉투</p>
           <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-recycle">
           <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-recycle"/></svg></span>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.4"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.25"></div></div>
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-bulky">
           <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-bulky"/></svg></span>
-          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.4"></div></div>
+          <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.3"></div></div>
           <h3 data-i18n="cat.bulky">대형·특수폐기물</h3>
           <p data-i18n="cat.bulky.sub">신고 후 배출</p>
           <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
@@ -209,7 +209,7 @@
   </section>
 
   <section class="section" id="game">
-    <div class="wrap">
+    <div class="wrap section-split">
       <div class="section-head">
         <div>
           <h2 data-i18n="game.title">분리배출 게임</h2>
@@ -366,8 +366,8 @@
 </footer>
 
 <script src="js/config.js?v=20261104b"></script>
-<script src="js/i18n.js?v=20261105g"></script>
-<script src="js/main.js?v=20261105d"></script>
+<script src="js/i18n.js?v=20261105h"></script>
+<script src="js/main.js?v=20261105e"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="js/eco3d.js?v=20261104b"></script>
 </body>

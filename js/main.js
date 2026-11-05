@@ -88,6 +88,8 @@
       });
       countEl.textContent = t("learn.progress").replace("{n}", finished).replace("{total}", steps.length);
       barEl.style.transform = "scaleX(" + finished / steps.length + ")";
+      // 처음 온 사람에게 "0단계 완료"를 보이지 않도록, 한 단계라도 끝내야 진행 막대·문구를 보임
+      countEl.hidden = barEl.parentNode.hidden = finished === 0;
     }
 
     function mark(key) {
