@@ -26,6 +26,8 @@
 :lang(zh){--font:"Pretendard Std Variable","PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,sans-serif}
 /* 중국어는 띄어쓰기가 없어 keep-all이면 문장 전체가 한 덩어리가 됨: 글자 사이에서 줄을 바꾸고, 쉼표·마침표가 줄 첫머리에 오지 않게 함 */
 :lang(zh){word-break:normal;line-break:strict}
+/* 카드 제목은 낱말 중간(特|殊)에서 나뉘지 않게: 한자 사이 줄바꿈을 막고, 번역문에 넣은 ​ 자리에서만 나눔 */
+:lang(zh) .guide-card h3{word-break:keep-all}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 img{max-width:100%;height:auto}
@@ -177,7 +179,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 }
 .guide-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
 .guide-card{position:relative;display:flex;flex-direction:column;align-items:center;padding:24px;border-radius:var(--radius);background:var(--white);text-align:center;overflow:hidden;box-shadow:0 16px 32px -24px color-mix(in srgb,var(--ink) 50%,transparent)}
-.guide-card h3{margin:0 0 2px;font-size:24px;letter-spacing:-.6px;line-height:1.35}
+.guide-card h3{margin:0 0 2px;font-size:24px;letter-spacing:-.6px;line-height:1.35;text-wrap:balance}
 .guide-card p{margin-bottom:12px;font-size:16px;color:var(--muted)}
 /* 카테고리 색: 쓰레기 봉투 실물 색을 상징하는 파스텔 배경 + 진한 색 픽토그램. 카드와 3D 팝업이 함께 씀 */
 .cat-general{--cat:var(--general);--cat-bg:var(--general-bg);--cat-hi:var(--general-hi);--cat-ink:var(--white)}

@@ -121,7 +121,7 @@ window.I18N = {
     "cat.food.sub": "专用回收箱·垃圾袋",
     "cat.recycle": "可回收物",
     "cat.recycle.sub": "纸·塑料·玻璃·易拉罐",
-    "cat.bulky": "大型·特殊废弃物",
+    "cat.bulky": "大型·\u200b特殊废弃物", // \u200b: 줄이 나뉠 때 "大型·" 뒤에서만 나뉘도록 (style.css :lang(zh) .guide-card h3)
     "cat.bulky.sub": "申报后投放",
     "common.soon": "准备中",
     "learn.progress": "已完成 {n}/{total} 步",
