@@ -221,6 +221,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:20px}
 .eco-actions .action-link{margin-top:0}
 .eco-actions .action-link:disabled{opacity:.4;cursor:default}
+/* 자동 진행 재생/일시정지: 지금 상태에 맞는 아이콘·글자만 보임 (eco3d.js가 data-state를 바꿈) */
+.eco-auto{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 18px;border:1.5px solid var(--fresh-strong);border-radius:999px;background:var(--white);color:var(--fresh-strong);font-size:16px;font-weight:700;transition:background-color .2s}
+.eco-auto:hover{background:var(--mint)}
+.eco-auto svg{width:14px;height:14px;fill:currentColor}
+.eco-auto[data-state="playing"] :is(.i-play,.l-play),.eco-auto[data-state="paused"] :is(.i-pause,.l-pause){display:none}
 .eco-reset{min-height:44px;padding:0 6px;border:0;background:none;color:var(--link);font-size:16px;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .eco-note{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:14px;color:var(--muted)}
 

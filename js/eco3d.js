@@ -40,11 +40,45 @@ function initLab(lab) {
     if (n === last) document.dispatchEvent(new CustomEvent("eco:lab-done", { detail: lab.dataset.ecoLab }));
   }
 
+  // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 3D 움직임이 끝난 뒤 DWELL만큼 읽을 시간을 줌.
+  // 단계 버튼·다음 단계를 누르거나 3D를 드래그하면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
+  // 움직임 줄이기 설정이면 자동 진행 없이 지금처럼 직접 누르는 방식만 씀.
+  const DWELL = 3500;
+  const auto = lab.querySelector("[data-eco-auto]");
+  const dialog = lab.closest("dialog");
+  let run = 0; // 진행 회차. 멈추거나 새로 시작하면 올라가서 이전 회차의 대기를 무효로 만듦
+
+  function setPlaying(on) {
+    run++;
+    if (auto) auto.dataset.state = on ? "playing" : "paused";
+    if (on) autoLoop(run);
+  }
+
+  async function autoLoop(id) {
+    if (step >= last) setStep(0);
+    while (id === run && step < last) {
+      while (id === run && view && view.busy()) await wait(100);
+      await wait(step === 0 ? 1200 : DWELL);
+      if (id !== run) return;
+      setStep(step + 1);
+    }
+    if (id === run && auto) auto.dataset.state = "paused";
+  }
+
   buttons.forEach(function (btn) {
-    btn.addEventListener("click", function () { setStep(Number(btn.dataset.step)); });
+    btn.addEventListener("click", function () { setPlaying(false); setStep(Number(btn.dataset.step)); });
   });
-  next.addEventListener("click", function () { setStep(Math.min(step + 1, last)); });
-  reset.addEventListener("click", function () { setStep(0); });
+  next.addEventListener("click", function () { setPlaying(false); setStep(Math.min(step + 1, last)); });
+  reset.addEventListener("click", function () { setStep(0); setPlaying(!reduced); });
+  canvas.addEventListener("pointerdown", function () { setPlaying(false); });
+  if (auto) {
+    auto.hidden = reduced;
+    auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
+  }
+  if (dialog) {
+    dialog.addEventListener("eco:open", function () { setStep(0); setPlaying(!reduced); });
+    dialog.addEventListener("close", function () { setPlaying(false); });
+  }
   setStep(0);
 
   mount(stage, canvas, def, { interactive: true }, function (v) {
@@ -52,6 +86,8 @@ function initLab(lab) {
     view.goTo(step, true);
   });
 }
+
+function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 // data-eco-widget 안의 [data-eco-mark="n"] 요소에 지금 단계를 is-on으로 표시
 function initLoop(stage) {
@@ -63,7 +99,6 @@ function initLoop(stage) {
   function mark(n) {
     marks.forEach(function (m) { m.classList.toggle("is-on", Number(m.dataset.ecoMark) === n); });
   }
-  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
   mount(stage, canvas, def, { interactive: false, zoom: Number(stage.dataset.ecoZoom) || 1 }, async function (view) {
     view.goTo(0, true);
@@ -90,7 +125,8 @@ function initLoop(stage) {
 function setupDialogs() {
   document.querySelectorAll("[data-eco-open]").forEach(function (btn) {
     const dialog = document.getElementById(btn.dataset.ecoOpen);
-    btn.addEventListener("click", function () { dialog.showModal(); });
+    // 열 때 알림 → initLab이 1단계부터 자동 진행을 시작
+    btn.addEventListener("click", function () { dialog.showModal(); dialog.dispatchEvent(new Event("eco:open")); });
   });
   document.querySelectorAll("dialog.eco-dialog").forEach(function (dialog) {
     dialog.querySelector("[data-eco-close]").addEventListener("click", function () { dialog.close(); });
