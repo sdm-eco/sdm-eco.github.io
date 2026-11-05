@@ -58,6 +58,8 @@ function initLab(lab) {
 
   async function autoLoop(id) {
     if (step >= last) setStep(0);
+    // 3D가 뜰 때까지 기다림 (보지도 않은 단계가 넘어가 완료 처리되지 않도록). 3D를 못 쓰는 기기면 글 단계만 시간으로 진행
+    while (id === run && !view && !stage.classList.contains("is-fallback")) await wait(100);
     while (id === run && step < last) {
       while (id === run && view && view.busy()) await wait(100);
       const need = step === 0 ? 1200 : DWELL;
@@ -72,8 +74,12 @@ function initLab(lab) {
     btn.addEventListener("click", function () { setPlaying(false); setStep(Number(btn.dataset.step)); });
   });
   next.addEventListener("click", function () { setPlaying(false); setStep(Math.min(step + 1, last)); });
-  reset.addEventListener("click", function () { setStep(0); setPlaying(!reduced); });
-  canvas.addEventListener("pointerdown", function () { held = true; });
+  reset.addEventListener("click", function () { held = false; setStep(0); setPlaying(!reduced); });
+  // 3D가 뜨기 전에도 캔버스 밖에서 손을 떼는 것을 받도록 누르는 순간 포인터를 붙잡음
+  canvas.addEventListener("pointerdown", function (e) {
+    held = true;
+    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 이미 끝난 포인터면 무시 */ }
+  });
   ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
     canvas.addEventListener(type, function () { held = false; });
   });
@@ -83,8 +89,8 @@ function initLab(lab) {
   }
   if (dialog) {
     // 열 때마다 "드래그해서 돌려 보세요" 안내를 다시 보임 (드래그하면 createView가 is-touched로 숨김)
-    dialog.addEventListener("eco:open", function () { stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); });
-    dialog.addEventListener("close", function () { setPlaying(false); });
+    dialog.addEventListener("eco:open", function () { held = false; stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); });
+    dialog.addEventListener("close", function () { held = false; setPlaying(false); });
   }
   setStep(0);
 
@@ -317,6 +323,11 @@ function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
 
   return {
     goTo: goTo,
-    busy: function () { return !!active || queue.length > 0; }
+    busy: function () {
+      // 체험 창에서 3D가 화면 밖이면(휴대폰에서 설명을 읽으려 내린 경우 등) 그리기가 멈춰 움직임이 끝나지 않음
+      // → 남은 움직임을 건너뛰고 그 단계의 완성 모습으로 바로 맞춤. 카드 장식 3D는 지금처럼 보일 때 이어서 움직임
+      if (opts.interactive && (!visible || document.hidden) && (active || queue.length)) goTo(shown, true);
+      return !!active || queue.length > 0;
+    }
   };
 }
