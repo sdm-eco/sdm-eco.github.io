@@ -233,8 +233,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 카드 제목이 두 줄이 되는 언어에서도 버튼 높이를 카드끼리 맞춤 */
 .guide-card .eco-open{margin-top:auto}
 .guide-card .card-3d+h3{margin-top:6px}
-.eco-open{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:16px;min-height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--fresh-strong);color:var(--white);font-size:15px;font-weight:800;transition:background-color .2s}
-.eco-open:hover{background:var(--fresh-hover)}
+/* 타일 색보다 버튼이 먼저 눈에 띄지 않게 흰 바탕 버튼, 마우스를 올리면 진한 초록 */
+.eco-open{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:16px;min-height:40px;padding:0 16px;border:1.5px solid var(--fresh-strong);border-radius:999px;background:var(--white);color:var(--fresh-strong);font-size:15px;font-weight:800;transition:background-color .2s,color .2s}
+.eco-open:hover{background:var(--fresh-strong);color:var(--white)}
 .eco-dialog{width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto}
 .eco-dialog::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
 .eco-dialog .eco-lab{margin-top:0}
@@ -254,14 +255,15 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .video-card:has(.video-placeholder) .ep{padding:1px 10px;border-radius:999px;background:var(--video-ink);color:var(--white)}
 .video-card:has(.video-placeholder) h3{margin-top:14px}
 
-.game-stage{position:relative;border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 55%,transparent),transparent 55%),linear-gradient(90deg,var(--banner),var(--banner-2));overflow:hidden}
+/* 바탕은 초록·크림으로 두고 색은 통 4개가 맡음 (노랑 = 음식물이라 넓은 노란 면은 피함) */
+.game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 60%,transparent),transparent 55%),linear-gradient(90deg,var(--mint),var(--sun));overflow:hidden}
 .game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .game-placeholder{display:flex;align-items:center;justify-content:space-between;gap:32px;padding:34px 44px;text-align:left}
 /* 게임 예고 장면: 위에 점수판, 아래에 표정 있는 통 4개, 물건은 main.js가 띄워 날려 보냄 */
 .game-demo{position:relative;flex:none;width:280px;height:196px}
 .game-hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:800;letter-spacing:.08em;color:var(--ink-2)}
-.hud-score b{display:inline-block;min-width:3ch;margin-left:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--fresh-strong)}
+.hud-score b{display:inline-block;min-width:3ch;margin-left:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--game-ink)}
 .hud-level{padding:2px 9px;border-radius:999px;background:var(--white);border:1px solid var(--card-line)}
 .hud-hearts{display:flex;gap:3px}
 .hud-hearts svg{width:15px;height:13px;fill:#e5484d}
