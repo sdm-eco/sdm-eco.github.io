@@ -135,18 +135,47 @@ function initLoop(stage) {
   });
 }
 
+// 체험 창은 한 페이지처럼: 열면 주소에 #food 같은 표시가 붙고, 휴대폰·브라우저의 뒤로 가기로 닫힘.
+// #food 주소로 바로 들어오면 그 창이 열린 채로 시작
 function setupDialogs() {
+  const dialogs = Array.from(document.querySelectorAll("dialog.eco-dialog"));
+  const hashOf = function (dialog) { return "#" + dialog.id.replace(/-dialog$/, ""); };
+  const ours = function (dialog) { return !!history.state && history.state.ecoDialog === dialog.id; };
+
+  function open(dialog, push) {
+    if (dialog.open) return;
+    dialog.showModal();
+    // 열 때 알림 → initLab이 1단계부터 자동 진행을 시작
+    dialog.dispatchEvent(new Event("eco:open"));
+    if (push) history.pushState({ ecoDialog: dialog.id }, "", location.pathname + location.search + hashOf(dialog));
+  }
+
   document.querySelectorAll("[data-eco-open]").forEach(function (btn) {
     const dialog = document.getElementById(btn.dataset.ecoOpen);
-    // 열 때 알림 → initLab이 1단계부터 자동 진행을 시작
-    btn.addEventListener("click", function () { dialog.showModal(); dialog.dispatchEvent(new Event("eco:open")); });
+    btn.addEventListener("click", function () { open(dialog, true); });
   });
-  document.querySelectorAll("dialog.eco-dialog").forEach(function (dialog) {
+  dialogs.forEach(function (dialog) {
     dialog.querySelector("[data-eco-close]").addEventListener("click", function () { dialog.close(); });
     dialog.addEventListener("click", function (e) {
       if (e.target === dialog) dialog.close();
     });
+    // 닫기 버튼·바깥 누름·Esc로 닫으면 열 때 붙인 주소 기록도 되돌림
+    dialog.addEventListener("close", function () { if (ours(dialog)) history.back(); });
   });
+
+  // 뒤로 가기: 열린 창을 닫음 / 앞으로 가기: 그 창을 다시 엶
+  window.addEventListener("popstate", function () {
+    dialogs.forEach(function (dialog) {
+      if (dialog.open && !ours(dialog)) dialog.close();
+      else if (!dialog.open && ours(dialog)) open(dialog, false);
+    });
+  });
+
+  const start = dialogs.find(function (dialog) { return hashOf(dialog) === location.hash; });
+  if (start) {
+    history.replaceState(null, "", location.pathname + location.search);
+    open(start, true);
+  }
 }
 
 function hasWebGL() {

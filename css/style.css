@@ -341,13 +341,13 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .nav-links{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .nav-links a{min-height:40px;justify-content:center;padding:4px 8px;font-size:15px;line-height:1.3;text-align:center;white-space:normal}
   .lang-switch{order:-1;width:100%;margin-left:0;padding:3px 3px 3px 10px}
-  .lang-switch button{flex:1;min-height:36px;padding:0 4px;font-size:14px}
+  .lang-switch button{flex:1;min-height:44px;padding:0 4px;font-size:14px}
   .hero h1{letter-spacing:-1.5px}
   .hero-desc{font-size:18px}
   .section{padding:44px 0}
   .section-head{flex-direction:column;align-items:flex-start;gap:8px}
   .section h2{font-size:30px}
-  .guide-grid,.video-grid{grid-template-columns:1fr}
+  .video-grid{grid-template-columns:1fr}
   .eco-stage{min-height:360px}
   .eco-panel{padding:22px 18px}
   .eco-panel h3{font-size:24px}
@@ -361,6 +361,35 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .learn-icon{width:40px;height:40px;margin:0}
   .learn-steps strong,.learn-steps small,.learn-tag{grid-column:3}
   .learn-tag{justify-self:start;margin-top:4px}
+  /* ── 휴대폰 전용 배치 (서대문구 모바일 요청)
+     첫 화면: 로고 → 다국어 → 배너 그림 → 제목·버튼, 그 바로 아래 분리배출 카드 2×2.
+     학습 띠·영상·게임은 그 아래로 (화면 순서만 바꾸고 PC 순서는 그대로) ── */
+  .review-strip{font-size:13px}
+  .review-strip .wrap{padding:6px 0}
+  .review-strip p{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .brand-sub{display:none}
+  .brand{min-height:44px}
+  /* 메뉴 대신 첫 화면의 큰 버튼과 카드로 이동 */
+  .header nav{display:none}
+  main{display:flex;flex-direction:column}
+  .hero{order:-2}
+  #guide{order:-1;padding:16px 0 36px}
+  .hero-art{order:-1;aspect-ratio:16/10;margin:0 0 -36px}
+  .hero-scene{-webkit-mask-image:linear-gradient(to bottom,#000 72%,transparent);mask-image:linear-gradient(to bottom,#000 72%,transparent)}
+  .hero-scene img{object-position:64% 62%}
+  .hero-grid{gap:0;padding:0 0 28px}
+  .guide-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  /* 카드 속 3D는 휴대폰에서 빼고(배터리·속도), 눌렀을 때 체험 창에서 보여 줌 */
+  .guide-card .card-3d{display:none}
+  .section-split .guide-card{padding:18px 12px 14px}
+  .guide-card .cat-pic{width:52px;height:52px}
+  .guide-card h3{font-size:19px;letter-spacing:-.4px}
+  .guide-card p{margin-bottom:12px;font-size:14px}
+  .eco-open{width:100%;min-height:44px;justify-content:center}
+  /* 체험 창은 화면 전체를 덮는 한 페이지처럼 (뒤로 가기로 닫힘) */
+  .eco-dialog{width:100%;max-width:none;height:100%;max-height:none;margin:0;border-radius:0}
+  .eco-dialog .eco-lab{min-height:100%;border:0;border-radius:0}
+  .eco-close{position:fixed}
 }
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
