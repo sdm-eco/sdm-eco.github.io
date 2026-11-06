@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261105x">
+<link rel="stylesheet" href="css/style.css?v=20261106j">
 </head>
 <body>
 <!-- 카테고리 픽토그램: 카드와 3D 팝업이 <use href="#pic-…">로 함께 씀 -->
@@ -56,6 +56,16 @@
 
 <main id="main">
   <section class="hero" id="top">
+    <figure class="hero-art">
+      <!-- 배너 그림: 서대문 명소(독립문·안산·홍제천 인공폭포)와 학생. 왼쪽은 흐려질 여백으로 비워 둔 그림이라 배너 오른쪽을 꽉 채우는 배경으로 씀 -->
+      <div class="hero-scene">
+        <img src="img/hero-scene.webp" alt="" width="1344" height="756" fetchpriority="high">
+      </div>
+      <span class="hero-leaf leaf-1" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
+      <span class="hero-leaf leaf-2" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
+      <span class="hero-leaf leaf-3" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
+      <span class="hero-leaf leaf-4" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
+    </figure>
     <svg class="garden-bg" viewBox="0 0 1440 360" preserveAspectRatio="none" aria-hidden="true">
       <path class="garden-back" d="M0 300C180 250 320 290 480 262S800 214 960 248s320 40 480-6V360H0z"/>
       <path class="garden-front" d="M0 330c200-34 360-6 540-26s340-50 520-24 260 30 380 12V360H0z"/>
@@ -79,39 +89,14 @@
 
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <h1 data-i18n-html="hero.title">서울 생활의 첫 습관,<br><em>올바른 분리배출</em></h1>
-        <p class="hero-desc" data-i18n="hero.desc">서대문구에서 공부하는 유학생을 위한 분리배출 교육입니다. 짧은 영상을 보고, 배출 방법을 읽고, 게임으로 익혀 보세요.</p>
+        <h1 data-i18n-html="hero.title">서대문 생활의 첫 습관,<br><em>올바른 분리배출</em></h1>
+        <p class="hero-desc" data-i18n="hero.desc">서대문구에서 생활하는 외국인을 위한 분리배출 교육입니다. 짧은 영상을 보고, 배출 방법을 읽고, 게임으로 익혀 보세요.</p>
         <div class="hero-actions">
           <a class="btn" href="#videos"><svg class="btn-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1l7 4-7 4z"/></svg><span data-i18n="hero.cta2">교육 영상 보기</span></a>
           <a class="btn btn-ghost" href="#guide"><svg class="btn-icon btn-icon-line" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="hero.cta1">배출방법 보기</span></a>
         </div>
       </div>
 
-      <figure class="hero-art">
-        <svg class="hero-skyline" viewBox="0 0 600 300" aria-hidden="true">
-          <!-- 독립문: 몸체, 위 난간, 아치 통로 (처음 열 때 이 순서로 그려짐) -->
-          <path class="sky-line" style="--d:.45s" pathLength="1" d="M40 300V80h130v220"/>
-          <path class="sky-line" style="--d:1.8s" pathLength="1" d="M32 80h146M38 68h134v12M52 56h106v12"/>
-          <path class="sky-line" style="--d:2.85s" pathLength="1" d="M80 300v-118a25 25 0 0 1 50 0v118"/>
-          <path class="sky-line" style="--d:3.6s" pathLength="1" d="M92 56v-10h26v10"/>
-          <!-- 낮은 건물들 -->
-          <path class="sky-line" style="--d:4.35s" pathLength="1" d="M200 300v-58h44v58M252 300v-86h34v86M206 256h32M206 272h32M260 232h18M260 250h18"/>
-          <!-- 남산과 N서울타워, 꼭대기 불빛 -->
-          <path class="sky-line" style="--d:5.4s" pathLength="1" d="M330 300c40-70 90-104 150-104s104 34 150 104"/>
-          <path class="sky-line" style="--d:6.45s" pathLength="1" d="M480 196V98M471 196l9-24 9 24M466 132h28l-4 22h-20z M473 98h14M480 98V58"/>
-          <g class="tower-light">
-            <radialGradient id="tower-glow"><stop offset="0"/><stop offset="1"/></radialGradient>
-            <circle class="glow-halo" cx="480" cy="56" r="20" fill="url(#tower-glow)"/>
-            <circle class="glow-ping" cx="480" cy="56" r="6"/>
-            <circle class="glow-core" cx="480" cy="56" r="3.5"/>
-          </g>
-        </svg>
-        <img src="img/hero-students-wide.webp" alt="" width="1040" height="673" fetchpriority="high">
-        <span class="hero-leaf leaf-1" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
-        <span class="hero-leaf leaf-2" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
-        <span class="hero-leaf leaf-3" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
-        <span class="hero-leaf leaf-4" aria-hidden="true"><svg viewBox="0 0 40 24"><path d="M2 14C12 3 28 2 38 10 28 20 12 23 2 14z"/></svg></span>
-      </figure>
     </div>
   </section>
 
@@ -370,7 +355,7 @@
 </footer>
 
 <script src="js/config.js?v=20261104b"></script>
-<script src="js/i18n.js?v=20261105j"></script>
+<script src="js/i18n.js?v=20261106a"></script>
 <script src="js/main.js?v=20261105e"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <script type="module" src="js/eco3d.js?v=20261105d"></script>
