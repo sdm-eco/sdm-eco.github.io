@@ -154,6 +154,11 @@ function setupDialogs() {
     const dialog = document.getElementById(btn.dataset.ecoOpen);
     btn.addEventListener("click", function () { open(dialog, true); });
   });
+  // 배출방법 카드는 카드 어디를 눌러도 그 카드의 체험 창이 열림 (휴대폰 터치 영역을 카드 전체로)
+  document.querySelectorAll(".guide-card").forEach(function (card) {
+    const btn = card.querySelector("[data-eco-open]");
+    if (btn) card.addEventListener("click", function (e) { if (!e.target.closest("button, a")) btn.click(); });
+  });
   dialogs.forEach(function (dialog) {
     dialog.querySelector("[data-eco-close]").addEventListener("click", function () { dialog.close(); });
     dialog.addEventListener("click", function (e) {

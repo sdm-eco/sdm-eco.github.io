@@ -4,27 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
-<title>서대문구 분리배출 교육 | 외국인 유학생 대상</title>
-<meta name="description" content="서대문구 기후환경과 외국인 유학생 대상 분리배출 교육 홈페이지">
+<title>서대문구 분리배출 교육 | 서대문에서 생활하는 외국인 대상</title>
+<meta name="description" content="서대문구 기후환경과 · 서대문구에서 생활하는 외국인 대상 분리배출 교육 홈페이지">
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261106l">
+<link rel="stylesheet" href="css/style.css?v=20261106m">
 </head>
 <body>
-<!-- 카테고리 픽토그램: 카드와 3D 팝업이 <use href="#pic-…">로 함께 씀 -->
+<!-- 카테고리 아이콘: 카드·3D 팝업·배너 바로 가기가 <use href="#obj-…">로 함께 씀 -->
 <svg class="pic-sprite" aria-hidden="true" focusable="false">
-  <symbol id="pic-general" viewBox="0 0 24 24"><path d="M9.5 7 8 3.5l4 2 4-2L14.5 7"/><path d="M8 7h8c1.7 0 3 1.3 3.2 3l.8 8.5a2 2 0 0 1-2 2.5H6a2 2 0 0 1-2-2.5L4.8 10C5 8.3 6.3 7 8 7z"/></symbol>
-  <symbol id="pic-food" viewBox="0 0 24 24"><path d="M12 7.5C10.4 6 5.6 6.2 5.2 11.3 4.8 16.6 8.4 21.2 12 19.8c3.6 1.4 7.2-3.2 6.8-8.5C18.4 6.2 13.6 6 12 7.5z"/><path d="M12 7.5c0-2 1-3.6 2.8-4.5"/></symbol>
-  <symbol id="pic-recycle" viewBox="0 0 24 24"><path d="M19.5 12a7.5 7.5 0 0 1-12.8 5.3"/><path d="M4.5 12a7.5 7.5 0 0 1 12.8-5.3"/><path d="M17.6 2.8v3.9h-3.9"/><path d="M6.4 21.2v-3.9h3.9"/></symbol>
-  <symbol id="pic-bulky" viewBox="0 0 24 24"><path d="M5.5 11V8.5a2.5 2.5 0 0 1 2.5-2.5h8a2.5 2.5 0 0 1 2.5 2.5V11"/><path d="M3 13a2 2 0 0 1 4 0v1.5h10V13a2 2 0 0 1 4 0v4.5H3z"/><path d="M5 17.5v2M19 17.5v2"/></symbol>
+  <!-- 분리배출 4대 아이콘: 실물 모양(종량제 봉투·음식물 수거함·재활용 수거함·의자), 색은 카테고리 색 -->
+  <symbol id="obj-general" viewBox="0 0 48 48"><path d="M21 12c-4-2-6-6-3-8 2 1 4 4 5 7zM27 12c4-2 6-6 3-8-2 1-4 4-5 7z" fill="#5b3fb8"/><path d="M19 16h10l-2-4h-6z" fill="#6747c4"/><path d="M15 16C9.5 22 8.4 30 9.2 36c.8 6 6.8 8 14.8 8s14-2 14.8-8c.8-6-.3-14-5.8-20z" fill="#7b5bd6"/><path d="M14.5 23.5c-1.3 4-1.4 8-.5 11.5" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".45"/><rect x="18.5" y="26" width="11" height="8" rx="2" fill="#fff"/><path d="M21 30h6" stroke="#7b5bd6" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="obj-food" viewBox="0 0 48 48"><rect x="19.5" y="7.5" width="9" height="5.5" rx="2.2" fill="#c99200"/><rect x="9.5" y="12" width="29" height="6.5" rx="3.2" fill="#d9a000"/><path d="M12 18.5h24l-2 22.3a2.5 2.5 0 0 1-2.5 2.2h-15a2.5 2.5 0 0 1-2.5-2.2z" fill="#f2b705"/><rect x="17.5" y="24" width="13" height="12" rx="2.5" fill="#fff"/><circle cx="24" cy="31" r="3.4" fill="#e0562b"/><path d="M24 27.6c.4-1.8 1.8-2.8 3.4-2.6-.3 1.6-1.6 2.6-3.4 2.6z" fill="#2f8f5b"/></symbol>
+  <symbol id="obj-recycle" viewBox="0 0 48 48"><rect x="10.5" y="11.5" width="27" height="6.5" rx="3.2" fill="#1f63b0"/><path d="M13 18h22l-2 22.8a2.5 2.5 0 0 1-2.5 2.2h-13a2.5 2.5 0 0 1-2.5-2.2z" fill="#2f7fd6"/><g fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19.6 28.4a5 5 0 0 1 8.2-2.9"/><path d="M28.4 31.6a5 5 0 0 1-8.2 2.9"/><path d="M28.4 22.8v3.4H25"/><path d="M19.6 37.2v-3.4H23"/></g></symbol>
+  <symbol id="obj-bulky" viewBox="0 0 48 48"><rect x="12" y="9" width="24" height="21" rx="6" fill="#e0558f"/><path d="M17 15h14" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".45"/><rect x="6.5" y="21" width="9" height="15" rx="4.5" fill="#c93f79"/><rect x="32.5" y="21" width="9" height="15" rx="4.5" fill="#c93f79"/><rect x="13" y="26" width="22" height="9" rx="3.5" fill="#d34a84"/><rect x="10" y="35" width="3.2" height="7" rx="1.4" fill="#8a4b2a"/><rect x="34.8" y="35" width="3.2" height="7" rx="1.4" fill="#8a4b2a"/></symbol>
 </svg>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
 
 <div class="review-strip">
   <div class="wrap">
-    <p><span class="draft-pill" data-i18n="strip.pill">초안 v0.3</span><span data-i18n="strip.text">홈페이지 골격 구성안입니다. 실제 운영 사이트가 아닙니다.</span></p>
+    <p><span class="draft-pill" data-i18n="strip.pill">초안 v0.4</span><span data-i18n="strip.text">홈페이지 골격 구성안입니다. 실제 운영 사이트가 아닙니다.</span></p>
   </div>
 </div>
 
@@ -90,11 +91,19 @@
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <h1 data-i18n-html="hero.title">서대문 생활의 첫 습관,<br><em>올바른 분리배출</em></h1>
-        <p class="hero-desc" data-i18n="hero.desc">서대문구에서 생활하는 외국인을 위한 분리배출 교육입니다. 짧은 영상을 보고, 배출 방법을 읽고, 게임으로 익혀 보세요.</p>
+        <p class="hero-desc hero-desc-short" data-i18n="hero.descShort">서대문구에서 생활하는 외국인을 위한 분리배출 교육입니다.</p>
+        <p class="hero-desc hero-desc-long" data-i18n="hero.desc">서대문구에서 생활하는 외국인을 위한 분리배출 교육입니다. 짧은 영상을 보고, 배출 방법을 읽고, 게임으로 익혀 보세요.</p>
         <div class="hero-actions">
           <a class="btn" href="#videos"><svg class="btn-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1l7 4-7 4z"/></svg><span data-i18n="hero.cta2">교육 영상 보기</span></a>
-          <a class="btn btn-ghost" href="#guide"><svg class="btn-icon btn-icon-line" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg><span data-i18n="hero.cta1">배출방법 보기</span></a>
-        </div>
+          <a class="btn btn-ghost" href="#guide"><svg class="btn-icon btn-icon-line" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C9.5 4.6 6 4.4 3 5.4v13c3-1 6.5-.8 9 1.1 2.5-1.9 6-2.1 9-1.1v-13c-3-1-6.5-.8-9 1.1zM12 6.5v13"/></svg><span data-i18n="hero.cta1">배출방법 보기</span></a>
+                </div>
+        <!-- 분리배출 바로 가기 (구청 의견 1): 글을 읽지 않고 아이콘으로 바로 그 품목의 3D 체험 창을 엶 -->
+        <ul class="quick-cats" aria-label="분리배출 바로 가기" data-i18n-attr="aria-label:quick.label">
+          <li><button type="button" class="quick-cat cat-general" data-eco-open="general-dialog"><svg aria-hidden="true"><use href="#obj-general"/></svg><span data-i18n="quick.general">일반</span></button></li>
+          <li><button type="button" class="quick-cat cat-food" data-eco-open="food-dialog"><svg aria-hidden="true"><use href="#obj-food"/></svg><span data-i18n="quick.food">음식물</span></button></li>
+          <li><button type="button" class="quick-cat cat-recycle" data-eco-open="pet-dialog"><svg aria-hidden="true"><use href="#obj-recycle"/></svg><span data-i18n="quick.recycle">재활용</span></button></li>
+          <li><button type="button" class="quick-cat cat-bulky" data-eco-open="bulky-dialog"><svg aria-hidden="true"><use href="#obj-bulky"/></svg><span data-i18n="quick.bulky">대형</span></button></li>
+        </ul>
       </div>
 
     </div>
@@ -162,28 +171,28 @@
       </div>
       <div class="guide-grid">
         <article class="guide-card cat-general">
-          <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-general"/></svg></span>
+          <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-general"/></svg></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general" data-eco-zoom="1.75"></div></div>
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
           <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-food">
-          <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-food"/></svg></span>
+          <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-food"/></svg></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food" data-eco-zoom="1.45"></div></div>
           <h3 data-i18n="cat.food">음식물 쓰레기</h3>
           <p data-i18n="cat.food.sub">전용 수거함·봉투</p>
           <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-recycle">
-          <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-recycle"/></svg></span>
+          <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-recycle"/></svg></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.25"></div></div>
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-bulky">
-          <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-bulky"/></svg></span>
+          <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-bulky"/></svg></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.3"></div></div>
           <h3 data-i18n="cat.bulky">대형·특수폐기물</h3>
           <p data-i18n="cat.bulky.sub">신고 후 배출</p>
@@ -237,7 +246,7 @@
       <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
-      <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-recycle"/></svg></span>
+      <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-recycle"/></svg></span>
       <h3 id="pet-dialog-title" data-i18n="pet.title">투명 페트병, 이렇게 버려요</h3>
       <p class="eco-lead" data-i18n="pet.lead">단계를 누르면 3D 페트병이 직접 보여 줘요.</p>
       <ol class="eco-steps">
@@ -267,7 +276,7 @@
       <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
-      <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-food"/></svg></span>
+      <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-food"/></svg></span>
       <h3 id="food-dialog-title" data-i18n="food.title">음식물 쓰레기, 이렇게 버려요</h3>
       <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
       <ol class="eco-steps">
@@ -280,7 +289,7 @@
         <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
         <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
       </div>
-      <p class="eco-note" data-i18n="food.note">딱딱한 껍데기(호두·밤), 양파·마늘 껍질, 차·한약재 찌꺼기도 일반쓰레기로 버려요.</p>
+      <p class="eco-note" data-i18n="food.note">딱딱한 껍데기(호두·밤), 양파·마늘 껍질, 차⁠·⁠한약재 찌꺼기도 일반쓰레기로 버려요.</p>
     </div>
   </div>
 </dialog>
@@ -295,7 +304,7 @@
       <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
-      <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-general"/></svg></span>
+      <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-general"/></svg></span>
       <h3 id="general-dialog-title" data-i18n="general.title">일반 쓰레기, 이렇게 버려요</h3>
       <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
       <ol class="eco-steps">
@@ -323,7 +332,7 @@
       <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
-      <span class="cat-pic" aria-hidden="true"><svg><use href="#pic-bulky"/></svg></span>
+      <span class="cat-pic" aria-hidden="true"><svg><use href="#obj-bulky"/></svg></span>
       <h3 id="bulky-dialog-title" data-i18n="bulky.title">대형·특수폐기물, 이렇게 버려요</h3>
       <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
       <ol class="eco-steps">
@@ -345,19 +354,19 @@
   <div class="wrap footer-inner">
     <div>
       <strong data-i18n="brand.sub">서대문구 기후환경과</strong>
-      <p data-i18n="footer.desc">외국인 유학생 대상 분리배출 교육</p>
+      <p data-i18n="footer.desc">서대문구에서 생활하는 외국인 대상 분리배출 교육</p>
     </div>
     <div class="footer-meta">
-      <p data-i18n="strip.pill">초안 v0.3</p>
+      <p data-i18n="strip.pill">초안 v0.4</p>
       <p class="draft-note" data-i18n="footer.note">구성안 · 실제 운영 사이트 아님</p>
     </div>
   </div>
 </footer>
 
 <script src="js/config.js?v=20261104b"></script>
-<script src="js/i18n.js?v=20261106a"></script>
+<script src="js/i18n.js?v=20261106b"></script>
 <script src="js/main.js?v=20261105e"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script type="module" src="js/eco3d.js?v=20261106a"></script>
+<script type="module" src="js/eco3d.js?v=20261106b"></script>
 </body>
 </html>
