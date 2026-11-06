@@ -106,7 +106,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .quick-cat{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:100%;min-height:96px;padding:10px 6px;border:1.5px solid color-mix(in srgb,var(--fresh) 22%,transparent);border-radius:18px;background:color-mix(in srgb,var(--white) 78%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 8px 18px -16px color-mix(in srgb,var(--ink) 60%,transparent);color:var(--ink);font-size:15px;font-weight:800;line-height:1.25;text-align:center;text-wrap:balance;transition:transform .15s,box-shadow .2s,background-color .2s,border-color .2s}
 /* 바탕은 네 칸 모두 같은 흰색 반투명(배너 톤 유지), 카테고리 색은 아이콘에만. 올리거나 누를 때만 그 색이 옅게 비침 */
 .quick-cat:hover,.quick-cat:active{transform:translateY(-2px);background:var(--cat-bg);border-color:color-mix(in srgb,var(--cat) 45%,transparent);box-shadow:0 12px 22px -16px var(--cat)}
-.quick-cat svg{width:44px;height:44px;flex:none}
+.quick-cat img{width:46px;height:46px;flex:none;object-fit:contain}
 .btn{display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:14px 24px;border:1.5px solid var(--fresh-strong);border-radius:999px;background:var(--fresh-strong);color:var(--white);font-size:17px;font-weight:800;transition:background-color .2s,border-color .2s}
 .btn:hover{background:var(--fresh-hover);border-color:var(--fresh-hover)}
 .btn-ghost{background:var(--mint);color:var(--fresh-strong);border-color:color-mix(in srgb,var(--fresh-strong) 45%,transparent)}
@@ -191,10 +191,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .cat-bulky{--cat:var(--bulky);--cat-bg:var(--bulky-bg);--cat-hi:var(--bulky-hi);--cat-ink:var(--white)}
 .guide-card[class*="cat-"]{background:var(--cat-bg)}
 .guide-card:has(.eco-open){cursor:pointer}
-.pic-sprite{position:absolute;width:0;height:0;overflow:hidden}
-/* 4대 아이콘(실물형 컬러)은 흰 원 위에, 둘레는 카테고리 색 */
+/* 4대 아이콘(img/cat-*.webp, 입체 그림)은 흰 원 위에, 둘레는 카테고리 색 */
 .cat-pic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:6px;border-radius:50%;background:var(--white);box-shadow:0 0 0 2px var(--cat),0 0 0 7px var(--cat-hi)}
-.cat-pic svg{width:38px;height:38px}
+.cat-pic img{width:42px;height:42px;object-fit:contain}
 .icon{display:grid;place-items:center;width:52px;height:52px;border-radius:16px;background:var(--lime-soft);color:var(--link)}
 .icon svg{width:28px;height:28px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
 .soon{align-self:flex-start;margin-top:auto;padding:3px 12px;border:1px dashed var(--soon-line);border-radius:999px;font-size:13px;font-weight:700;color:var(--soon-ink);background:var(--wash)}
@@ -214,7 +213,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-stage.is-fallback .eco-fallback{display:flex}
 .eco-panel{padding:32px}
 .eco-panel .cat-pic{width:48px;height:48px;margin-bottom:12px}
-.eco-panel .cat-pic svg{width:34px;height:34px}
+.eco-panel .cat-pic img{width:36px;height:36px}
 .eco-panel h3{margin:0 0 4px;padding-right:40px;font-size:28px;letter-spacing:-.8px;line-height:1.35;text-wrap:balance}
 .eco-lead{font-size:16px;color:var(--muted);text-wrap:balance}
 .eco-steps{list-style:none;margin:22px 0 0;padding:0;display:grid;gap:8px}
@@ -406,7 +405,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-actions .btn{flex:1;justify-content:center}
   .quick-cats{gap:8px;max-width:none;margin-top:16px}
   .quick-cat{min-height:86px;padding:8px 4px;font-size:14px;border-radius:16px}
-  .quick-cat svg{width:40px;height:40px}
+  .quick-cat img{width:42px;height:42px}
   /* 베트남어는 이름이 길어 두 줄이 되면 작은 휴대폰(360×740)에서 첫 화면을 넘음 */
   :lang(vi) .quick-cat{font-size:13px;letter-spacing:-.2px}
   .guide-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
