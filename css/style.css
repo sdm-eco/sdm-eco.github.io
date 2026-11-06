@@ -82,9 +82,10 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .vine{stroke-dasharray:1;stroke-dashoffset:1;animation:vine-grow 5s cubic-bezier(.16,1,.3,1) .5s forwards}
 .vine-late{animation-delay:1.6s}
 .garden-pulses{fill:none;stroke:var(--fresh);stroke-width:2.6;stroke-linecap:round;opacity:.55}
-.vine-pulse{stroke-dasharray:.07 .93;stroke-dashoffset:1;opacity:0;animation:vine-pulse 10s linear 5s infinite}
+/* 굵은 선은 넝쿨 길이의 55% 지점(바로 가기 4칸의 오른쪽 끝을 지난 곳, 1201~1920px에서 47~55%)에서 출발: 카드 뒤에서는 가려져 보이지 않았음 */
+.vine-pulse{stroke-dasharray:.07 .93;stroke-dashoffset:.45;opacity:0;animation:vine-pulse 8s linear 5s infinite}
 @keyframes vine-grow{to{stroke-dashoffset:0}}
-@keyframes vine-pulse{0%{stroke-dashoffset:1;opacity:0}8%,85%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes vine-pulse{0%{stroke-dashoffset:.45;opacity:0}8%,85%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
 @keyframes node-glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.9;transform:scale(1.7)}}
 @keyframes garden-lean{0%,100%{transform:skewX(0)}35%{transform:skewX(-3deg)}70%{transform:skewX(2deg)}}
 
@@ -126,6 +127,10 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .leaf-2{left:30%;top:-6%;width:20px;animation-duration:13s;animation-delay:-6s}
 .leaf-3{right:4%;top:40%;width:28px;animation-duration:12s;animation-delay:-3.5s}
 .leaf-4{left:58%;top:62%;width:18px;animation-duration:14s;animation-delay:-9s}
+.leaf-5{left:12%;top:20%;width:22px;animation-duration:12.5s;animation-delay:-2s}
+.leaf-6{left:44%;top:30%;width:16px;animation-duration:15s;animation-delay:-7.5s}
+.leaf-7{right:18%;top:12%;width:20px;animation-duration:13.5s;animation-delay:-4.5s}
+.leaf-8{left:26%;top:78%;width:24px;animation-duration:11.5s;animation-delay:-10s}
 @keyframes leaf-float{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:.85}50%{transform:translate(46px,-38px) rotate(40deg)}85%{opacity:.85}100%{opacity:0;transform:translate(92px,-20px) rotate(80deg)}}
 
 .learn{padding:32px 0 0}
@@ -392,6 +397,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-scene img{object-position:64% 62%}
   .hero-grid{gap:0;padding:0 0 24px}
   .hero-desc-long{display:none}
+  .garden-pulses{display:none}
   .hero-desc-short{display:block;margin-top:12px;line-height:1.6}
   .hero-copy{display:flex;flex-direction:column}
   .hero-copy .quick-cats{order:3}
