@@ -274,7 +274,8 @@
     return { s: s, at: function (x, y) { return [(w - IW * s) * pos[0] + x * s, (h - IH * s) * pos[1] + y * s]; } };
   }
 
-  // 그림 속 수거함에 그려진 ♻ 두 개가 은은하게 밝아졌다 흐려졌다를 계속 반복 (CSS 애니메이션, 두 통이 번갈아)
+  // 그림 속 초록 수거함에 그려진 ♻가 은은하게 밝아졌다 흐려졌다를 계속 반복 (CSS 애니메이션)
+  // 노란 통은 바탕이 밝아 잘 안 보이고 두 개가 번갈아 깜빡이면 산만해서 초록 통 하나만 씀
   // 같은 그림을 ♻ 자리에만 겹쳐 놓고 CSS 필터로 흰 화살표만 남겨(나머지는 검정 → screen 합성으로 안 보임) 빛나게 함
   // → 그려진 ♻와 모양이 정확히 같음. 화면 크기가 바뀌면 자리를 다시 맞춤. 움직임 줄이기 설정이면 보이지 않음
   function setupBinMarks() {
@@ -282,14 +283,13 @@
     var img = scene && scene.querySelector("img");
     if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var BOX = 48; // ♻ 둘레를 덮는 칸 크기(그림 원본 기준 px)
-    var marks = [[761, 484], [888, 484]].map(function (p, i) {
+    var marks = [[761, 484]].map(function (p) {
       var el = document.createElement("span");
       el.className = "bin-mark";
       el.setAttribute("aria-hidden", "true");
       el.innerHTML = "<i></i><i></i>"; // 또렷한 화살표 + 번진 빛무리
       el.style.setProperty("--bg", "url(" + img.currentSrc + ")");
-      el.style.animationDelay = i * 0.8 + "s"; // 두 통이 번갈아(반 주기 차이)
-      if (i === 0) el.classList.add("is-green"); // 초록 통은 ♻가 더 어두워 기준이 다름
+      el.classList.add("is-green"); // 초록 통은 ♻가 더 어두워 기준이 다름
       scene.appendChild(el);
       return { el: el, p: p };
     });
@@ -322,7 +322,7 @@
     if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     // box: 조각 왼쪽 위(원본 그림 좌표), from~to: 흔들리기 시작하는 높이(귀)~머리끝(조각 안 y),
     // face: 이 x보다 오른쪽(얼굴 옆 머리)은 덜 흔듦, amp: 머리끝 최대 흔들림(원본 px), period: 한 번 왕복(초)
-    var HAIR = [{ src: "img/hair-girl2.png", plate: "img/hair-girl2-plate.png", box: [735, 200], from: 32, to: 86, face: 72, amp: 3.2, period: 2.8 }];
+    var HAIR = [{ src: "img/hair-girl2.png", plate: "img/hair-girl2-plate.png", box: [735, 200], from: 32, to: 86, face: 72, amp: 4.3, period: 2.8 }];
     var items = [], visible = true, running = false, last = 0;
 
     HAIR.forEach(function (h) {
@@ -421,29 +421,47 @@
     document.addEventListener("visibilitychange", start);
   }
 
-  // 배너 그림 속 홍제천 인공폭포: 떨어지는 물줄기 결이 아래로 흐르고, 웅덩이 물빛이 은은하게 반짝임
-  // 물 영역 마스크(img/waterfall-mask.png: R = 떨어지는 물, G = 웅덩이, 원본 그림 좌표 box에서 잘라낸 것)에서만
-  // 밝은 빛을 계산해 그림 위에 screen으로 덧입힘(그림을 밀지 않아 원본이 비쳐 어색해질 일이 없음)
+  // 배너 그림 속 홍제천 인공폭포: 떨어지는 물줄기가 실제로 흘러내리고, 웅덩이 물빛이 은은하게 반짝임
+  // 물 영역 마스크(img/waterfall-mask.png: R = 떨어지는 물, G = 웅덩이, 원본 그림 좌표 BOX에서 잘라낸 것)에서만 다시 그림
+  //  - 떨어지는 물: 그림 속 물줄기를 조금 위에서 끌어와 아래로 흘림. 끌어오는 거리(0~FLOW_L)를 반 주기 엇갈린 두 흐름으로
+  //    번갈아 섞어(flow map) 되감기는 순간이 보이지 않게 하고, 밝은 물줄기 결을 더 빠르게 흘려 물살 느낌을 더함
+  //  - 웅덩이: 옆으로 흐르는 잔물결 빛 + 폭포 바로 아래 물안개
+  // 그림과 같은 색 보정(--scene-filter)을 걸어 겹친 부분이 티 나지 않게 함
   // 움직임 줄이기 설정이면 안 움직이고, 배너가 화면 밖이거나 탭이 숨으면 멈춤
   // 한계: 물 픽셀마다 CPU로 계산(약 1.5만 개, 초당 30번). 더 크게 쓰면 WebGL로 옮길 것
   function setupWaterfall() {
     var scene = document.querySelector(".hero-scene");
     var img = scene && scene.querySelector("img");
     if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var BOX = [1150, 236], SPEED = 55, TH = 96; // 물줄기가 내려오는 속도(원본 px/초), 물줄기 무늬 세로 길이
+    var BOX = [1150, 236], FLOW = 38, FLOW_L = 18, SPEED = 70, TH = 96; // 흐름 속도·끌어오는 거리, 물줄기 결 속도·무늬 길이(원본 px)
     var mask = new Image();
     var it = null, visible = true, running = false, last = 0;
     mask.onload = function () {
-      var w = mask.naturalWidth, h = mask.naturalHeight;
+      if (img.complete) build(); else img.addEventListener("load", build, { once: true });
+    };
+    mask.src = "img/waterfall-mask.png";
+
+    function read(image, sx, sy, w, h) {
       var c = document.createElement("canvas");
       c.width = w;
       c.height = h;
       var g = c.getContext("2d");
-      g.drawImage(mask, 0, 0);
-      var m = g.getImageData(0, 0, w, h).data;
+      g.drawImage(image, sx, sy, w, h, 0, 0, w, h);
+      return g.getImageData(0, 0, w, h).data;
+    }
+
+    function build() {
+      var w = mask.naturalWidth, h = mask.naturalHeight;
+      var m = read(mask, 0, 0, w, h);
+      // 원본 그림의 물 부분 (배너 img는 원본 1344×756 크기로 읽음)
+      var c = document.createElement("canvas");
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      c.getContext("2d").drawImage(img, 0, 0);
+      var src = c.getContext("2d").getImageData(BOX[0], BOX[1], w, h).data;
       var idx = [];
       for (var i = 0; i < w * h; i++) if (m[i * 4] > 8 || m[i * 4 + 1] > 8) idx.push(i);
-      // 세로 물줄기 무늬: 칸마다 밝기·간격·위치가 조금씩 다른 가는 줄 (옆 칸과 섞어 부드럽게)
+      // 밝은 물줄기 결: 칸마다 밝기·간격·위치가 조금씩 다른 세로 줄 (옆 칸과 섞어 부드럽게)
       var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
       var col = [];
       for (var x = 0; x < w; x++) col.push({ k: 1 + Math.floor(rnd() * 3), ph: rnd() * Math.PI * 2, a: 0.35 + rnd() * 0.65 });
@@ -453,7 +471,7 @@
           var v = 0;
           for (var d = -1; d <= 1; d++) {
             var q = col[Math.min(w - 1, Math.max(0, x + d))];
-            v += (d ? 0.25 : 0.5) * q.a * Math.pow(0.5 + 0.5 * Math.sin((y / TH) * Math.PI * 2 * q.k + q.ph), 8);
+            v += (d ? 0.25 : 0.5) * q.a * Math.pow(0.5 + 0.5 * Math.sin((y / TH) * Math.PI * 2 * q.k + q.ph), 4);
           }
           tile[y * w + x] = v;
         }
@@ -465,26 +483,42 @@
       cv.setAttribute("aria-hidden", "true");
       scene.appendChild(cv);
       var ctx = cv.getContext("2d");
-      it = { w: w, h: h, m: m, idx: idx, tile: tile, cv: cv, ctx: ctx, out: ctx.createImageData(w, h) };
+      it = { w: w, h: h, m: m, src: src, idx: idx, tile: tile, cv: cv, ctx: ctx, out: ctx.createImageData(w, h) };
       place();
-    };
-    mask.src = "img/waterfall-mask.png";
+    }
+
+    // (x, y)에서 off만큼 위에 있는 물 색 (위가 물이 아니면 제자리 색), 세로로만 부드럽게 섞음
+    function pull(x, y, off, ch) {
+      var sy = y - off, y0 = Math.floor(sy), f = sy - y0, w = it.w, m = it.m, src = it.src;
+      if (y0 < 0 || m[(y0 * w + x) * 4] < 80) return src[(y * w + x) * 4 + ch];
+      var a = src[(y0 * w + x) * 4 + ch], b = src[(Math.min(y0 + 1, it.h - 1) * w + x) * 4 + ch];
+      return a + (b - a) * f;
+    }
 
     function draw(time) {
-      var t = time / 1000, w = it.w, m = it.m, od = it.out.data, tile = it.tile, idx = it.idx;
+      var t = time / 1000, w = it.w, m = it.m, src = it.src, od = it.out.data, tile = it.tile, idx = it.idx;
+      var ph1 = (t * FLOW / FLOW_L) % 1, ph2 = (ph1 + 0.5) % 1;
+      var o1 = ph1 * FLOW_L, o2 = ph2 * FLOW_L, w1 = 1 - Math.abs(2 * ph1 - 1), w2 = 1 - w1;
       var shift = Math.floor(t * SPEED);
       for (var n = 0; n < idx.length; n++) {
         var i = idx[n], x = i % w, y = (i - x) / w, o = i * 4;
         var fall = m[o] / 255, pool = m[o + 1] / 255;
-        // 떨어지는 물: 무늬를 아래로 흘림
-        var a = fall * 0.5 * tile[(((y - shift) % TH) + TH) % TH * w + x];
-        if (pool > 0) {
-          // 웅덩이: 옆으로 흐르는 잔물결 빛 + 폭포 바로 아래 물안개가 숨 쉬듯
+        var r, g, b, glow = 0;
+        if (fall > pool) {
+          r = pull(x, y, o1, 0) * w1 + pull(x, y, o2, 0) * w2;
+          g = pull(x, y, o1, 1) * w1 + pull(x, y, o2, 1) * w2;
+          b = pull(x, y, o1, 2) * w1 + pull(x, y, o2, 2) * w2;
+          glow = 0.35 * tile[(((y - shift) % TH) + TH) % TH * w + x];
+        } else {
+          r = src[o]; g = src[o + 1]; b = src[o + 2];
           var ripple = 0.5 + 0.5 * Math.sin(x * 0.22 - t * 1.8 + 1.7 * Math.sin(y * 0.5 + t * 0.6));
-          a += pool * 0.42 * Math.pow(ripple, 10) * (0.6 + 0.4 * Math.sin(x * 0.07 + y * 0.31 + t)); // 줄무늬가 너무 고르지 않게
-          a += pool * Math.exp(-Math.max(0, y - 176) / 14) * (0.16 + 0.1 * Math.sin(t * 1.7 + x * 0.08));
+          glow = 0.42 * Math.pow(ripple, 10) * (0.6 + 0.4 * Math.sin(x * 0.07 + y * 0.31 + t)) // 줄무늬가 너무 고르지 않게
+            + Math.exp(-Math.max(0, y - 176) / 14) * (0.16 + 0.1 * Math.sin(t * 1.7 + x * 0.08));
         }
-        od[o] = 240; od[o + 1] = 248; od[o + 2] = 255; od[o + 3] = Math.min(255, a * 255);
+        od[o] = r + (255 - r) * glow;
+        od[o + 1] = g + (255 - g) * glow;
+        od[o + 2] = b + (255 - b) * glow;
+        od[o + 3] = Math.max(fall, pool) * 255;
       }
       it.ctx.putImageData(it.out, 0, 0);
     }
@@ -512,6 +546,65 @@
     new ResizeObserver(place).observe(scene);
     new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
     document.addEventListener("visibilitychange", start);
+  }
+
+  // 독립문·첫 번째 학생 위 먼 하늘에서 작은 새들이 계속 천천히 맴돌며 날아다님
+  // 그림 좌표(원본 1344×756)로 맴도는 범위(가운데 C, 가로·세로 반지름 R)를 정하고 sceneMap으로 화면 좌표로 바꿈
+  // 새마다 빠르기·위상이 다른 느린 곡선(가로는 크게, 세로는 작게 출렁)을 따라 날아 서로 겹치지 않고 자연스럽게 흩어짐
+  // 새는 작은 "ㅅ" 모양(색연필 톤의 흐린 회갈색), 날갯짓은 CSS. 배너가 좁으면(휴대폰) 2마리
+  // 휴대폰처럼 그림 위쪽 하늘이 잘려 보이면 보이는 윗선 아래로 범위를 내림
+  // 움직임 줄이기 설정이면 나오지 않고, 배너가 화면 밖이거나 탭이 숨으면 멈춤
+  function setupBirds() {
+    var scene = document.querySelector(".hero-scene");
+    var img = scene && scene.querySelector("img");
+    if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var C = [655, 96], R = [105, 22];
+    // 새마다: 한 바퀴 시간(초), 위상, 날갯짓 빠르기
+    var KINDS = [[26, 0, 0.46], [31, 2.1, 0.52], [23, 4.0, 0.49]];
+    var birds = [], map = null, low = 0, visible = true, running = false;
+
+    function place() {
+      map = sceneMap(scene, img);
+      if (!map) return;
+      low = Math.max(0, -map.at(0, 0)[1] / map.s + 40 - (C[1] - R[1]));
+      var n = scene.clientWidth < 700 ? 2 : 3, size = Math.min(11, Math.max(7, 12 * map.s));
+      while (birds.length > n) birds.pop().el.remove();
+      while (birds.length < n) {
+        var k = KINDS[birds.length], el = document.createElement("span");
+        el.className = "bird";
+        el.setAttribute("aria-hidden", "true");
+        scene.appendChild(el);
+        birds.push({ el: el, k: k });
+      }
+      birds.forEach(function (b, i) {
+        b.el.innerHTML = '<svg viewBox="0 0 12 6" width="' + size + '" height="' + size / 2 + '"><path style="animation-duration:' + b.k[2] + 's;animation-delay:-' + i * 0.17 + 's" d="M0 4.2Q3 0.6 6 4Q9 0.6 12 4.2"/></svg>';
+      });
+      start();
+    }
+
+    function frame(now) {
+      if (!visible || document.hidden || !map) { running = false; return; }
+      var t = now / 1000;
+      birds.forEach(function (b) {
+        var w = (Math.PI * 2) / b.k[0], ph = b.k[1];
+        // 가로로 크게 오가며, 세로로는 두 배 빠르게 작게 출렁(8자에 가까운 느린 곡선) + 아주 느린 흔들림
+        var x = C[0] + R[0] * Math.sin(w * t + ph) + 12 * Math.sin(w * 2.7 * t + ph * 1.3);
+        var y = C[1] + low + R[1] * Math.sin(w * 2 * t + ph) * 0.8 + 6 * Math.sin(w * 0.6 * t + ph);
+        var p = map.at(x, y);
+        b.el.style.transform = "translate(" + p[0] + "px," + p[1] + "px)";
+        b.el.style.opacity = 1;
+      });
+      requestAnimationFrame(frame);
+    }
+    function start() {
+      if (running || !visible || document.hidden || !map) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+    new ResizeObserver(place).observe(scene);
+    new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
+    document.addEventListener("visibilitychange", start);
+    if (img.complete) place(); else img.addEventListener("load", place, { once: true });
   }
 
   function setupHeroScene() {
@@ -626,6 +719,7 @@
   setupBinMarks();
   setupHairSway();
   setupWaterfall();
+  setupBirds();
   progress = setupProgress();
   applyLang(detectLang());
 })();
