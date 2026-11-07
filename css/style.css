@@ -125,15 +125,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:58% 45%;filter:var(--scene-filter);animation:scene-in 1.4s ease-out backwards}
 @keyframes scene-in{from{opacity:0;transform:scale(1.03)}}
 /* 그림 속 수거함의 ♻가 은은하게 밝아졌다 흐려졌다 반복(main.js setupBinMarks): 같은 그림을 겹쳐 흰 화살표만 남겨(검정은 screen으로 안 보임) 빛나게 */
-/* 배너 인물 움직임(main.js setupFigures: 머리카락·끄덕임·손짓): 그림과 같은 색 보정을 걸어 겹친 조각이 티 나지 않게 */
-.fig-move{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter)}
+/* 배너 인물 움직임(main.js setupFigures: 머리카락·손짓): 그림과 같은 색 보정을 걸어 겹친 조각이 티 나지 않게
+   그림이 흐릿하게 나타나는 동안(scene-in 1.4초)은 숨겨 둠: 선명한 조각만 따로 떠 보이지 않게 (폭포도 같음) */
+.fig-move{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter);animation:overlay-wait 1.4s step-end backwards}
+@keyframes overlay-wait{from{visibility:hidden}}
 /* 먼 하늘의 작은 새(main.js setupBirds): 색연필 톤의 흐린 회갈색 ㅅ, 날개를 위아래로 */
 .bird{position:absolute;left:0;top:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.2s}
 .bird svg{display:block;overflow:visible}
 .bird path{fill:none;stroke:#6f6b5f;stroke-opacity:.8;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 90%;animation:bird-flap .5s ease-in-out infinite alternate}
 @keyframes bird-flap{to{transform:scaleY(-.45)}}
 /* 인공폭포 물(main.js setupWaterfall): 물 부분만 다시 그려 겹침, 그림과 같은 색 보정 */
-.water-fx{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter)}
+.water-fx{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter);animation:overlay-wait 1.4s step-end backwards}
 .bin-mark{position:absolute;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:0;-webkit-mask:radial-gradient(circle,#000 55%,transparent 72%);mask:radial-gradient(circle,#000 55%,transparent 72%);animation:bin-mark-pulse 1.6s ease-in-out infinite}
 /* 노란 통 기준: 밝기 0.80 아래(통 색 0.72~0.75)는 검정, 0.88 위(흰 화살표 0.87~0.91)는 흰색이 되도록 밝기·대비를 맞춤 */
 .bin-mark i{position:absolute;inset:0;background-image:var(--bg);background-size:var(--bs);background-position:var(--bp);background-repeat:no-repeat;filter:grayscale(1) brightness(.6) contrast(21)}

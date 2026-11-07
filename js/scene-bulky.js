@@ -1,8 +1,8 @@
 // 대형 폐기물 장면 (클레이 스타일)
 // 서대문구청 안내: 구 홈페이지 인터넷 접수 또는 동별 대행업체 전화로 배출 신고 → 수수료 납부
 // → "신고필증"을 출력해 배출 품목에 붙임 → 약속한 날 내놓으면 수거
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108k";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 
 const CHAIR = [-0.35, 0.2];        // 의자 처음 위치 (x, z)
 const CHAIR_OUT = [0.3, -0.95];    // 집 앞에 내놓는 곳

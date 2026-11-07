@@ -4,28 +4,29 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108k";
-import food from "./scene-food.js?v=20261108k";
-import general from "./scene-general.js?v=20261108k";
-import bulky from "./scene-bulky.js?v=20261108k";
-import can from "./scene-can.js?v=20261108k";
-import vinyl from "./scene-vinyl.js?v=20261108k";
-import carton from "./scene-carton.js?v=20261108k";
-import medicine from "./scene-medicine.js?v=20261108k";
-import battery from "./scene-battery.js?v=20261108k";
-import glass from "./scene-glass.js?v=20261108k";
-import paper from "./scene-paper.js?v=20261108k";
-import appliance from "./scene-appliance.js?v=20261108k";
-import confuse from "./scene-confuse.js?v=20261108k";
+import pet from "./scene-pet.js?v=20261108r";
+import food from "./scene-food.js?v=20261108r";
+import general from "./scene-general.js?v=20261108r";
+import bulky from "./scene-bulky.js?v=20261108r";
+import can from "./scene-can.js?v=20261108r";
+import vinyl from "./scene-vinyl.js?v=20261108r";
+import carton from "./scene-carton.js?v=20261108r";
+import medicine from "./scene-medicine.js?v=20261108r";
+import battery from "./scene-battery.js?v=20261108r";
+import glass from "./scene-glass.js?v=20261108r";
+import paper from "./scene-paper.js?v=20261108r";
+import appliance from "./scene-appliance.js?v=20261108r";
+import confuse from "./scene-confuse.js?v=20261108r";
 
-import { GROUND } from "./eco3d-util.js?v=20261108k";
-import { sfx } from "./eco3d-sound.js?v=20261108k";
+import { GROUND } from "./eco3d-util.js?v=20261108r";
+import { sfx } from "./eco3d-sound.js?v=20261108r";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
   glass: glass, paper: paper, appliance: appliance, confuse: confuse
 };
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let webglOK = null; // hasWebGL()의 확인 결과 (아래 시작 코드보다 먼저 선언해야 함)
 
 document.querySelectorAll("[data-eco-lab]").forEach(initLab);
 document.querySelectorAll("[data-eco-loop]").forEach(initLoop);
@@ -36,13 +37,14 @@ setupSound();
 function initLab(lab) {
   const def = SCENES[lab.dataset.ecoLab];
   const stage = lab.querySelector(".eco-stage");
-  const canvas = lab.querySelector(".eco-canvas");
+  let canvas = lab.querySelector(".eco-canvas");
   const buttons = Array.from(lab.querySelectorAll("[data-step]"));
   const next = lab.querySelector("[data-eco-next]");
   const reset = lab.querySelector("[data-eco-reset]");
   const last = buttons.length;
   let step = 0;
   let view = null;
+  let cancelMount = null; // 3D를 불러오는 중이면 그 대기를 취소하는 함수
 
   function setStep(n) {
     step = n;
@@ -92,22 +94,48 @@ function initLab(lab) {
   });
   next.addEventListener("click", function () { setPlaying(false); setStep(Math.min(step + 1, last)); });
   reset.addEventListener("click", function () { held = false; setStep(0); setPlaying(!reduced); });
-  // 3D가 뜨기 전에도 캔버스 밖에서 손을 떼는 것을 받도록 누르는 순간 포인터를 붙잡음
-  canvas.addEventListener("pointerdown", function (e) {
-    held = true;
-    try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* 이미 끝난 포인터면 무시 */ }
-  });
-  ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
-    canvas.addEventListener(type, function () { held = false; });
-  });
+  // 3D가 뜨기 전에도 캔버스 밖에서 손을 떼는 것을 받도록 누르는 순간 포인터를 붙잡음 (캔버스를 새로 바꿀 때마다 다시 붙임)
+  function watchHold(c) {
+    c.addEventListener("pointerdown", function (e) {
+      held = true;
+      try { c.setPointerCapture(e.pointerId); } catch (err) { /* 이미 끝난 포인터면 무시 */ }
+    });
+    ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
+      c.addEventListener(type, function () { held = false; });
+    });
+  }
+  watchHold(canvas);
+
+  // 3D 불러오기·반납: 브라우저가 동시에 쓸 수 있는 WebGL 장치 수(크롬 16개)에 한도가 있어
+  // 13개 품목을 다 열면 먼저 연 3D가 꺼졌음 → 지금 보이는 품목만 장치를 쓰고, 안 보이게 되면 반납
+  // 반납한 캔버스는 다시 쓸 수 없어 같은 모양의 새 캔버스로 바꿔 끼움
+  function load() {
+    if (view || cancelMount) return;
+    cancelMount = mount(stage, canvas, def, { interactive: true }, function (v) {
+      cancelMount = null;
+      view = v;
+      view.goTo(step, true);
+    });
+  }
+  function unload() {
+    if (cancelMount) { cancelMount(); cancelMount = null; }
+    if (!view) return;
+    view.destroy();
+    view = null;
+    const fresh = canvas.cloneNode(false);
+    canvas.replaceWith(fresh);
+    canvas = fresh;
+    watchHold(canvas);
+    stage.classList.remove("is-ready");
+  }
   if (auto) {
     auto.hidden = reduced;
     auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
   }
   // 열 때마다(품목을 바꿔 보일 때도) "드래그해서 돌려 보세요" 안내를 다시 보이고 1단계부터 자동 진행
   // (드래그하면 createView가 is-touched로 숨김)
-  function start() { held = false; stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); }
-  function stop() { held = false; setPlaying(false); }
+  function start() { held = false; stage.classList.remove("is-touched"); load(); setStep(0); setPlaying(!reduced); }
+  function stop() { held = false; setPlaying(false); unload(); }
   lab.addEventListener("eco:start", start);
   lab.addEventListener("eco:stop", stop);
   if (dialog) {
@@ -116,11 +144,7 @@ function initLab(lab) {
     dialog.addEventListener("close", stop);
   }
   setStep(0);
-
-  mount(stage, canvas, def, { interactive: true }, function (v) {
-    view = v;
-    view.goTo(step, true);
-  });
+  load();
 }
 
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
@@ -254,13 +278,19 @@ function setupDialogs() {
   }
 }
 
+// WebGL을 쓸 수 있는지 한 번만 확인하고, 확인용으로 만든 장치는 바로 반납(장치 수 한도를 차지하지 않게)
 function hasWebGL() {
-  try {
-    const c = document.createElement("canvas");
-    return !!(c.getContext("webgl2") || c.getContext("webgl"));
-  } catch (e) {
-    return false;
+  if (webglOK === null) {
+    try {
+      const gl = document.createElement("canvas").getContext("webgl2") || document.createElement("canvas").getContext("webgl");
+      webglOK = !!gl;
+      const lose = gl && gl.getExtension("WEBGL_lose_context");
+      if (lose) lose.loseContext();
+    } catch (e) {
+      webglOK = false;
+    }
   }
+  return webglOK;
 }
 
 let threeLib = null;
@@ -273,16 +303,19 @@ function loadThree() {
 }
 
 // 화면 근처에 오면 Three.js를 불러와 장면을 만듦. 실패하면 is-fallback
+// 돌려주는 함수를 부르면 아직 만들기 전인 대기를 취소함
 function mount(stage, canvas, def, opts, onReady) {
   if (!hasWebGL()) {
     stage.classList.add("is-fallback");
-    return;
+    return function () {};
   }
+  let cancelled = false;
   const loader = new IntersectionObserver(async function (entries) {
     if (!entries.some(function (e) { return e.isIntersecting; })) return;
     loader.disconnect();
     try {
       const lib = await loadThree();
+      if (cancelled) return;
       const view = createView(lib, stage, canvas, def, opts);
       stage.classList.add("is-ready");
       onReady(view);
@@ -292,6 +325,7 @@ function mount(stage, canvas, def, opts, onReady) {
     }
   }, { rootMargin: "300px" });
   loader.observe(stage);
+  return function () { cancelled = true; loader.disconnect(); };
 }
 
 // 클레이(점토) 스타일 조명: 위아래로 은은한 하늘·바닥 빛 + 따뜻한 주광(부드러운 그림자) + 뒤쪽 테두리 빛
@@ -366,6 +400,8 @@ function createView(lib, stage, canvas, def, opts) {
     if (instant || reduced || n < shown) {
       queue.length = 0;
       active = null;
+      if (orbiting) { orbiting = false; velocity = 0; }
+      if (instant || reduced) orbit = 0;
       Object.assign(v, states[n], { $key: null, $p: 0 });
       if (world.reset) world.reset();
       shown = n;
@@ -438,7 +474,7 @@ function createView(lib, stage, canvas, def, opts) {
     }
     // 마지막 단계를 벗어나면(앞 단계·처음부터) 장면 전체 회전을 1초쯤에 걸쳐 원래 방향으로 되돌림
     if (orbit && shown < states.length - 1) {
-      orbiting = false;
+      if (orbiting) { orbiting = false; velocity = 0; }
       orbit *= Math.pow(0.01, dt);
       if (Math.abs(orbit) < 0.001) orbit = 0;
     }
@@ -472,13 +508,14 @@ function createView(lib, stage, canvas, def, opts) {
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
   }
-  new ResizeObserver(resize).observe(stage);
+  const sizer = new ResizeObserver(resize);
+  sizer.observe(stage);
   resize();
 
   // 화면에 보일 때만 그림
-  let visible = false, running = false, prev = 0;
+  let visible = false, running = false, prev = 0, dead = false;
   function frame(now) {
-    if (!visible || document.hidden) { running = false; return; }
+    if (dead || !visible || document.hidden) { running = false; return; }
     const dt = Math.min((now - prev) / 1000, 0.05);
     prev = now;
     update(dt);
@@ -486,15 +523,16 @@ function createView(lib, stage, canvas, def, opts) {
     requestAnimationFrame(frame);
   }
   function start() {
-    if (running || !visible || document.hidden) return;
+    if (dead || running || !visible || document.hidden) return;
     running = true;
     prev = performance.now();
     requestAnimationFrame(frame);
   }
-  new IntersectionObserver(function (entries) {
+  const watcher = new IntersectionObserver(function (entries) {
     visible = entries[entries.length - 1].isIntersecting;
     start();
-  }).observe(stage);
+  });
+  watcher.observe(stage);
   document.addEventListener("visibilitychange", start);
 
   update(0);
@@ -502,6 +540,16 @@ function createView(lib, stage, canvas, def, opts) {
 
   return {
     goTo: goTo,
+    // 그리기를 멈추고 WebGL 장치를 반납 (이 캔버스는 다시 쓸 수 없음)
+    destroy: function () {
+      dead = true;
+      sizer.disconnect();
+      watcher.disconnect();
+      document.removeEventListener("visibilitychange", start);
+      pmrem.dispose();
+      renderer.dispose();
+      renderer.forceContextLoss();
+    },
     busy: function () {
       // 체험 창에서 3D가 화면 밖이면(휴대폰에서 설명을 읽으려 내린 경우 등) 그리기가 멈춰 움직임이 끝나지 않음
       // → 남은 움직임을 건너뛰고 그 단계의 완성 모습으로 바로 맞춤. 카드 장식 3D는 지금처럼 보일 때 이어서 움직임

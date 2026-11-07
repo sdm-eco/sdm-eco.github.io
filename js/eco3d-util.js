@@ -1,4 +1,19 @@
 // 3D 장면들이 함께 쓰는 계산·텍스처·물방울 도우미
+
+// 오래된 브라우저(Safari 16·Firefox 112 이전)에는 둥근 사각형 그리기(roundRect)가 없어 3D 무늬를 못 그리고 글 설명만 나왔음
+// → 없을 때만 같은 모양을 arcTo로 그리는 대체 함수를 붙임. 반지름은 숫자 하나 또는 [왼위, 오위, 오아래, 왼아래](이 사이트가 쓰는 형태)
+if (typeof CanvasRenderingContext2D !== "undefined" && !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+    const a = Array.isArray(r) ? r : [r, r, r, r];
+    const k = function (v) { return Math.max(0, Math.min(v || 0, Math.abs(w) / 2, Math.abs(h) / 2)); };
+    this.moveTo(x + k(a[0]), y);
+    this.arcTo(x + w, y, x + w, y + h, k(a[1]));
+    this.arcTo(x + w, y + h, x, y + h, k(a[2]));
+    this.arcTo(x, y + h, x, y, k(a[3]));
+    this.arcTo(x, y, x + w, y, k(a[0]));
+    this.closePath();
+  };
+}
 export const GROUND = -1.5;   // 바닥 높이
 export const TAU = Math.PI * 2;
 
@@ -313,6 +328,7 @@ function clayGrain(shader) {
       "{ float h0 = clayHeight(vClayPos);\n" +
       "  vec3 g = vec3(clayHeight(vClayPos + vec3(0.004, 0.0, 0.0)), clayHeight(vClayPos + vec3(0.0, 0.004, 0.0)), clayHeight(vClayPos + vec3(0.0, 0.0, 0.004))) - h0;\n" +
       "  vec3 gv = (g.x * vClayX + g.y * vClayY + g.z * vClayZ) / 0.004;\n" +
+      "  #ifdef DOUBLE_SIDED\n  gv *= faceDirection;\n  #endif\n" +
       "  normal = normalize(normal - " + GRAIN + " * (gv - dot(gv, normal) * normal)); }");
 }
 function grainKey() { return "clay-grain"; }

@@ -255,15 +255,17 @@
     }
 
     new IntersectionObserver(function (entries) {
-      visible = entries[entries.length - 1].isIntersecting;
+      visible = entries[entries.length - 1].isIntersecting && !reduceMotion.matches;
       if (visible && !timer) timer = setTimeout(drop, 400);
     }).observe(demo);
+    // 페이지를 연 뒤 움직임 줄이기를 켜면 다음 물건부터 멈춤, 끄면 화면에 보일 때 다시 시작
+    reduceMotion.addEventListener("change", function () {
+      var r = demo.getBoundingClientRect();
+      visible = !reduceMotion.matches && r.bottom > 0 && r.top < innerHeight;
+      if (visible && !timer) timer = setTimeout(drop, 400);
+    });
   }
 
-  // 배너 그림 속 짧은 분리배출 장면 (페이지를 열 때 한 번, 약 6초)
-  // 그림이 색연필 질감이라 물건 그림 대신 빛으로만 표현: 여학생 손 → 노란 통, 남학생 손 → 초록 통으로 반짝이는 별이 날아 들어가고
-  // 통 입구가 은은하게 빛나며 반짝임과 빛나는 ♻가 떠올랐다 사라짐
-  // 그림은 object-fit:cover라 그림 좌표(원본 1344×756)를 화면 좌표로 바꿔 놓음. 움직임 줄이기 설정이면 재생 안 함
   // 배너 그림(object-fit:cover, 원본 1344×756)의 좌표를 지금 화면 좌표로 바꾸는 함수. s = 그림 배율
   function sceneMap(scene, img) {
     var IW = 1344, IH = 756;
@@ -655,6 +657,10 @@
     if (img.complete) place(); else img.addEventListener("load", place, { once: true });
   }
 
+  // 배너 그림 속 짧은 분리배출 장면 (페이지를 열 때 한 번, 약 6초)
+  // 그림이 색연필 질감이라 물건 그림 대신 빛으로만 표현: 여학생 손 → 노란 통, 남학생 손 → 초록 통으로 반짝이는 별이 날아 들어가고
+  // 통 입구가 은은하게 빛나며 반짝임과 빛나는 ♻가 떠올랐다 사라짐
+  // 그림은 object-fit:cover라 그림 좌표(원본 1344×756)를 화면 좌표로 바꿔 놓음. 움직임 줄이기 설정이면 재생 안 함
   function setupHeroScene() {
     var scene = document.querySelector(".hero-scene");
     var img = scene && scene.querySelector("img");

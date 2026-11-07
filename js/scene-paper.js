@@ -1,8 +1,8 @@
 // 종이류 장면 (클레이 스타일)
 // 서대문구청 안내: 종이류는 이물질(부착물 등)을 제거하고 차곡차곡 쌓은 후 묶어서 배출
 // (택배 운송장 스티커·테이프는 종량제 봉투 / 코팅된 종이·사진·벽지·물티슈는 재활용 불가)
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, wobble } from "./eco3d-util.js?v=20261108k";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, wobble } from "./eco3d-util.js?v=20261108r";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 
 const BOX = [-0.95, 0.2];   // 택배 상자 처음 자리 (x, z)
 const STACK = [0.85, 0.0];  // 신문 더미 자리 (x, z)

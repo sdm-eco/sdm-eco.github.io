@@ -1,8 +1,8 @@
 // 유리병 장면 (클레이 스타일)
 // 서대문구청 재활용품 분리배출 안내(병류): 라벨·병뚜껑을 제거하고 내용물을 비운 뒤 배출, 담배꽁초 등 이물질 넣지 않기
 // (깨진 유리·거울·도자기·화분·강화유리는 재활용 불가)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108k";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 
 const PROFILE = [[0, 0], [0.4, 0], [0.46, 0.04], [0.48, 0.15], [0.48, 1.6], [0.44, 1.85], [0.3, 2.1], [0.17, 2.35], [0.15, 2.6], [0.165, 2.66], [0.15, 2.72]];
 const TOP = 2.72;
