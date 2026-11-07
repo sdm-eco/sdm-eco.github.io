@@ -310,6 +310,23 @@
     if (img.complete) place(); else img.addEventListener("load", place, { once: true });
   }
 
+  // 움직임 줄이기 설정을 페이지를 연 뒤에 켜거나 꺼도 그림 위 효과(머리·폭포·새)가 따르게 함
+  // 켜면 그리기를 멈추고 겹친 요소를 숨겨 원래 그림으로, 끄면 다시 보이고 시작. els: 숨길 요소 목록을 돌려주는 함수
+  var reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+  // 돌려주는 sync()는 그리기 루프에서도 불러, 변경 알림이 늦거나 오지 않는 환경에서도 바로 숨김
+  function followReducedMotion(els, start) {
+    var off = false;
+    function sync() {
+      var r = reduceMotion.matches;
+      if (r === off) return;
+      off = r;
+      els().forEach(function (el) { el.hidden = r; });
+      if (!r) start();
+    }
+    reduceMotion.addEventListener("change", sync);
+    return sync;
+  }
+
   // 배너 그림 속 두 번째 여학생(단발)의 머리끝이 바람에 찰랑임
   // 원본 그림 좌표 box에서 잘라낸 두 장을 그림 위에 겹침:
   //   plate: 머리카락을 지우고 주변 색으로 메운 판(머리가 움직여도 밑의 원래 머리카락이 비치지 않게)
@@ -407,7 +424,7 @@
     }
 
     function frame(now) {
-      if (!visible || document.hidden) { running = false; return; }
+      if (!visible || document.hidden || reduceMotion.matches) { running = false; if (sync) sync(); return; }
       if (now - last > 33) { last = now; items.forEach(function (it) { draw(it, now); }); }
       requestAnimationFrame(frame);
     }
@@ -419,6 +436,7 @@
     new ResizeObserver(place).observe(scene);
     new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
     document.addEventListener("visibilitychange", start);
+    var sync = followReducedMotion(function () { return items.map(function (it) { return it.cv; }); }, start);
   }
 
   // 배너 그림 속 홍제천 인공폭포: 떨어지는 물줄기가 실제로 흘러내리고, 웅덩이 물빛이 은은하게 반짝임
@@ -534,7 +552,7 @@
       start();
     }
     function frame(now) {
-      if (!visible || document.hidden) { running = false; return; }
+      if (!visible || document.hidden || reduceMotion.matches) { running = false; if (sync) sync(); return; }
       if (now - last > 33) { last = now; draw(now); }
       requestAnimationFrame(frame);
     }
@@ -546,6 +564,7 @@
     new ResizeObserver(place).observe(scene);
     new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
     document.addEventListener("visibilitychange", start);
+    var sync = followReducedMotion(function () { return it ? [it.cv] : []; }, start);
   }
 
   // 독립문·첫 번째 학생 위 먼 하늘에서 작은 새들이 계속 천천히 맴돌며 날아다님
@@ -583,7 +602,7 @@
     }
 
     function frame(now) {
-      if (!visible || document.hidden || !map) { running = false; return; }
+      if (!visible || document.hidden || !map || reduceMotion.matches) { running = false; if (sync) sync(); return; }
       var t = now / 1000;
       birds.forEach(function (b) {
         var w = (Math.PI * 2) / b.k[0], ph = b.k[1];
@@ -604,6 +623,7 @@
     new ResizeObserver(place).observe(scene);
     new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
     document.addEventListener("visibilitychange", start);
+    var sync = followReducedMotion(function () { return birds.map(function (b) { return b.el; }); }, start);
     if (img.complete) place(); else img.addEventListener("load", place, { once: true });
   }
 

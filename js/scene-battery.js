@@ -1,8 +1,8 @@
 // 폐건전지·폐형광등 장면 (클레이 스타일)
 // 서대문구 폐금속자원 배출 안내: 공동주택은 단지 내 수거함, 단독주택은 인근 주민센터·주택 골목 수거함
 // (LED·전등 케이스·일반 전구는 넣으면 안 됨 → 재활용품 안내: 백열·LED 전구는 종량제 봉투)
-import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
+import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108i";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108i";
 
 const BOX = [0, -0.85];                // 수거함 위치 (x, z)
 const HOLE = [-0.38, GROUND + 1.25, -0.39]; // 건전지 넣는 구멍 (앞면)

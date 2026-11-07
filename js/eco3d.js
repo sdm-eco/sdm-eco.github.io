@@ -4,22 +4,22 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108h";
-import food from "./scene-food.js?v=20261108h";
-import general from "./scene-general.js?v=20261108h";
-import bulky from "./scene-bulky.js?v=20261108h";
-import can from "./scene-can.js?v=20261108h";
-import vinyl from "./scene-vinyl.js?v=20261108h";
-import carton from "./scene-carton.js?v=20261108h";
-import medicine from "./scene-medicine.js?v=20261108h";
-import battery from "./scene-battery.js?v=20261108h";
-import glass from "./scene-glass.js?v=20261108h";
-import paper from "./scene-paper.js?v=20261108h";
-import appliance from "./scene-appliance.js?v=20261108h";
-import confuse from "./scene-confuse.js?v=20261108h";
+import pet from "./scene-pet.js?v=20261108i";
+import food from "./scene-food.js?v=20261108i";
+import general from "./scene-general.js?v=20261108i";
+import bulky from "./scene-bulky.js?v=20261108i";
+import can from "./scene-can.js?v=20261108i";
+import vinyl from "./scene-vinyl.js?v=20261108i";
+import carton from "./scene-carton.js?v=20261108i";
+import medicine from "./scene-medicine.js?v=20261108i";
+import battery from "./scene-battery.js?v=20261108i";
+import glass from "./scene-glass.js?v=20261108i";
+import paper from "./scene-paper.js?v=20261108i";
+import appliance from "./scene-appliance.js?v=20261108i";
+import confuse from "./scene-confuse.js?v=20261108i";
 
-import { GROUND } from "./eco3d-util.js?v=20261108h";
-import { sfx } from "./eco3d-sound.js?v=20261108h";
+import { GROUND } from "./eco3d-util.js?v=20261108i";
+import { sfx } from "./eco3d-sound.js?v=20261108i";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
@@ -157,7 +157,8 @@ function setupItems() {
         btn.focus({ preventScroll: true });
         // 휴대폰에서 버튼 줄이 옆으로 밀리는 경우: 고른 버튼이 닫기 버튼(오른쪽 64px)에 가리지 않게 줄을 밀어 둠
         const row = btn.parentElement, r = row.getBoundingClientRect(), b = btn.getBoundingClientRect();
-        row.scrollLeft = Math.max(0, b.right - (r.right - 64));
+        const over = b.right - (r.right - 64), under = r.left + 14 - b.left;
+        if (over > 0) row.scrollLeft += over; else if (under > 0) row.scrollLeft -= under;
         lab.dispatchEvent(new Event("eco:start"));
       }
     }

@@ -147,6 +147,15 @@ export const sfx = {
   isOn: function () { return on; },
   set: function (value) {
     on = !!value;
+    if (!on && ctx) {
+      // 나고 있는 소리는 0.05초 만에 줄여 끊고, 다음에 켤 때는 새 출력 묶음을 씀(끊긴 소리가 되살아나지 않게)
+      const old = master;
+      old.gain.setTargetAtTime(0, ctx.currentTime, 0.015);
+      setTimeout(function () { old.disconnect(); }, 120);
+      master = ctx.createGain();
+      master.gain.value = 0.32;
+      master.connect(ctx.destination);
+    }
     try { localStorage.setItem(KEY, on ? "1" : "0"); } catch (e) { /* 기억 못 해도 동작은 함 */ }
     if (on) audio();
   },
