@@ -76,26 +76,9 @@ export function seeded(seed) {
   };
 }
 
-// 위가 열린 둥근 수거함 (앞에 스티커)
+// 위가 열린 둥근 수거함 (앞에 스티커) — 모든 장면이 클레이 스타일로 바뀌어 clayBin과 같은 모양을 씀
 export function binGroup(THREE, top, bottom, height, color, rimColor, stickerMap) {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.5, side: THREE.DoubleSide });
-  const wall = new THREE.Mesh(new THREE.CylinderGeometry(top, bottom, height, 48, 1, true), mat);
-  wall.position.y = height / 2;
-  const floor = new THREE.Mesh(new THREE.CircleGeometry(bottom, 48), mat);
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = 0.01;
-  const rim = new THREE.Mesh(new THREE.TorusGeometry(top, 0.045, 10, 64), new THREE.MeshStandardMaterial({ color: rimColor, roughness: 0.4 }));
-  rim.rotation.x = Math.PI / 2;
-  rim.position.y = height;
-  const sw = top * 0.95;
-  const sticker = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw * 0.62), new THREE.MeshStandardMaterial({ map: stickerMap, roughness: 0.5, transparent: true }));
-  const mid = (top + bottom) / 2;
-  sticker.position.set(0, height * 0.52, mid + 0.02);
-  sticker.rotation.x = -Math.atan((top - bottom) / height);
-  g.add(wall, floor, rim, sticker);
-  g.visible = false;
-  return g;
+  return clayBin(THREE, top, bottom, height, color, rimColor, stickerMap);
 }
 
 // 집 앞 벽(문·창문·불 켜진 등). signMap 텍스처를 문 옆 벽에 붙임. 바닥이 y=0
@@ -131,9 +114,11 @@ export function houseFront(THREE, signMap) {
 // 헹구기 단계 공통: 위에서 내려오는 수도꼭지와 물줄기, 그리고 기울인 그릇 입구에서 쏟아지는 방울
 // 쓰는 법: const f = createFaucet(THREE, scene, x, y);  매 프레임 f.update(나타남 0~1, 물 나옴 여부, dt)
 //          f.pour(obj, 입구(obj 기준 좌표), 기울기 그룹, 방울 모음, dt)  ← 쏟는 동안만 부름
-export function createFaucet(THREE, scene, x, y) {
+// 클레이 장면용(무광 흰색 + 초록 손잡이)이 기본. clay를 false로 주면 예전 크롬 모양
+export function createFaucet(THREE, scene, x, y, clay) {
+  clay = clay !== false;
   const g = new THREE.Group();
-  const metal = new THREE.MeshStandardMaterial({ color: 0xc9d2d6, metalness: 0.85, roughness: 0.25 });
+  const metal = clay ? clayMat(THREE, CLAY.white, { roughness: 0.4, clearcoat: 0.5 }) : new THREE.MeshStandardMaterial({ color: 0xc9d2d6, metalness: 0.85, roughness: 0.25 });
   const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.1, 20), metal);
   pipe.rotation.z = Math.PI / 2;
   pipe.position.set(0.55, 0.25, 0);
@@ -141,7 +126,7 @@ export function createFaucet(THREE, scene, x, y) {
   const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.35, 20), metal);
   spout.position.y = 0.08;
   elbow.position.y = 0.25;
-  const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 20), new THREE.MeshStandardMaterial({ color: 0x3b8fd0, roughness: 0.4 }));
+  const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 20), clay ? clayMat(THREE, CLAY.green) : new THREE.MeshStandardMaterial({ color: 0x3b8fd0, roughness: 0.4 }));
   knob.position.set(0.55, 0.4, 0);
   g.add(pipe, elbow, spout, knob);
   g.position.set(x, y, 0);
@@ -290,4 +275,60 @@ export function permitTexture(THREE) {
       x += bw + 7;
     }
   });
+}
+
+// ── 클레이(점토) 스타일: 배너 아래 3D 그림 아이콘처럼 말랑한 파스텔 + 사이트 테마(맑은 에코그린) ──
+// 시범 적용 장면(def.clay)에서만 씀. 색은 이 팔레트에서만 고름
+export const CLAY = {
+  cream: 0xfff6e6, white: 0xf7f8f4,
+  green: 0x6cc596, greenDeep: 0x2f8f5b, mint: 0xbfe8cf,
+  blue: 0x8ec2f2, blueDeep: 0x4a8fe0,
+  yellow: 0xf7d36e, yellowDeep: 0xe2a93a,
+  coral: 0xf29a86, wood: 0xe6c49a, silver: 0xd9dee2
+};
+
+// 무광에 가까운 부드러운 점토 재질 (가장자리에 은은한 윤기)
+export function clayMat(THREE, color, extra) {
+  return new THREE.MeshPhysicalMaterial(Object.assign({
+    color: color, roughness: 0.55, metalness: 0, sheen: 0.5, sheenRoughness: 0.6, sheenColor: 0xffffff,
+    clearcoat: 0.15, clearcoatRoughness: 0.6
+  }, extra || {}));
+}
+
+// 둥글둥글한 수거함: 아래가 둥글게 말린 몸통 + 두툼한 테두리 + 앞 스티커. 바닥이 y=0, 처음엔 숨김
+export function clayBin(THREE, top, bottom, height, color, rimColor, stickerMap) {
+  const g = new THREE.Group();
+  const pts = [[0, 0], [bottom - 0.12, 0], [bottom - 0.03, 0.03], [bottom, 0.12], [top, height - 0.05], [top, height]];
+  const wall = new THREE.Mesh(new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), 64), clayMat(THREE, color, { side: THREE.DoubleSide }));
+  const rim = new THREE.Mesh(new THREE.TorusGeometry(top, Math.min(0.075, top * 0.1), 16, 72), clayMat(THREE, rimColor));
+  rim.rotation.x = Math.PI / 2;
+  rim.position.y = height;
+  const sw = top * 0.95;
+  const sticker = new THREE.Mesh(new THREE.PlaneGeometry(sw, sw * 0.62), new THREE.MeshStandardMaterial({ map: stickerMap, roughness: 0.6, transparent: true }));
+  sticker.position.set(0, height * 0.5, (top + bottom) / 2 + 0.025);
+  sticker.rotation.x = -Math.atan((top - bottom) / height);
+  g.add(wall, rim, sticker);
+  g.visible = false;
+  return g;
+}
+
+// 부드러운 움직임 곡선
+// 기울여 쏟기(p 0~1): 살짝 뒤로 젖혔다가(준비) → 기울여 머묾 → 바로 세울 때 살짝 지나쳤다 돌아옴
+export function tiltCurve(p) {
+  const prep = p < 0.12 ? -0.06 * Math.sin(Math.PI * p / 0.12) : 0;
+  const up = easeInOut(clamp01((p - 0.1) / 0.25));
+  const back = backOut(clamp01((p - 0.72) / 0.28));
+  return up * (1 - back) + prep;
+}
+// 통통 튀며 내려앉기: 0→1로 갈 때 바닥에 닿고 두 번 작게 튐 (높이 비율 반환, 0이 바닥)
+export function bounceDrop(t) {
+  t = clamp01(t);
+  if (t < 0.6) return 1 - Math.pow(t / 0.6, 2);
+  if (t < 0.85) return 0.18 * Math.sin(Math.PI * (t - 0.6) / 0.25);
+  return 0.05 * Math.sin(Math.PI * (t - 0.85) / 0.15);
+}
+// 내려앉은 뒤 흔들림이 잦아듦 (t 0~1, 진폭 1에서 0으로)
+export function wobble(t, times) {
+  t = clamp01(t);
+  return Math.sin(t * Math.PI * 2 * (times || 3)) * Math.pow(1 - t, 2);
 }

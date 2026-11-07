@@ -4,19 +4,21 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261107s";
-import food from "./scene-food.js?v=20261107s";
-import general from "./scene-general.js?v=20261107s";
-import bulky from "./scene-bulky.js?v=20261107s";
-import can from "./scene-can.js?v=20261107s";
-import vinyl from "./scene-vinyl.js?v=20261107s";
-import carton from "./scene-carton.js?v=20261107s";
-import medicine from "./scene-medicine.js?v=20261107s";
-import battery from "./scene-battery.js?v=20261107s";
-import glass from "./scene-glass.js?v=20261107s";
-import paper from "./scene-paper.js?v=20261107s";
-import appliance from "./scene-appliance.js?v=20261107s";
-import confuse from "./scene-confuse.js?v=20261107s";
+import pet from "./scene-pet.js?v=20261107u";
+import food from "./scene-food.js?v=20261107u";
+import general from "./scene-general.js?v=20261107u";
+import bulky from "./scene-bulky.js?v=20261107u";
+import can from "./scene-can.js?v=20261107u";
+import vinyl from "./scene-vinyl.js?v=20261107u";
+import carton from "./scene-carton.js?v=20261107u";
+import medicine from "./scene-medicine.js?v=20261107u";
+import battery from "./scene-battery.js?v=20261107u";
+import glass from "./scene-glass.js?v=20261107u";
+import paper from "./scene-paper.js?v=20261107u";
+import appliance from "./scene-appliance.js?v=20261107u";
+import confuse from "./scene-confuse.js?v=20261107u";
+
+import { GROUND } from "./eco3d-util.js?v=20261107u";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
@@ -251,8 +253,8 @@ function hasWebGL() {
 let threeLib = null;
 function loadThree() {
   if (!threeLib) {
-    threeLib = Promise.all([import("three"), import("three/addons/environments/RoomEnvironment.js")])
-      .then(function (mods) { return { THREE: mods[0], RoomEnvironment: mods[1].RoomEnvironment }; });
+    threeLib = Promise.all([import("three"), import("three/addons/environments/RoomEnvironment.js"), import("three/addons/geometries/RoundedBoxGeometry.js")])
+      .then(function (mods) { return { THREE: mods[0], RoomEnvironment: mods[1].RoomEnvironment, ext: { RoundedBoxGeometry: mods[2].RoundedBoxGeometry } }; });
   }
   return threeLib;
 }
@@ -268,7 +270,7 @@ function mount(stage, canvas, def, opts, onReady) {
     loader.disconnect();
     try {
       const lib = await loadThree();
-      const view = createView(lib.THREE, lib.RoomEnvironment, stage, canvas, def, opts);
+      const view = createView(lib, stage, canvas, def, opts);
       stage.classList.add("is-ready");
       onReady(view);
     } catch (err) {
@@ -279,24 +281,61 @@ function mount(stage, canvas, def, opts, onReady) {
   loader.observe(stage);
 }
 
-function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
+// 클레이(점토) 스타일 조명: 위아래로 은은한 하늘·바닥 빛 + 따뜻한 주광(부드러운 그림자) + 뒤쪽 테두리 빛
+// 바닥에는 그림자만 받는 투명한 판을 깔아 물건이 바닥에 붙어 보이게 함 (def.clay인 장면만)
+// 한계: 그림자 지도 1장(1024px)·VSM 흐림이라 아주 작은 물건의 그림자는 흐릿함. 더 선명하게 하려면 mapSize를 늘릴 것
+function clayLook(THREE, renderer, scene, sun) {
+  renderer.toneMappingExposure = 1.08;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.VSMShadowMap;
+  sun.color.set(0xfff3e4);
+  sun.intensity = 1.7;
+  sun.position.set(-1.8, 8, 4);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024);
+  sun.shadow.radius = 14;
+  sun.shadow.blurSamples = 16;
+  sun.shadow.bias = -0.0005;
+  const cam = sun.shadow.camera;
+  cam.left = -4; cam.right = 4; cam.top = 4; cam.bottom = -4; cam.near = 1; cam.far = 16;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xdcefe3, 1.1));
+  const rim = new THREE.DirectionalLight(0xdcecff, 0.9);
+  rim.position.set(3, 3, -5);
+  scene.add(rim);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ color: 0x2d5a44, opacity: 0.22 }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.position.y = GROUND;
+  floor.receiveShadow = true;
+  scene.add(floor);
+}
+
+function createView(lib, stage, canvas, def, opts) {
+  const THREE = lib.THREE;
   const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.environment = pmrem.fromScene(new lib.RoomEnvironment(), 0.04).texture;
   const sun = new THREE.DirectionalLight(0xffffff, 1.3);
   sun.position.set(3, 5, 4);
   scene.add(sun);
+  if (def.clay) clayLook(THREE, renderer, scene, sun);
 
   const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
   camera.position.set(0, 0.6, 8.2);
 
   // 드래그로 돌리는 그룹 — 장면이 원하는 자리에 붙임
   const spin = new THREE.Group();
-  const world = def.build(THREE, scene, spin);
+  // ext: 장면이 쓸 수 있는 three.js 부가 도구 (둥근 상자 등)
+  const world = def.build(THREE, scene, spin, lib.ext);
+  // 클레이 장면: 불투명한 물건만 부드러운 그림자를 드리움 (물방울·투명한 병·바닥 그림자 판은 제외)
+  if (def.clay) {
+    scene.traverse(function (o) {
+      if (o.isMesh && !o.isInstancedMesh && !o.userData.noShadow && !(o.material && o.material.transparent)) o.castShadow = true;
+    });
+  }
 
   // 단계 애니메이션: 값을 0~1 사이에서 직선으로 바꾸고, 부드럽게 보이는 처리는 장면이 맡음
   const states = def.states, moves = def.moves;
@@ -361,6 +400,9 @@ function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
     spin.rotation.y = def.spin || 0;
   }
 
+  // 클레이 장면: 카메라가 아주 천천히 좌우로 흔들려(숨 쉬듯) 멈춰 있어도 입체감이 보임
+  const camBase = new THREE.Vector3();
+  let lookY = 0, idle = 0;
   function update(dt) {
     runTweens(dt);
     if (!dragging) {
@@ -368,6 +410,11 @@ function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
       spin.rotation.y += velocity * dt;
     }
     world.update(v, dt);
+    if (def.clay && !reduced) {
+      idle += dt;
+      camera.position.set(camBase.x + Math.sin(idle * 0.45) * 0.4, camBase.y + Math.sin(idle * 0.31) * 0.1, camBase.z);
+      camera.lookAt(0, lookY, 0);
+    }
   }
 
   function resize() {
@@ -380,6 +427,8 @@ function createView(THREE, RoomEnvironment, stage, canvas, def, opts) {
     const cam = def.camera || [0.6, 0.1];
     camera.position.set(0, cam[0], Math.max(fit, fit * 0.95 / camera.aspect) / (opts.zoom || 1));
     camera.lookAt(0, cam[1], 0);
+    camBase.copy(camera.position);
+    lookY = cam[1];
     camera.updateProjectionMatrix();
     renderer.render(scene, camera);
   }
