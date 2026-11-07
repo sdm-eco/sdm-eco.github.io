@@ -288,7 +288,7 @@
       el.setAttribute("aria-hidden", "true");
       el.innerHTML = "<i></i><i></i>"; // 또렷한 화살표 + 번진 빛무리
       el.style.setProperty("--bg", "url(" + img.currentSrc + ")");
-      el.style.animationDelay = i * 1.6 + "s";
+      el.style.animationDelay = i * 0.8 + "s"; // 두 통이 번갈아(반 주기 차이)
       if (i === 0) el.classList.add("is-green"); // 초록 통은 ♻가 더 어두워 기준이 다름
       scene.appendChild(el);
       return { el: el, p: p };
@@ -308,6 +308,210 @@
     }
     new ResizeObserver(place).observe(scene);
     if (img.complete) place(); else img.addEventListener("load", place, { once: true });
+  }
+
+  // 배너 그림 속 두 번째 여학생(단발)의 머리끝이 바람에 찰랑임
+  // 원본 그림 좌표 box에서 잘라낸 두 장을 그림 위에 겹침:
+  //   plate: 머리카락을 지우고 주변 색으로 메운 판(머리가 움직여도 밑의 원래 머리카락이 비치지 않게)
+  //   piece: 머리카락만 따낸 조각 → 정수리·귀 위는 고정, 귀 아래로 갈수록 진자처럼 좌우로 흔듦(끝이 조금 늦게 따라옴)
+  // 움직임 줄이기 설정이면 안 움직이고, 배너가 화면 밖이거나 탭이 숨으면 멈춤
+  // 한계: 픽셀마다 CPU로 계산(조각이 작아 가벼움, 초당 30번). 조각이 크거나 많아지면 WebGL로 옮길 것
+  function setupHairSway() {
+    var scene = document.querySelector(".hero-scene");
+    var img = scene && scene.querySelector("img");
+    if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // box: 조각 왼쪽 위(원본 그림 좌표), from~to: 흔들리기 시작하는 높이(귀)~머리끝(조각 안 y),
+    // face: 이 x보다 오른쪽(얼굴 옆 머리)은 덜 흔듦, amp: 머리끝 최대 흔들림(원본 px), period: 한 번 왕복(초)
+    var HAIR = [{ src: "img/hair-girl2.png", plate: "img/hair-girl2-plate.png", box: [735, 200], from: 32, to: 86, face: 72, amp: 3.2, period: 2.8 }];
+    var items = [], visible = true, running = false, last = 0;
+
+    HAIR.forEach(function (h) {
+      var piece = new Image(), plate = new Image(), n = 0;
+      var done = function () { if (++n === 2) { items.push(prepare(h, piece, plate)); place(); } };
+      piece.onload = plate.onload = done;
+      piece.src = h.src;
+      plate.src = h.plate;
+    });
+
+    function pixels(image, w, ht) {
+      var c = document.createElement("canvas");
+      c.width = w;
+      c.height = ht;
+      var g = c.getContext("2d");
+      g.drawImage(image, 0, 0);
+      return g.getImageData(0, 0, w, ht).data;
+    }
+
+    function prepare(h, piece, plate) {
+      var w = piece.naturalWidth, ht = piece.naturalHeight;
+      var cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = ht;
+      cv.className = "hair-sway";
+      cv.setAttribute("aria-hidden", "true");
+      scene.appendChild(cv);
+      var ctx = cv.getContext("2d");
+      // 흔들림 정도: 귀 높이(from)에서 0 → 머리끝(to)에서 1로 부드럽게, 얼굴 옆 머리는 0.55배
+      var weight = new Float32Array(w * ht);
+      for (var y = 0; y < ht; y++) {
+        var t = Math.min(1, Math.max(0, (y - h.from) / (h.to - h.from)));
+        var k = t * t * (3 - 2 * t);
+        for (var x = 0; x < w; x++) weight[y * w + x] = k * (x > h.face ? 0.55 : 1);
+      }
+      return { h: h, w: w, ht: ht, data: pixels(piece, w, ht), plate: pixels(plate, w, ht), cv: cv, ctx: ctx, out: ctx.createImageData(w, ht), weight: weight };
+    }
+
+    // 메운 판 위에, (dx, dy)만큼 밀린 머리카락을 겹쳐 그림 (이웃 네 점 사이로 섞어 가져와 부드럽게)
+    function draw(it, time) {
+      var h = it.h, w = it.w, ht = it.ht, src = it.data, pl = it.plate, od = it.out.data, wt = it.weight;
+      var ph = (time / 1000) * Math.PI * 2 / h.period;
+      for (var y = 0; y < ht; y++) {
+        for (var x = 0; x < w; x++) {
+          var i = y * w + x, k = wt[i], o = i * 4;
+          // 진자처럼 좌우로: 끝으로 갈수록 크게, 조금 늦게(1.1*k) 따라오고, 끝 가닥만 잔물결이 살짝 더해짐
+          var swing = Math.sin(ph - 1.1 * k);
+          var dx = h.amp * k * swing + 0.18 * h.amp * k * k * Math.sin(ph * 2.6 + x * 0.09);
+          var dy = -0.12 * Math.abs(dx); // 밖으로 흔들릴 때 끝이 살짝 들림
+          var sx = x - dx, sy = y - dy;
+          var x0 = Math.floor(sx), y0 = Math.floor(sy), fx = sx - x0, fy = sy - y0;
+          var r = 0, g = 0, b = 0, a = 0;
+          for (var n = 0; n < 4; n++) {
+            var xx = x0 + (n & 1), yy = y0 + (n >> 1);
+            if (xx < 0 || yy < 0 || xx >= w || yy >= ht) continue;
+            var f = ((n & 1) ? fx : 1 - fx) * ((n >> 1) ? fy : 1 - fy), j = (yy * w + xx) * 4, al = src[j + 3] * f;
+            r += src[j] * al; g += src[j + 1] * al; b += src[j + 2] * al; a += al;
+          }
+          // 판(pa) 위에 머리카락(a)을 덮어 그림
+          var pa = pl[o + 3], A = a / 255, outA = a + pa * (1 - A);
+          if (outA < 0.5) { od[o + 3] = 0; continue; }
+          od[o] = ((a ? r / a : 0) * a + pl[o] * pa * (1 - A)) / outA;
+          od[o + 1] = ((a ? g / a : 0) * a + pl[o + 1] * pa * (1 - A)) / outA;
+          od[o + 2] = ((a ? b / a : 0) * a + pl[o + 2] * pa * (1 - A)) / outA;
+          od[o + 3] = outA;
+        }
+      }
+      it.ctx.putImageData(it.out, 0, 0);
+    }
+
+    function place() {
+      var m = sceneMap(scene, img);
+      if (!m) return;
+      items.forEach(function (it) {
+        var p = m.at(it.h.box[0], it.h.box[1]);
+        it.cv.style.left = p[0] + "px";
+        it.cv.style.top = p[1] + "px";
+        it.cv.style.width = it.w * m.s + "px";
+        it.cv.style.height = it.ht * m.s + "px";
+      });
+      start();
+    }
+
+    function frame(now) {
+      if (!visible || document.hidden) { running = false; return; }
+      if (now - last > 33) { last = now; items.forEach(function (it) { draw(it, now); }); }
+      requestAnimationFrame(frame);
+    }
+    function start() {
+      if (running || !visible || document.hidden || !items.length) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+    new ResizeObserver(place).observe(scene);
+    new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
+    document.addEventListener("visibilitychange", start);
+  }
+
+  // 배너 그림 속 홍제천 인공폭포: 떨어지는 물줄기 결이 아래로 흐르고, 웅덩이 물빛이 은은하게 반짝임
+  // 물 영역 마스크(img/waterfall-mask.png: R = 떨어지는 물, G = 웅덩이, 원본 그림 좌표 box에서 잘라낸 것)에서만
+  // 밝은 빛을 계산해 그림 위에 screen으로 덧입힘(그림을 밀지 않아 원본이 비쳐 어색해질 일이 없음)
+  // 움직임 줄이기 설정이면 안 움직이고, 배너가 화면 밖이거나 탭이 숨으면 멈춤
+  // 한계: 물 픽셀마다 CPU로 계산(약 1.5만 개, 초당 30번). 더 크게 쓰면 WebGL로 옮길 것
+  function setupWaterfall() {
+    var scene = document.querySelector(".hero-scene");
+    var img = scene && scene.querySelector("img");
+    if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var BOX = [1150, 236], SPEED = 55, TH = 96; // 물줄기가 내려오는 속도(원본 px/초), 물줄기 무늬 세로 길이
+    var mask = new Image();
+    var it = null, visible = true, running = false, last = 0;
+    mask.onload = function () {
+      var w = mask.naturalWidth, h = mask.naturalHeight;
+      var c = document.createElement("canvas");
+      c.width = w;
+      c.height = h;
+      var g = c.getContext("2d");
+      g.drawImage(mask, 0, 0);
+      var m = g.getImageData(0, 0, w, h).data;
+      var idx = [];
+      for (var i = 0; i < w * h; i++) if (m[i * 4] > 8 || m[i * 4 + 1] > 8) idx.push(i);
+      // 세로 물줄기 무늬: 칸마다 밝기·간격·위치가 조금씩 다른 가는 줄 (옆 칸과 섞어 부드럽게)
+      var seed = 7, rnd = function () { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+      var col = [];
+      for (var x = 0; x < w; x++) col.push({ k: 1 + Math.floor(rnd() * 3), ph: rnd() * Math.PI * 2, a: 0.35 + rnd() * 0.65 });
+      var tile = new Float32Array(w * TH);
+      for (var y = 0; y < TH; y++) {
+        for (x = 0; x < w; x++) {
+          var v = 0;
+          for (var d = -1; d <= 1; d++) {
+            var q = col[Math.min(w - 1, Math.max(0, x + d))];
+            v += (d ? 0.25 : 0.5) * q.a * Math.pow(0.5 + 0.5 * Math.sin((y / TH) * Math.PI * 2 * q.k + q.ph), 8);
+          }
+          tile[y * w + x] = v;
+        }
+      }
+      var cv = document.createElement("canvas");
+      cv.width = w;
+      cv.height = h;
+      cv.className = "water-fx";
+      cv.setAttribute("aria-hidden", "true");
+      scene.appendChild(cv);
+      var ctx = cv.getContext("2d");
+      it = { w: w, h: h, m: m, idx: idx, tile: tile, cv: cv, ctx: ctx, out: ctx.createImageData(w, h) };
+      place();
+    };
+    mask.src = "img/waterfall-mask.png";
+
+    function draw(time) {
+      var t = time / 1000, w = it.w, m = it.m, od = it.out.data, tile = it.tile, idx = it.idx;
+      var shift = Math.floor(t * SPEED);
+      for (var n = 0; n < idx.length; n++) {
+        var i = idx[n], x = i % w, y = (i - x) / w, o = i * 4;
+        var fall = m[o] / 255, pool = m[o + 1] / 255;
+        // 떨어지는 물: 무늬를 아래로 흘림
+        var a = fall * 0.5 * tile[(((y - shift) % TH) + TH) % TH * w + x];
+        if (pool > 0) {
+          // 웅덩이: 옆으로 흐르는 잔물결 빛 + 폭포 바로 아래 물안개가 숨 쉬듯
+          var ripple = 0.5 + 0.5 * Math.sin(x * 0.22 - t * 1.8 + 1.7 * Math.sin(y * 0.5 + t * 0.6));
+          a += pool * 0.42 * Math.pow(ripple, 10) * (0.6 + 0.4 * Math.sin(x * 0.07 + y * 0.31 + t)); // 줄무늬가 너무 고르지 않게
+          a += pool * Math.exp(-Math.max(0, y - 176) / 14) * (0.16 + 0.1 * Math.sin(t * 1.7 + x * 0.08));
+        }
+        od[o] = 240; od[o + 1] = 248; od[o + 2] = 255; od[o + 3] = Math.min(255, a * 255);
+      }
+      it.ctx.putImageData(it.out, 0, 0);
+    }
+
+    function place() {
+      var mp = sceneMap(scene, img);
+      if (!mp || !it) return;
+      var p = mp.at(BOX[0], BOX[1]);
+      it.cv.style.left = p[0] + "px";
+      it.cv.style.top = p[1] + "px";
+      it.cv.style.width = it.w * mp.s + "px";
+      it.cv.style.height = it.h * mp.s + "px";
+      start();
+    }
+    function frame(now) {
+      if (!visible || document.hidden) { running = false; return; }
+      if (now - last > 33) { last = now; draw(now); }
+      requestAnimationFrame(frame);
+    }
+    function start() {
+      if (running || !visible || document.hidden || !it) return;
+      running = true;
+      requestAnimationFrame(frame);
+    }
+    new ResizeObserver(place).observe(scene);
+    new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); }).observe(scene);
+    document.addEventListener("visibilitychange", start);
   }
 
   function setupHeroScene() {
@@ -420,6 +624,8 @@
   setupGameDemo();
   setupHeroScene();
   setupBinMarks();
+  setupHairSway();
+  setupWaterfall();
   progress = setupProgress();
   applyLang(detectLang());
 })();
