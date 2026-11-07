@@ -4,22 +4,22 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108i";
-import food from "./scene-food.js?v=20261108i";
-import general from "./scene-general.js?v=20261108i";
-import bulky from "./scene-bulky.js?v=20261108i";
-import can from "./scene-can.js?v=20261108i";
-import vinyl from "./scene-vinyl.js?v=20261108i";
-import carton from "./scene-carton.js?v=20261108i";
-import medicine from "./scene-medicine.js?v=20261108i";
-import battery from "./scene-battery.js?v=20261108i";
-import glass from "./scene-glass.js?v=20261108i";
-import paper from "./scene-paper.js?v=20261108i";
-import appliance from "./scene-appliance.js?v=20261108i";
-import confuse from "./scene-confuse.js?v=20261108i";
+import pet from "./scene-pet.js?v=20261108j";
+import food from "./scene-food.js?v=20261108j";
+import general from "./scene-general.js?v=20261108j";
+import bulky from "./scene-bulky.js?v=20261108j";
+import can from "./scene-can.js?v=20261108j";
+import vinyl from "./scene-vinyl.js?v=20261108j";
+import carton from "./scene-carton.js?v=20261108j";
+import medicine from "./scene-medicine.js?v=20261108j";
+import battery from "./scene-battery.js?v=20261108j";
+import glass from "./scene-glass.js?v=20261108j";
+import paper from "./scene-paper.js?v=20261108j";
+import appliance from "./scene-appliance.js?v=20261108j";
+import confuse from "./scene-confuse.js?v=20261108j";
 
-import { GROUND } from "./eco3d-util.js?v=20261108i";
-import { sfx } from "./eco3d-sound.js?v=20261108i";
+import { GROUND } from "./eco3d-util.js?v=20261108j";
+import { sfx } from "./eco3d-sound.js?v=20261108j";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
@@ -298,7 +298,7 @@ function mount(stage, canvas, def, opts, onReady) {
 // 바닥에는 그림자만 받는 투명한 판을 깔아 물건이 바닥에 붙어 보이게 함 (def.clay인 장면만)
 // 한계: 그림자 지도 1장(1024px)·VSM 흐림이라 아주 작은 물건의 그림자는 흐릿함. 더 선명하게 하려면 mapSize를 늘릴 것
 function clayLook(THREE, renderer, scene, sun) {
-  renderer.toneMappingExposure = 1.08;
+  renderer.toneMappingExposure = 1.02;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.VSMShadowMap;
   sun.color.set(0xfff3e4);
@@ -311,7 +311,7 @@ function clayLook(THREE, renderer, scene, sun) {
   sun.shadow.bias = -0.0005;
   const cam = sun.shadow.camera;
   cam.left = -4; cam.right = 4; cam.top = 4; cam.bottom = -4; cam.near = 1; cam.far = 16;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xdcefe3, 1.1));
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xdcefe3, 0.9));
   const rim = new THREE.DirectionalLight(0xdcecff, 0.9);
   rim.position.set(3, 3, -5);
   scene.add(rim);

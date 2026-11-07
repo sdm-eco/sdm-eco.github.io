@@ -1,8 +1,8 @@
 // 폐가전 장면 (클레이 스타일)
 // 서대문구 폐금속자원 배출 안내: 냉장고·에어컨·세탁기·TV 등 대형폐가전(또는 소형 5개 이상)은 폐가전 무상방문수거 예약(☎1599-0903),
 // 소형폐가전 5개 미만은 구청 홈페이지 "대형폐기물 신고"에서 무상 신고 → 접수증 부착 후 건물 밖 배출
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108i";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108i";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108j";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
 
 const FRIDGE = [-0.75, -0.1];        // 냉장고 자리 (x, z)
 const PHONE = [1.35, -0.25, 0.35];    // 휴대폰 자리 (x, y, z)

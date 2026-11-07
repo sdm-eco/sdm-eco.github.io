@@ -1,8 +1,8 @@
 // 일반 쓰레기 장면 (클레이 스타일)
 // 서대문구청 안내: 재활용품은 품목별로 따로 배출, 일반(가연성) 쓰레기는 종량제 봉투에 담아
 // 18시~23시에 내 집 앞·내 점포 앞에 배출 (규격봉투 미사용 시 과태료)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, binGroup, seeded, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108i";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108i";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, binGroup, seeded, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108j";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
 
 const R_BIN = [1.6, 0.35];     // 재활용품 수거함 위치 (x, z)
 const BAG = [-1.45, 0.15];      // 종량제 봉투가 나타나는 곳

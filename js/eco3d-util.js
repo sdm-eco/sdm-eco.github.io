@@ -280,19 +280,58 @@ export function permitTexture(THREE) {
 // ── 클레이(점토) 스타일: 배너 아래 3D 그림 아이콘처럼 말랑한 파스텔 + 사이트 테마(맑은 에코그린) ──
 // 시범 적용 장면(def.clay)에서만 씀. 색은 이 팔레트에서만 고름
 export const CLAY = {
-  cream: 0xfff6e6, white: 0xf7f8f4,
-  green: 0x6cc596, greenDeep: 0x2f8f5b, mint: 0xbfe8cf,
-  blue: 0x8ec2f2, blueDeep: 0x4a8fe0,
-  yellow: 0xf7d36e, yellowDeep: 0xe2a93a,
-  coral: 0xf29a86, wood: 0xe6c49a, silver: 0xd9dee2
+  cream: 0xfff1d8, white: 0xf4f5ef,
+  green: 0x4fbb80, greenDeep: 0x23864f, mint: 0x9fdcb8,
+  blue: 0x6eb0ef, blueDeep: 0x3a7fd8,
+  yellow: 0xf6c84c, yellowDeep: 0xe09a22,
+  coral: 0xee7f68, wood: 0xdcae78, silver: 0xcfd6db
 };
 
-// 무광에 가까운 부드러운 점토 재질 (가장자리에 은은한 윤기)
+// 손으로 빚은 점토 표면: 물건 자체 좌표의 잔무늬로 빛 받는 방향(법선)을 살짝 흔들고 색도 아주 조금 얼룩지게 함
+//  - 그림 파일 없이 셰이더에서 계산. 물건 좌표를 쓰므로 움직여도 무늬가 따라가고, 크기를 키워도 무늬 굵기는 일정
+//  - 높이 = 굵은 덩어리(손으로 누른 자국) + 잔 알갱이. 물건 좌표에서 기울기를 직접 구해 법선을 기울임(픽셀 깨짐 없음)
+//  - 세기: GRAIN(빛 받는 방향 흔들림), MOTTLE(색 얼룩). 조각 하나당 잡음 9번 계산이라 작은 3D 화면에선 부담 적음
+const GRAIN = "0.32", MOTTLE = "0.035";
+function clayGrain(shader) {
+  shader.vertexShader = shader.vertexShader
+    .replace("#include <common>", "#include <common>\nvarying vec3 vClayPos, vClayX, vClayY, vClayZ;")
+    .replace("#include <begin_vertex>", "#include <begin_vertex>\n" +
+      "vClayPos = transformed * vec3(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz), length(modelMatrix[2].xyz));\n" +
+      "vClayX = normalize(mat3(modelViewMatrix) * vec3(1.0, 0.0, 0.0));\n" +
+      "vClayY = normalize(mat3(modelViewMatrix) * vec3(0.0, 1.0, 0.0));\n" +
+      "vClayZ = normalize(mat3(modelViewMatrix) * vec3(0.0, 0.0, 1.0));");
+  shader.fragmentShader = shader.fragmentShader
+    .replace("#include <common>", "#include <common>\nvarying vec3 vClayPos, vClayX, vClayY, vClayZ;\n" +
+      "float clayHash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }\n" +
+      "float clayNoise(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);\n" +
+      "  return mix(mix(mix(clayHash(i), clayHash(i + vec3(1, 0, 0)), f.x), mix(clayHash(i + vec3(0, 1, 0)), clayHash(i + vec3(1, 1, 0)), f.x), f.y),\n" +
+      "             mix(mix(clayHash(i + vec3(0, 0, 1)), clayHash(i + vec3(1, 0, 1)), f.x), mix(clayHash(i + vec3(0, 1, 1)), clayHash(i + vec3(1, 1, 1)), f.x), f.y), f.z); }\n" +
+      "float clayHeight(vec3 p) { return clayNoise(p * 9.0) * 0.05 + clayNoise(p * 20.0) * 0.008; }")
+    .replace("#include <color_fragment>", "#include <color_fragment>\n" +
+      "diffuseColor.rgb *= 1.0 - " + MOTTLE + " + 2.0 * " + MOTTLE + " * clayNoise(vClayPos * 3.0);")
+    .replace("#include <normal_fragment_maps>", "#include <normal_fragment_maps>\n" +
+      "{ float h0 = clayHeight(vClayPos);\n" +
+      "  vec3 g = vec3(clayHeight(vClayPos + vec3(0.004, 0.0, 0.0)), clayHeight(vClayPos + vec3(0.0, 0.004, 0.0)), clayHeight(vClayPos + vec3(0.0, 0.0, 0.004))) - h0;\n" +
+      "  vec3 gv = (g.x * vClayX + g.y * vClayY + g.z * vClayZ) / 0.004;\n" +
+      "  normal = normalize(normal - " + GRAIN + " * (gv - dot(gv, normal) * normal)); }");
+}
+function grainKey() { return "clay-grain"; }
+
+// 무광에 가까운 부드러운 점토 재질 (가장자리에 은은한 윤기, 표면은 손으로 빚은 잔무늬)
+// extra.grain === false 이면 무늬 없이 매끈하게 (화면·유리처럼 매끈해야 하는 것)
 export function clayMat(THREE, color, extra) {
-  return new THREE.MeshPhysicalMaterial(Object.assign({
-    color: color, roughness: 0.55, metalness: 0, sheen: 0.5, sheenRoughness: 0.6, sheenColor: 0xffffff,
-    clearcoat: 0.15, clearcoatRoughness: 0.6
-  }, extra || {}));
+  const opt = Object.assign({}, extra || {});
+  const grain = opt.grain !== false;
+  delete opt.grain;
+  const m = new THREE.MeshPhysicalMaterial(Object.assign({
+    color: color, roughness: 0.62, metalness: 0, sheen: 0.3, sheenRoughness: 0.7, sheenColor: 0xffffff,
+    clearcoat: 0.1, clearcoatRoughness: 0.7
+  }, opt));
+  if (grain) {
+    m.onBeforeCompile = clayGrain;
+    m.customProgramCacheKey = grainKey;
+  }
+  return m;
 }
 
 // 둥글둥글한 수거함: 아래가 둥글게 말린 몸통 + 두툼한 테두리 + 앞 스티커. 바닥이 y=0, 처음엔 숨김

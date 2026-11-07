@@ -1,9 +1,9 @@
 // 헷갈리는 쓰레기 장면 ("재활용품인 척하는 쓰레기") — 클레이 스타일
 // 서대문구·서울시 안내: 칫솔·영수증·나무젓가락·고무장갑·테이프 등은 재활용이 안 되므로 종량제 봉투에,
 // 컵라면 용기·유색 스티로폼은 깨끗이 씻어 재질별로 모으면 재활용, 아니면 종량제 봉투
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, binGroup, createFaucet, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108i";
-import { bagGroup, recycleSticker } from "./scene-general.js?v=20261108i";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108i";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, binGroup, createFaucet, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108j";
+import { bagGroup, recycleSticker } from "./scene-general.js?v=20261108j";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
 
 const R_BIN = [-1.65, -0.6]; // 재활용품 수거함 (x, z)
 const BAG = [1.45, -0.5];     // 종량제 봉투
