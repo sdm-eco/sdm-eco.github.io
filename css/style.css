@@ -5,15 +5,15 @@
 /* Hallmark · answered F7 · the pill radius stays on the 3D open and action buttons, the duration and 3D tags and the drag hint; .soon is unused on this page */
 
 :root{
-  --ink:#1b2b22;--ink-2:#3a5444;--muted:#56675c;--line:#dfe5d8;--paper:#f1f9ea;--white:#fbfcf6;
-  --mint:#e6f6da;--mint-hi:#d2efbd;--mint-2:#dff3cf;--sun:#fbf6dc;
+  --ink:#1b2b22;--ink-2:#3a5444;--muted:#56675c;--line:#e0e6ed;--paper:#f1f6fb;--white:#ffffff;
+  --mint:#e6f1fb;--mint-hi:#d2e5f7;--mint-2:#e0eef9;--sun:#ffffff;
   --fresh:#2a9d55;--fresh-strong:#1d7a43;--fresh-hover:#186a3a;
   --forest:#0b2e22;--forest-2:#0f3a2c;--night:#06120d;
   --green:#2f8f5b;--meadow:#7cc46b;--link:#1f6b44;--link-dark:#174f33;
-  --lime:#d4f29a;--lime-3:#b8de78;--lime-hover:#c8ec85;--lime-soft:#e9f7cf;--leaf:#9fcf7a;
-  --lime-ink:#173404;--leaf-ink:#2c5a1e;--card-line:#d9e9cc;
+  --lime:#d4f29a;--lime-3:#b8de78;--lime-hover:#c8ec85;--lime-soft:#e6f4ea;--leaf:#9fcf7a;
+  --lime-ink:#173404;--leaf-ink:#2c5a1e;--card-line:#d5e3f0;
   --on-dark:#f5fbef;
-  --wash:#f7fbf2;--mist:#eef2e6;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
+  --wash:#f5f9fd;--mist:#edf2f7;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
   --glow:#f2b632;--focus:#1f6b44;--danger:#b42318;
   /* 카테고리 타일·게임 배너: 구청 시안 색 그대로(실제 봉투 색 확인 전 임시값) */
   --general:#7b5bd6;--general-bg:#f6f2fe;--general-hi:#e2d6fb;--food:#f2b705;--food-bg:#fef9e2;--food-hi:#fae9a5;--food-ink:#3d2f00;--recycle:#2f7fd6;--recycle-bg:#edf5fd;--recycle-hi:#cde1f9;--bulky:#e0558f;--bulky-bg:#fef0f5;--bulky-hi:#fad0e1;--banner:#fdf4c8;--video:#ef7d4f;--video-ink:#b4491f;--video-bg:#fdeee6;--video-hi:#fadccd;--video-line:#f6d6c6;--game-ink:#8a5a00;--banner-2:#fbecb2;
@@ -70,11 +70,12 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .lang-switch button:hover{background:var(--lime-soft)}
 .lang-switch button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
 
-.hero{position:relative;overflow:hidden;color:var(--ink);background:radial-gradient(ellipse at 82% 12%,var(--sun),transparent 50%),linear-gradient(180deg,var(--white) 40%,var(--mint))}
+/* 색: 흰 바탕 + 위쪽 하늘색(그림 속 하늘과 이어짐). 초록은 버튼·글자 포인트로만 (2026-11 색 시안 C) */
+.hero{position:relative;overflow:hidden;color:var(--ink);background:linear-gradient(180deg,#e9f3fd 0%,var(--white) 62%)}
 .hero:after{content:"";position:absolute;width:640px;height:640px;right:-220px;top:-260px;border:1px solid color-mix(in srgb,var(--fresh) 18%,transparent);border-radius:50%;box-shadow:0 0 0 90px color-mix(in srgb,var(--fresh) 4%,transparent),0 0 0 180px color-mix(in srgb,var(--fresh) 3%,transparent);pointer-events:none}
 .garden-bg{position:absolute;left:0;right:0;bottom:0;width:100%;height:clamp(220px,28vw,380px);pointer-events:none}
-.garden-back{fill:var(--meadow);opacity:.2}
-.garden-front{fill:var(--meadow);opacity:.3;transform-box:view-box;transform-origin:50% 100%;animation:garden-lean 8s ease-in-out infinite}
+.garden-back{fill:var(--meadow);opacity:.04}
+.garden-front{fill:var(--meadow);opacity:.06;transform-box:view-box;transform-origin:50% 100%;animation:garden-lean 8s ease-in-out infinite}
 .garden-vines{fill:none;stroke:var(--fresh);stroke-width:1.5;stroke-opacity:.35}
 .garden-vines ellipse{fill:var(--fresh);fill-opacity:.3;stroke:none}
 .garden-vines circle{fill:var(--fresh);stroke:none;opacity:.3;transform-box:fill-box;transform-origin:center;animation:node-glow 2.8s ease-in-out infinite}
@@ -118,7 +119,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .hero-art{position:absolute;top:0;right:0;bottom:0;width:58%;margin:0;pointer-events:none}
 .hero-scene{position:absolute;inset:0;-webkit-mask-image:linear-gradient(to right,transparent,#000 26%),linear-gradient(to bottom,#000 80%,transparent);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent,#000 26%),linear-gradient(to bottom,#000 80%,transparent);mask-composite:intersect}
 /* 나타나는 효과가 끝나면 효과를 남기지 않음(backwards): 끝난 뒤에도 그림이 별도 층으로 남으면 Edge에서 폭을 바꾼 뒤 흐림 마스크가 예전 크기로 남아 그림이 잘려 보였음 */
-.hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:58% 45%;animation:scene-in 1.4s ease-out backwards}
+/* 그림의 누런 기를 빼고(풀색을 푸르게) 조금 맑게 */
+.hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:58% 45%;filter:hue-rotate(10deg) saturate(1.05) contrast(1.07) brightness(1.03);animation:scene-in 1.4s ease-out backwards}
 @keyframes scene-in{from{opacity:0;transform:scale(1.03)}}
 /* 그림 속 수거함의 ♻가 은은하게 밝아졌다 흐려졌다 반복(main.js setupBinMarks): 같은 그림을 겹쳐 흰 화살표만 남겨(검정은 screen으로 안 보임) 빛나게 */
 .bin-mark{position:absolute;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:0;-webkit-mask:radial-gradient(circle,#000 55%,transparent 72%);mask:radial-gradient(circle,#000 55%,transparent 72%);animation:bin-mark-pulse 3.2s ease-in-out infinite}
@@ -152,7 +154,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @keyframes leaf-float{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:.85}50%{transform:translate(46px,-38px) rotate(40deg)}85%{opacity:.85}100%{opacity:0;transform:translate(92px,-20px) rotate(80deg)}}
 
 .learn{padding:32px 0 0}
-.learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),var(--sun))}
+.learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:22px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,#edf5fd,#f4faf3)}
 .learn-head h2{margin:0;font-size:26px;line-height:1.35;letter-spacing:-.8px;font-weight:850;text-wrap:balance}
 .learn-head p{margin-top:4px;font-size:16px;color:var(--muted)}
 .learn-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
