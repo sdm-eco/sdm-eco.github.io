@@ -1,7 +1,7 @@
 // 폐의약품 장면
 // 서울시 폐의약품 안내: 가루약·알약은 포장된 그대로, 물약·시럽·연고는 마개를 닫아 용기째
 // → 주민센터·보건소·구청 등 폐의약품 수거함 (알약은 봉투에 표시·밀봉하면 우체통도 가능, 물약 제외)
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, stickerTexture } from "./eco3d-util.js?v=20261107p";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, stickerTexture } from "./eco3d-util.js?v=20261107s";
 
 const BOX = [0, -0.95];              // 수거함 위치 (x, z)
 const SLOT = [0, GROUND + 1.5, -0.42]; // 수거함 투입구

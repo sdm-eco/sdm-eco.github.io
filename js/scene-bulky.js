@@ -1,7 +1,7 @@
 // 대형 폐기물 장면
 // 서대문구청 안내: 구 홈페이지 인터넷 접수 또는 동별 대행업체 전화로 배출 신고 → 수수료 납부
 // → "신고필증"을 출력해 배출 품목에 붙임 → 약속한 날 내놓으면 수거
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, houseFront } from "./eco3d-util.js?v=20261107p";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, houseFront, screenBase, phoneDone, permitTexture } from "./eco3d-util.js?v=20261107s";
 
 const CHAIR = [-0.35, 0.2];        // 의자 처음 위치 (x, z)
 const CHAIR_OUT = [0.3, -0.95];    // 집 앞에 내놓는 곳
@@ -124,15 +124,6 @@ function armchair(THREE) {
   return g;
 }
 
-function screenBase(g, w, h) {
-  g.fillStyle = "#ffffff";
-  g.fillRect(0, 0, w, h);
-  g.fillStyle = "#2f8f5b";
-  g.fillRect(0, 0, w, 70);
-  g.fillStyle = "#ffffff";
-  g.fillRect(24, 28, 70, 14);
-}
-
 // 신청 화면: 소파 그림, 입력 칸, ₩ 결제 버튼
 function phoneForm(THREE) {
   return canvasTexture(THREE, 256, 496, function (g, w, h) {
@@ -153,51 +144,6 @@ function phoneForm(THREE) {
     g.textAlign = "center";
     g.textBaseline = "middle";
     g.fillText("₩", w / 2, 397);
-  });
-}
-
-// 완료 화면: 초록 체크
-function phoneDone(THREE) {
-  return canvasTexture(THREE, 256, 496, function (g, w, h) {
-    screenBase(g, w, h);
-    g.fillStyle = "#2f8f5b";
-    g.beginPath();
-    g.arc(w / 2, 240, 80, 0, TAU);
-    g.fill();
-    g.strokeStyle = "#ffffff";
-    g.lineWidth = 22;
-    g.lineCap = "round";
-    g.lineJoin = "round";
-    g.beginPath();
-    g.moveTo(w / 2 - 40, 242);
-    g.lineTo(w / 2 - 10, 272);
-    g.lineTo(w / 2 + 42, 212);
-    g.stroke();
-    g.fillStyle = "#dfe6e2";
-    g.fillRect(48, 370, w - 96, 22);
-  });
-}
-
-// 신고필증: 노란 바탕, 번호, 바코드
-function permitTexture(THREE) {
-  return canvasTexture(THREE, 384, 248, function (g, w, h) {
-    g.fillStyle = "#ffd84d";
-    g.beginPath();
-    g.roundRect(4, 4, w - 8, h - 8, 22);
-    g.fill();
-    g.strokeStyle = "#c79a12";
-    g.lineWidth = 8;
-    g.stroke();
-    g.fillStyle = "#3a2f0b";
-    g.font = "bold 50px system-ui, sans-serif";
-    g.textAlign = "center";
-    g.fillText("No. 1376", w / 2, 82);
-    let x = 48;
-    for (let i = 0; x < w - 48; i++) {
-      const bw = [6, 10, 4, 14][i % 4];
-      g.fillRect(x, 120, bw, 90);
-      x += bw + 7;
-    }
   });
 }
 

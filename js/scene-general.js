@@ -1,7 +1,7 @@
 // 일반 쓰레기 장면
 // 서대문구청 안내: 재활용품은 품목별로 따로 배출, 일반(가연성) 쓰레기는 종량제 봉투에 담아
 // 18시~23시에 내 집 앞·내 점포 앞에 배출 (규격봉투 미사용 시 과태료)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, binGroup, seeded, houseFront } from "./eco3d-util.js?v=20261107p";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, binGroup, seeded, houseFront } from "./eco3d-util.js?v=20261107s";
 
 const R_BIN = [1.6, 0.35];     // 재활용품 수거함 위치 (x, z)
 const BAG = [-1.45, 0.15];      // 종량제 봉투가 나타나는 곳
@@ -128,7 +128,8 @@ function build(THREE, scene, spin) {
 }
 
 // 종량제 봉투: 몸통 + 입구(묶으면 오므라듦) + 묶은 매듭
-function bagGroup(THREE) {
+// 종량제 봉투·재활용 스티커는 헷갈리는 쓰레기 장면(scene-confuse.js)에서도 씀
+export function bagGroup(THREE) {
   const group = new THREE.Group();
   const mat = new THREE.MeshStandardMaterial({ map: bagTexture(THREE), roughness: 0.55, side: THREE.DoubleSide });
   const bodyGeo = new THREE.LatheGeometry(densePoints(THREE, [[0, 0], [0.42, 0.02], [0.62, 0.14], [0.7, 0.45], [0.68, 0.82], [0.56, 1.04], [0.4, 1.15]], 4), 56);
@@ -257,7 +258,7 @@ function glassBottle(THREE) {
   return m;
 }
 
-function recycleSticker(THREE) {
+export function recycleSticker(THREE) {
   return stickerTexture(THREE, 512, 312, "#1f5f9a", function (g, w, h) {
     // 돌고 도는 화살표 세 개
     g.lineWidth = 22;

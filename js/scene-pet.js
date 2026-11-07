@@ -1,6 +1,6 @@
 // 투명 페트병 장면
 // 배출 순서: 서울시 안내(내용물 비우기 → 라벨 제거 → 압착 → 뚜껑 닫기 → 투명 페트병 전용 수거함)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops } from "./eco3d-util.js?v=20261107p";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops } from "./eco3d-util.js?v=20261107s";
 
 // 페트병 옆모습 (반지름, 높이) — 바닥에서 입구까지
 const PROFILE = [[0, 0], [0.42, 0], [0.58, 0.04], [0.62, 0.16], [0.62, 0.95], [0.57, 1.08], [0.62, 1.2],
