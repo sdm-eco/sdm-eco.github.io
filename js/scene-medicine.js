@@ -1,7 +1,8 @@
 // 폐의약품 장면 (클레이 스타일)
 // 서울시 폐의약품 안내: 가루약·알약은 포장된 그대로, 물약·시럽·연고는 마개를 닫아 용기째
 // → 주민센터·보건소·구청 등 폐의약품 수거함 (알약은 봉투에 표시·밀봉하면 우체통도 가능, 물약 제외)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const BOX = [0, -0.95];              // 수거함 위치 (x, z)
 const SLOT = [0, GROUND + 1.5, -0.42]; // 수거함 투입구
@@ -174,6 +175,14 @@ function build(THREE, scene, spin, ext) {
     }
     cap.scale.setScalar(sp.scale.x);
     cap.visible = sp.visible;
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "pills", 0.46) || hit(v, "pills", 0.71)) sfx.play("tap");   // 알약 포장·약 봉지 톡톡
+    if (hit(v, "liquid", 0.78) || hit(v, "liquid", 0.88)) sfx.play("tick"); // 마개 돌려 닫는 틱틱
+    if (hit(v, "liquid", 0.98)) sfx.play("click");                         // 다 잠기면 딸깍
+    if (hit(v, "box", 0.15)) sfx.play("thud");                             // 수거함 쿵
+    for (let i = 0; i < items.length; i++) if (hit(v, "box", ENTER + i * GAP + FLY * 0.9)) sfx.play("slide"); // 투입구에 쏙
+    if (hit(v, "box", 0.95)) sfx.play("chime");                            // 끝 띵동
   }
 
   return { update: update };

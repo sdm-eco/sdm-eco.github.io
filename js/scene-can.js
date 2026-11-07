@@ -1,7 +1,8 @@
 // 캔 장면 (클레이 스타일 시범)
 // 서대문구청 안내(재활용품 분리배출·올바른 쓰레기 배출방법): 내용물을 비우고 이물질 제거 → 압착 →
 // 캔류로 배출 (단독주택은 투명 비닐봉투에 담아 배출요일에)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const R = 0.6, H = 1.9;   // 캔 반지름·높이
 const SQUASH = 0.38;      // 찌그러졌을 때 높이 비율
@@ -143,6 +144,14 @@ function build(THREE, scene, spin, ext) {
 
     const sy = 1 - crouch * 0.12 + jiggle;
     can.scale.set(1 / Math.sqrt(sy), sy, 1 / Math.sqrt(sy));
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "empty", 0.36)) sfx.play("pour", 0.86);        // 쪼르륵 비우기
+    if (hit(v, "rinse", 0.12)) sfx.play("water", 1.14);       // 수도꼭지 물줄기
+    if (hit(v, "rinse", 0.71)) sfx.play("pour", 0.6);         // 헹군 물 쏟기
+    if (hit(v, "crush", 0.28)) sfx.play("crunch", 0.7, true); // 판이 누를 때 금속 찌그럭
+    if (hit(v, "bin", 0.78)) sfx.play("thud");                 // 수거함에 통
+    if (hit(v, "bin", 0.95)) sfx.play("chime");                // 끝 띵동
   }
 
   return { update: update, reset: function () { drops.clear(); faucet.clear(); } };

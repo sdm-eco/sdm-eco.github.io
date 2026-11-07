@@ -1,6 +1,7 @@
 // 투명 페트병 장면 (클레이 스타일 시범)
 // 배출 순서: 서울시 안내(내용물 비우기 → 라벨 제거 → 압착 → 뚜껑 닫기 → 투명 페트병 전용 수거함)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 // 페트병 옆모습 (반지름, 높이) — 바닥에서 입구까지
 const PROFILE = [[0, 0], [0.42, 0], [0.58, 0.04], [0.62, 0.16], [0.62, 0.95], [0.57, 1.08], [0.62, 1.2],
@@ -218,6 +219,21 @@ function build(THREE, scene, spin) {
       emitClock = 0;
     }
     drops.update(dt);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (v.crush < 0.5) {
+      if (hit(v, "cap", 0.08) || hit(v, "cap", 0.18) || hit(v, "cap", 0.28)) sfx.play("tick"); // 돌려 여는 틱틱
+      if (hit(v, "cap", 0.4)) sfx.play("pop");                                                  // 빠질 때 퐁
+      if (hit(v, "cap", 0.76) || hit(v, "cap", 0.91)) sfx.play("tap");                          // 바닥에 톡톡
+    } else {
+      if (hit(v, "cap", 0.68) || hit(v, "cap", 0.8) || hit(v, "cap", 0.9)) sfx.play("tick");   // 돌려 닫는 틱틱
+      if (hit(v, "cap", 0.98)) sfx.play("click");                                               // 다 잠기면 딸깍
+    }
+    if (hit(v, "liquid", 0.36)) sfx.play("pour", 0.86); // 쪼르륵 (기울여 머무는 동안)
+    if (hit(v, "label", 0.05)) sfx.play("peel");        // 라벨 떼는 소리
+    if (hit(v, "crush", 0.15)) sfx.play("crunch", 0.8); // 찌그럭
+    if (hit(v, "bin", 0.78)) sfx.play("thud");           // 수거함에 통
+    if (hit(v, "bin", 0.95)) sfx.play("chime");          // 끝 띵동
   }
 
   return { update: update, reset: drops.clear };

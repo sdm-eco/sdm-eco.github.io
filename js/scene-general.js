@@ -1,7 +1,8 @@
 // 일반 쓰레기 장면 (클레이 스타일)
 // 서대문구청 안내: 재활용품은 품목별로 따로 배출, 일반(가연성) 쓰레기는 종량제 봉투에 담아
 // 18시~23시에 내 집 앞·내 점포 앞에 배출 (규격봉투 미사용 시 과태료)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, binGroup, seeded, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, binGroup, seeded, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const R_BIN = [1.6, 0.35];     // 재활용품 수거함 위치 (x, z)
 const BAG = [-1.45, 0.15];      // 종량제 봉투가 나타나는 곳
@@ -145,6 +146,16 @@ function build(THREE, scene, spin, ext) {
     g.rotation.z = Math.sin(Math.PI * carry) * -0.15 + tied * 0.05;
     const k = 1 - jiggle * 0.07 - crouch * 0.14 + (carry > 0 && carry < 0.5 ? Math.sin(Math.PI * carry / 0.5) * 0.08 : 0) - land * 0.08;
     squash(g, Math.max(appear, 0.001) * BAG_SIZE, k);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "sort", 0.132)) sfx.play("tap");           // 수거함이 내려앉을 때 톡
+    if (hit(v, "sort", 0.52)) sfx.play("slide");          // 캔이 수거함에 쏙
+    if (hit(v, "sort", 0.77)) sfx.play("clink");          // 유리병이 수거함에 쨍
+    if (hit(v, "bag", 0.132)) sfx.play("rustle", 0.25);   // 봉투가 떨어질 때 바스락
+    if (hit(v, "bag", 0.33)) sfx.play("rustle", 1.6);     // 쓰레기가 하나씩 들어가는 동안 바스락
+    if (hit(v, "bag", 0.82)) sfx.play("tie");             // 입구 묶기 슥슥
+    if (hit(v, "out", 0.7)) sfx.play("thud");             // 집 앞에 털썩
+    if (hit(v, "out", 0.95)) sfx.play("chime");           // 끝 띵동
   }
 
   // 되돌릴 때 따로 정리할 것은 없음 (모두 상태값으로 그림)

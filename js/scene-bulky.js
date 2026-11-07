@@ -1,7 +1,8 @@
 // 대형 폐기물 장면 (클레이 스타일)
 // 서대문구청 안내: 구 홈페이지 인터넷 접수 또는 동별 대행업체 전화로 배출 신고 → 수수료 납부
 // → "신고필증"을 출력해 배출 품목에 붙임 → 약속한 날 내놓으면 수거
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, houseFront, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const CHAIR = [-0.35, 0.2];        // 의자 처음 위치 (x, z)
 const CHAIR_OUT = [0.3, -0.95];    // 집 앞에 내놓는 곳
@@ -84,7 +85,7 @@ function build(THREE, scene, spin, ext) {
     sticker.rotation.set(0, lerp(-0.35, Math.PI, fly), (1 - fly) * (0.6 + Math.sin(fly * 10) * 0.3) + wobble(slap, 2) * 0.12);
     const grow = lerp(0.4, 1, backOut(clamp01((sp - 0.12) / 0.5)));
     sticker.scale.set(Math.max(grow * (1 + 0.16 * Math.sin(slap * Math.PI)), 0.001), Math.max(grow * (1 - 0.1 * Math.sin(slap * Math.PI)), 0.001), 1);
-    const hit = wobble(clamp01((sp - 0.66) / 0.34), 2);
+    const jolt = wobble(clamp01((sp - 0.66) / 0.34), 2);
 
     // 3단계: 집 앞이 솟아오르고 → 의자가 움츠렸다(준비) 폴짝 들려 옮겨져 → 통통 튀며 내려앉아 흔들림이 잦아듦
     const op = v.out;
@@ -97,11 +98,21 @@ function build(THREE, scene, spin, ext) {
     const hop = op < 0.48 ? Math.sin(Math.PI * 0.5 * clamp01((op - 0.3) / 0.18)) * 0.55 : bounceDrop((op - 0.48) / 0.4) * 0.55;
     chair.position.set(lerp(CHAIR[0], CHAIR_OUT[0], carry), GROUND + hop, lerp(CHAIR[1], CHAIR_OUT[1], carry));
     const sway = wobble(clamp01((op - 0.8) / 0.2), 2);
-    chair.rotation.set(Math.sin(Math.PI * carry) * 0.12, Math.PI + Math.sin(Math.PI * carry) * 0.25, hit * 0.05 + sway * 0.06);
+    chair.rotation.set(Math.sin(Math.PI * carry) * 0.12, Math.PI + Math.sin(Math.PI * carry) * 0.25, jolt * 0.05 + sway * 0.06);
     const base = lerp(1, 0.88, carry);
     const land = op > 0.71 && op < 0.83 ? Math.sin(Math.PI * (op - 0.71) / 0.12) : 0;
-    const sy = 1 - crouch * 0.1 - land * 0.08 + hit * 0.04;
+    const sy = 1 - crouch * 0.1 - land * 0.08 + jolt * 0.04;
     chair.scale.set(base / Math.sqrt(sy), base * sy, base / Math.sqrt(sy));
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "report", 0.05)) sfx.play("pop");     // 휴대폰 퐁 등장
+    if (hit(v, "report", 0.53)) sfx.play("tap");     // 화면 톡
+    if (hit(v, "report", 0.6)) sfx.play("beep");     // 납부 완료 띠링
+    if (hit(v, "sticker", 0.06)) sfx.play("slide");  // 필증이 쏙 나옴
+    if (hit(v, "sticker", 0.63)) sfx.play("stick");  // 등받이에 착
+    if (hit(v, "out", 0.72)) sfx.play("thud");       // 집 앞에 쿵
+    if (hit(v, "out", 0.82)) sfx.play("tap");        // 한 번 더 통
+    if (hit(v, "out", 0.95)) sfx.play("chime");      // 끝 띵동
   }
 
   return { update: update };

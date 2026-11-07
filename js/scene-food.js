@@ -1,7 +1,8 @@
 // 음식물 쓰레기 장면 (클레이 스타일)
 // 서대문구청 안내: 물기 제거 후 배출, 뼈·조개/달걀 껍데기·핵과류 씨 등은 일반쓰레기,
 // 단독주택은 음식물 전용 봉투, 공동주택은 전용 수거함
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, createDrops, binGroup, seeded, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, stickerTexture, createDrops, binGroup, seeded, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const BASE = GROUND + 0.12;   // 바구니 다리 높이만큼 띄움
 const G_BIN = [-1.85, 0.25];   // 일반쓰레기통 위치 (x, z)
@@ -229,6 +230,15 @@ function build(THREE, scene, spin, ext) {
       emitClock = 0;
     }
     drops.update(dt);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "water", 0.15)) sfx.play("water", 1.69); // 흔드는 동안 물 빠지는 소리
+    if (hit(v, "water", 0.92)) sfx.play("tap");         // 바구니를 내려놓을 때 톡
+    if (hit(v, "pick", 0.4) || hit(v, "pick", 0.55) || hit(v, "pick", 0.7) || hit(v, "pick", 0.85)) sfx.play("slide"); // 일반쓰레기가 통에 하나씩 쏙
+    if (hit(v, "bin", 0.53)) sfx.play("thud");          // 음식물이 수거함에 툭
+    if (hit(v, "bin", 0.844)) sfx.play("tap");          // 바구니를 내려놓을 때 톡
+    if (hit(v, "bin", 0.928)) sfx.play("lid");          // 뚜껑이 탁 닫힘
+    if (hit(v, "bin", 0.97)) sfx.play("chime");         // 끝 띵동
   }
 
   return { update: update, reset: drops.clear };

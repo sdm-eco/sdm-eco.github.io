@@ -1,8 +1,9 @@
 // 헷갈리는 쓰레기 장면 ("재활용품인 척하는 쓰레기") — 클레이 스타일
 // 서대문구·서울시 안내: 칫솔·영수증·나무젓가락·고무장갑·테이프 등은 재활용이 안 되므로 종량제 봉투에,
 // 컵라면 용기·유색 스티로폼은 깨끗이 씻어 재질별로 모으면 재활용, 아니면 종량제 봉투
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, binGroup, createFaucet, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
-import { bagGroup, recycleSticker } from "./scene-general.js?v=20261108g";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, binGroup, createFaucet, CLAY, clayMat, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { bagGroup, recycleSticker } from "./scene-general.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const R_BIN = [-1.65, -0.6]; // 재활용품 수거함 (x, z)
 const BAG = [1.45, -0.5];     // 종량제 봉투
@@ -141,6 +142,16 @@ function build(THREE, scene, spin, ext) {
     const binLand = wobble(clamp01((cp - 0.9) / 0.1), 2);
     rBin.rotation.z = binLand * 0.06;
     rBin.scale.set(1, 1 - binLand * 0.05, 1);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "show", 0.24) || hit(v, "show", 0.44) || hit(v, "show", 0.64)) sfx.play("tap"); // 쓰레기가 떨어져 톡톡 (5개 중 3번만)
+    if (hit(v, "bag", 0.132)) sfx.play("rustle", 0.25);  // 봉투가 떨어질 때 바스락
+    if (hit(v, "bag", 0.42)) sfx.play("rustle", 1.3);    // 쓰레기가 하나씩 들어가는 동안 바스락
+    if (hit(v, "bag", 0.86)) sfx.play("tie");            // 입구 묶기 슥슥
+    if (hit(v, "cup", 0.2)) sfx.play("water", 0.79);     // 수도꼭지 물줄기
+    if (hit(v, "cup", 0.538)) sfx.play("pour", 0.21);    // 헹군 물 쏟기
+    if (hit(v, "cup", 0.86)) sfx.play("slide");          // 컵이 재활용함에 쏙
+    if (hit(v, "cup", 0.95)) sfx.play("chime");          // ✓로 바뀌며 끝 띵동
   }
 
   return { update: update, reset: function () { faucet.clear(); } };

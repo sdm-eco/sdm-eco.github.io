@@ -1,7 +1,8 @@
 // 종이류 장면 (클레이 스타일)
 // 서대문구청 안내: 종이류는 이물질(부착물 등)을 제거하고 차곡차곡 쌓은 후 묶어서 배출
 // (택배 운송장 스티커·테이프는 종량제 봉투 / 코팅된 종이·사진·벽지·물티슈는 재활용 불가)
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const BOX = [-0.95, 0.2];   // 택배 상자 처음 자리 (x, z)
 const STACK = [0.85, 0.0];  // 신문 더미 자리 (x, z)
@@ -157,6 +158,15 @@ function build(THREE, scene, spin, ext) {
     stack.scale.y = 1 - (fl < 1 ? wobble(land, 2) * 0.06 : 0);
     cords.forEach(function (ring) { ring.position.y = GROUND + TOP / 2 + bundle; });
     knot.position.y = GROUND + TOP + 0.05 + bundle;
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "peel", 0.12)) sfx.play("rip");          // 테이프 찌익
+    if (hit(v, "peel", 0.4)) sfx.play("peel");          // 운송장 떼는 슥
+    if (hit(v, "flat", 0.1)) sfx.play("paper", 0.84);   // 상자를 눌러 펴는 사각사각
+    if (hit(v, "flat", 0.9)) sfx.play("tap");           // 신문 더미 위에 톡
+    if (hit(v, "tie", 0.35)) sfx.play("tie");           // 끈 조이기 슥슥
+    if (hit(v, "tie", 0.75)) sfx.play("tie");           // 매듭
+    if (hit(v, "tie", 0.95)) sfx.play("chime");         // 끝 띵동
   }
 
   return { update: update };

@@ -4,21 +4,22 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108g";
-import food from "./scene-food.js?v=20261108g";
-import general from "./scene-general.js?v=20261108g";
-import bulky from "./scene-bulky.js?v=20261108g";
-import can from "./scene-can.js?v=20261108g";
-import vinyl from "./scene-vinyl.js?v=20261108g";
-import carton from "./scene-carton.js?v=20261108g";
-import medicine from "./scene-medicine.js?v=20261108g";
-import battery from "./scene-battery.js?v=20261108g";
-import glass from "./scene-glass.js?v=20261108g";
-import paper from "./scene-paper.js?v=20261108g";
-import appliance from "./scene-appliance.js?v=20261108g";
-import confuse from "./scene-confuse.js?v=20261108g";
+import pet from "./scene-pet.js?v=20261108h";
+import food from "./scene-food.js?v=20261108h";
+import general from "./scene-general.js?v=20261108h";
+import bulky from "./scene-bulky.js?v=20261108h";
+import can from "./scene-can.js?v=20261108h";
+import vinyl from "./scene-vinyl.js?v=20261108h";
+import carton from "./scene-carton.js?v=20261108h";
+import medicine from "./scene-medicine.js?v=20261108h";
+import battery from "./scene-battery.js?v=20261108h";
+import glass from "./scene-glass.js?v=20261108h";
+import paper from "./scene-paper.js?v=20261108h";
+import appliance from "./scene-appliance.js?v=20261108h";
+import confuse from "./scene-confuse.js?v=20261108h";
 
-import { GROUND } from "./eco3d-util.js?v=20261108g";
+import { GROUND } from "./eco3d-util.js?v=20261108h";
+import { sfx } from "./eco3d-sound.js?v=20261108h";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
@@ -30,6 +31,7 @@ document.querySelectorAll("[data-eco-lab]").forEach(initLab);
 document.querySelectorAll("[data-eco-loop]").forEach(initLoop);
 setupItems();
 setupDialogs();
+setupSound();
 
 function initLab(lab) {
   const def = SCENES[lab.dataset.ecoLab];
@@ -122,6 +124,16 @@ function initLab(lab) {
 }
 
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+// 효과음 켜기·끄기 버튼([data-eco-sound]): 기본 꺼짐, 누르면 모든 체험 창 버튼이 함께 바뀜 (eco3d-sound.js)
+function setupSound() {
+  const btns = Array.from(document.querySelectorAll("[data-eco-sound]"));
+  const sync = function () { btns.forEach(function (b) { b.setAttribute("aria-pressed", String(sfx.isOn())); }); };
+  btns.forEach(function (b) {
+    b.addEventListener("click", function () { sfx.set(!sfx.isOn()); sync(); });
+  });
+  sync();
+}
 
 // 한 창에 품목이 여럿(예: 페트병·캔·비닐·종이팩): 창 위 품목 버튼([data-eco-item="이름"])으로 체험을 바꿔 보임.
 // 숨은 품목의 3D는 처음 보일 때 불러옴(mount의 IntersectionObserver). 창을 닫으면 다음에 첫 품목부터 보임
@@ -339,7 +351,8 @@ function createView(lib, stage, canvas, def, opts) {
 
   // 단계 애니메이션: 값을 0~1 사이에서 직선으로 바꾸고, 부드럽게 보이는 처리는 장면이 맡음
   const states = def.states, moves = def.moves;
-  const v = Object.assign({ $key: null, $p: 0 }, states[0]);
+  // $sound: 체험 창의 3D만 효과음을 냄(카드 미리보기는 조용히), $k0·$p0: 이번 그림 직전 진행 상태(효과음 순간 판단용)
+  const v = Object.assign({ $key: null, $p: 0, $k0: null, $p0: 0, $sound: !!opts.interactive }, states[0]);
   let shown = 0;
   let active = null;
   const queue = [];
@@ -404,6 +417,8 @@ function createView(lib, stage, canvas, def, opts) {
   const camBase = new THREE.Vector3();
   let lookY = 0, idle = 0;
   function update(dt) {
+    v.$k0 = v.$key;
+    v.$p0 = v.$p;
     runTweens(dt);
     if (!dragging) {
       velocity *= Math.pow(0.04, dt);

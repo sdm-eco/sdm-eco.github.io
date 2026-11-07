@@ -1,7 +1,8 @@
 // 유리병 장면 (클레이 스타일)
 // 서대문구청 재활용품 분리배출 안내(병류): 라벨·병뚜껑을 제거하고 내용물을 비운 뒤 배출, 담배꽁초 등 이물질 넣지 않기
 // (깨진 유리·거울·도자기·화분·강화유리는 재활용 불가)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const PROFILE = [[0, 0], [0.4, 0], [0.46, 0.04], [0.48, 0.15], [0.48, 1.6], [0.44, 1.85], [0.3, 2.1], [0.17, 2.35], [0.15, 2.6], [0.165, 2.66], [0.15, 2.72]];
 const TOP = 2.72;
@@ -151,6 +152,15 @@ function build(THREE, scene, spin) {
     const s = 1 / (1 + y * 0.5);
     shadow.scale.set(s, s, s);
     shadow.material.opacity = (bp >= 0.6 && y < 0.3 ? 0 : s) * 0.75;
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "cap", 0.03)) sfx.play("rattle");                       // 뚜껑 달그락
+    if (hit(v, "cap", 0.2)) sfx.play("pop");                           // 병따개로 딴 듯 톡 튀어 오름
+    if (hit(v, "cap", 0.76) || hit(v, "cap", 0.91)) sfx.play("tap");   // 바닥에 톡톡
+    if (hit(v, "empty", 0.36)) sfx.play("pour", 0.79);                 // 쪼르륵 비우기
+    if (hit(v, "label", 0.05)) sfx.play("peel");                       // 라벨 떼는 소리
+    if (hit(v, "bin", 0.78)) sfx.play("clink");                        // 유리병 수거함에 쨍
+    if (hit(v, "bin", 0.95)) sfx.play("chime");                        // 끝 띵동
   }
 
   return { update: update, reset: function () { drops.clear(); faucet.clear(); } };

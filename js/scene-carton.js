@@ -1,6 +1,7 @@
 // 종이팩 장면 (클레이 스타일)
 // 종이팩 따로 배출 안내(기후에너지환경부 등): 비우고 → 헹구고 → 납작하게 → 종이팩끼리 따로 배출
-import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const W = 1.0, HB = 1.6, D = 1.0, ROOF = 0.45; // 몸통 폭·높이·깊이, 지붕 높이
 const PIV = GROUND + 1.0;
@@ -103,6 +104,14 @@ function build(THREE, scene, spin, ext) {
     // 크기: 납작해짐(가로 넓게·앞뒤 얇게) + 부풂·출렁임·움츠림 (부피는 그대로인 느낌으로 가로를 반대로)
     const sy = 1 + swell * 0.04 - jig * 0.05 - crouch * 0.12;
     pack.scale.set(lerp(1, 1.3, f) * (1 + swell * 0.05) / Math.sqrt(sy), sy, lerp(1, 0.1, f) * (1 + swell * 0.08) / Math.sqrt(sy));
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "empty", 0.36)) sfx.play("pour", 0.79);  // 쪼르륵 비우기
+    if (hit(v, "rinse", 0.12)) sfx.play("water", 1.08); // 수도꼭지 물줄기
+    if (hit(v, "rinse", 0.71)) sfx.play("pour", 0.58);  // 헹군 물 쏟기
+    if (hit(v, "flat", 0.14)) sfx.play("paper", 0.99);  // 꾹 눌러 펴는 사각사각
+    if (hit(v, "bin", 0.78)) sfx.play("thud");          // 수거함에 통
+    if (hit(v, "bin", 0.95)) sfx.play("chime");         // 끝 띵동
   }
 
   return { update: update, reset: function () { drops.clear(); faucet.clear(); } };

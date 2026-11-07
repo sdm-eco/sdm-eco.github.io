@@ -1,7 +1,8 @@
 // 폐가전 장면 (클레이 스타일)
 // 서대문구 폐금속자원 배출 안내: 냉장고·에어컨·세탁기·TV 등 대형폐가전(또는 소형 5개 이상)은 폐가전 무상방문수거 예약(☎1599-0903),
 // 소형폐가전 5개 미만은 구청 홈페이지 "대형폐기물 신고"에서 무상 신고 → 접수증 부착 후 건물 밖 배출
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const FRIDGE = [-0.75, -0.1];        // 냉장고 자리 (x, z)
 const PHONE = [1.35, -0.25, 0.35];    // 휴대폰 자리 (x, y, z)
@@ -173,18 +174,29 @@ function build(THREE, scene, spin, ext) {
     toaster.position.y = bounceDrop(tt) * 1.6;
     const fly = easeInOut(clamp01((sp - 0.35) / 0.5));
     const slap = clamp01((sp - 0.85) / 0.15);
-    const hit = wobble(clamp01((sp - 0.85) / 0.15), 2);
+    const jolt = wobble(clamp01((sp - 0.85) / 0.15), 2);
     const kLand = kt > 0.58 && kt < 0.8 ? Math.sin(Math.PI * (kt - 0.58) / 0.22) : 0;
     const tLand = tt > 0.58 && tt < 0.8 ? Math.sin(Math.PI * (tt - 0.58) / 0.22) : 0;
-    squash(kettle, 1 - kLand * 0.14 - hit * 0.05, 1);
+    squash(kettle, 1 - kLand * 0.14 - jolt * 0.05, 1);
     squash(toaster, 1 - tLand * 0.14, 1);
-    kettle.rotation.z = hit * 0.05;
+    kettle.rotation.z = jolt * 0.05;
     small.scale.setScalar(Math.max(Math.min(sp / 0.04, 1), 0.001));
     permit.visible = sp > 0.35;
     permit.position.set(lerp(PHONE[0], permitHome.x, fly), lerp(PHONE[1], permitHome.y, fly) + Math.sin(Math.PI * fly) * 0.7, lerp(PHONE[2], permitHome.z, fly));
-    permit.rotation.set(0, lerp(-0.35, 0, fly) + (1 - fly) * Math.sin(fly * 9) * 0.4, (1 - fly) * 0.8 + hit * 0.1);
+    permit.rotation.set(0, lerp(-0.35, 0, fly) + (1 - fly) * Math.sin(fly * 9) * 0.4, (1 - fly) * 0.8 + jolt * 0.1);
     const grow = lerp(0.5, 1, backOut(fly));
     permit.scale.set(Math.max(grow * (1 + 0.15 * Math.sin(slap * Math.PI)), 0.001), Math.max(grow * (1 - 0.1 * Math.sin(slap * Math.PI)), 0.001), 1);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "book", 0.05)) sfx.play("pop");          // 휴대폰 퐁 등장
+    if (hit(v, "book", 0.53)) sfx.play("tap");          // 화면 톡
+    if (hit(v, "book", 0.6)) sfx.play("beep");          // 예약 완료 띠링
+    if (hit(v, "pickup", 0.01)) sfx.play("roll", 0.75); // 손수레 들어옴
+    if (hit(v, "pickup", 0.42)) sfx.play("tap");        // 냉장고가 기울어 실림
+    if (hit(v, "pickup", 0.5)) sfx.play("roll", 1.5);   // 실어 나감
+    if (hit(v, "small", 0.18) || hit(v, "small", 0.24)) sfx.play("tap"); // 주전자·토스터 톡톡
+    if (hit(v, "small", 0.85)) sfx.play("stick");       // 접수증 착
+    if (hit(v, "small", 0.95)) sfx.play("chime");       // 끝 띵동
   }
 
   return { update: update };

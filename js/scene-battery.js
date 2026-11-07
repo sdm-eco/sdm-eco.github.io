@@ -1,7 +1,8 @@
 // 폐건전지·폐형광등 장면 (클레이 스타일)
 // 서대문구 폐금속자원 배출 안내: 공동주택은 단지 내 수거함, 단독주택은 인근 주민센터·주택 골목 수거함
 // (LED·전등 케이스·일반 전구는 넣으면 안 됨 → 재활용품 안내: 백열·LED 전구는 종량제 봉투)
-import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108g";
+import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, CLAY, clayMat, bounceDrop, wobble } from "./eco3d-util.js?v=20261108h";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108h";
 
 const BOX = [0, -0.85];                // 수거함 위치 (x, z)
 const HOLE = [-0.38, GROUND + 1.25, -0.39]; // 건전지 넣는 구멍 (앞면)
@@ -196,6 +197,15 @@ function build(THREE, scene, spin, ext) {
     tube.position.set(tx, ty, tz);
     tube.rotation.set(trx, 0, trz);
     tube.scale.setScalar(ts);
+
+    // 효과음 (체험 창에서 효과음을 켰을 때만): 진행률이 그 순간을 지날 때 한 번
+    if (hit(v, "cells", 0.06)) sfx.play("pop");                          // 건전지 쏙 빠짐
+    if (hit(v, "cells", 0.42) || hit(v, "cells", 0.67)) sfx.play("tap"); // 모은 자리에 톡톡
+    if (hit(v, "tube", 0.74)) sfx.play("clink");                         // 형광등 살며시 놓임
+    if (hit(v, "box", 0.12)) sfx.play("thud");                           // 수거함 쿵
+    if (hit(v, "box", CELL_IN + CELL_FLY * 0.9) || hit(v, "box", CELL_IN + 2 * CELL_GAP + CELL_FLY * 0.9)) sfx.play("rattle"); // 구멍에 달그락 (4개 중 두 번만)
+    if (hit(v, "box", 0.86)) sfx.play("slide");                          // 형광등 긴 틈으로 쏙
+    if (hit(v, "box", 0.95)) sfx.play("chime");                          // 끝 띵동
   }
 
   return { update: update };
