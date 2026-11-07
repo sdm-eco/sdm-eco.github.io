@@ -89,7 +89,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @keyframes node-glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.9;transform:scale(1.7)}}
 @keyframes garden-lean{0%,100%{transform:skewX(0)}35%{transform:skewX(-3deg)}70%{transform:skewX(2deg)}}
 
-.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);gap:70px;align-items:center;padding:64px 0 76px}
+.hero-grid{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,600px) minmax(0,1fr);gap:70px;align-items:center;padding:48px 0 56px}
 .hero h1{font-size:clamp(38px,4.2vw,58px);letter-spacing:-2.5px;line-height:1.24;margin:0 0 24px;font-weight:850;text-wrap:balance}
 /* 두 구절을 각각 따로 균형 있게 줄바꿈(한쪽 구절의 마지막 단어만 따로 떨어지지 않게) */
 .hero h1 em{display:block;font-style:normal;color:var(--fresh-strong);font-size:1.16em}
@@ -183,7 +183,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .learn-steps [data-state="soon"] .learn-tag{border:1px dashed var(--soon-line);background:var(--white);color:var(--soon-ink)}
 
 
-.section{padding:56px 0}
+.section{padding:40px 0}
 .section-tint{background:var(--paper)}
 .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:20px}
 .section h2{font-size:37px;line-height:1.4;letter-spacing:-1.4px;margin:0;font-weight:850;text-wrap:balance}
@@ -333,7 +333,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .game-cta .action-link{margin-top:0;border-color:var(--fresh-strong);background:var(--fresh-strong)}
 .game-cta .action-link:hover{border-color:var(--fresh-hover);background:var(--fresh-hover)}
 
-.footer{padding:36px 0;border-top:1px solid var(--line)}
+.footer{padding:28px 0;border-top:1px solid var(--line)}
 .footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
 .footer strong{font-size:18px}
 .footer p{margin-top:6px;font-size:16px;color:var(--muted)}
@@ -386,7 +386,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   :lang(zh) .hero h1{font-size:clamp(24px,7.6vw,30px)}
   :lang(en) .hero h1,:lang(vi) .hero h1{font-size:clamp(22px,6.6vw,28px);letter-spacing:-.6px}
   .hero-desc{font-size:18px}
-  .section{padding:44px 0}
+  .section{padding:32px 0}
   .section-head{flex-direction:column;align-items:flex-start;gap:8px}
   .section h2{font-size:30px}
   .video-grid{grid-template-columns:1fr}
