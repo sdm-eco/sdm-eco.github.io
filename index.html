@@ -4,13 +4,18 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light">
+<!-- 콘텐츠 보안 정책: 스크립트·영상·자막·게임은 이 사이트 파일만, 글꼴은 jsDelivr만 허용
+     importmap을 고치면 script-src의 sha256 값을 다시 계산할 것. 게임·영상을 다른 주소에 두면 frame-src·media-src에 그 주소를 추가할 것 -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-CmdlgsRAk9ZIeXy65Hqw0vq1o7eJWZnbPTvyjBgsPRo='; style-src 'self' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; img-src 'self' data:; frame-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>서대문구 분리배출 교육 | 서대문에서 생활하는 외국인 대상</title>
 <meta name="description" content="서대문구 기후환경과 · 서대문구에서 생활하는 외국인 대상 분리배출 교육 홈페이지">
 <link rel="icon" type="image/png" href="img/favicon.png">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
+<!-- 글꼴: 한국어·영어용 Pretendard, 베트남어·중국어용 Pretendard Std. 바뀌지 않는 npm 원본 파일을 쓰고 integrity로 내용이 같은지 확인
+     (.min.css는 jsDelivr가 그때그때 만들어 integrity를 쓸 수 없음) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261108r">
+<link rel="stylesheet" href="css/style.css?v=20261108t">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -111,7 +116,7 @@
       </div>
       <ol class="learn-steps">
         <li data-learn-step="video"><a href="#videos"><span class="learn-num"><span class="learn-n">1</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="23" rx="3"/><path d="M3 38h42"/><path d="M21 17l8 4.5-8 4.5z"/></svg><strong data-i18n="nav.video">교육 영상</strong><small data-i18n="step2.sub">영상 2편</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
-        <li data-learn-step="guide"><a href="#guide"><span class="learn-num"><span class="learn-n">2</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V11c-6-2-13-2-18 2z"/><path d="M24 13v26"/><path d="M11 19h7M11 25h7M30 19h7M30 25h7"/><circle cx="15" cy="45" r="2.6" style="fill:var(--general);stroke:none"/><circle cx="21" cy="45" r="2.6" style="fill:var(--food);stroke:none"/><circle cx="27" cy="45" r="2.6" style="fill:var(--recycle);stroke:none"/><circle cx="33" cy="45" r="2.6" style="fill:var(--bulky);stroke:none"/></svg><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
+        <li data-learn-step="guide"><a href="#guide"><span class="learn-num"><span class="learn-n">2</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 13c-5-4-12-4-18-2v26c6-2 13-2 18 2 5-4 12-4 18-2V11c-6-2-13-2-18 2z"/><path d="M24 13v26"/><path d="M11 19h7M11 25h7M30 19h7M30 25h7"/><circle class="dot dot-general" cx="15" cy="45" r="2.6"/><circle class="dot dot-food" cx="21" cy="45" r="2.6"/><circle class="dot dot-recycle" cx="27" cy="45" r="2.6"/><circle class="dot dot-bulky" cx="33" cy="45" r="2.6"/></svg><strong data-i18n="nav.guide">배출방법 안내</strong><small data-i18n="step1.sub">품목별로 버리는 법</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
         <li data-learn-step="game"><a href="#game"><span class="learn-num"><span class="learn-n">3</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="5" y="15" width="38" height="20" rx="10"/><path d="M15 21v8M11 25h8"/><circle cx="32" cy="22.5" r="1.6"/><circle cx="36" cy="27.5" r="1.6"/></svg><strong data-i18n="nav.game">게임</strong><small data-i18n="step3.sub">직접 분류해 보기</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
       </ol>
     </div>
@@ -215,8 +220,10 @@
             </div>
           </div>
           <div class="game-copy">
-            <h3 data-i18n="game.card.title">곧 게임이 열려요</h3>
-            <p data-i18n="game.card.desc">게임이 완성되면 이곳에서 바로 플레이할 수 있습니다.</p>
+            <h3 class="game-soon" data-i18n="game.card.title">곧 게임이 열려요</h3>
+            <p class="game-soon" data-i18n="game.card.desc">게임이 완성되면 이곳에서 바로 플레이할 수 있습니다.</p>
+            <h3 class="game-live" data-i18n="game.card.titleLive">분리배출 게임을 해 보세요</h3>
+            <p class="game-live" data-i18n="game.card.descLive">물건을 알맞은 통에 넣어 점수를 올려 보세요.</p>
           </div>
           <div class="game-cta">
             <button type="button" class="action-link" id="game-play"><span data-i18n="game.play">게임 시작</span></button>
@@ -599,10 +606,10 @@
   </div>
 </footer>
 
-<script src="js/config.js?v=20261104b"></script>
-<script src="js/i18n.js?v=20261108r"></script>
-<script src="js/main.js?v=20261108r"></script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script src="js/config.js?v=20261108t"></script>
+<script src="js/i18n.js?v=20261108t"></script>
+<script src="js/main.js?v=20261108u"></script>
+<script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.min.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
 <script type="module" src="js/eco3d.js?v=20261108r"></script>
 </body>
 </html>

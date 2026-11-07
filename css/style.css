@@ -178,6 +178,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .learn-steps [data-learn-step="game"]{--step:var(--glow);--step-ink:var(--game-ink);--step-bg:var(--banner)}
 .learn-num{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--step-bg,var(--mist));box-shadow:inset 0 0 0 1.5px var(--step,var(--line));color:var(--step-ink,var(--ink-2));font-size:14px;font-weight:800}
 .learn-icon{width:46px;height:46px;margin:4px 0 2px;fill:none;stroke:var(--step-ink,var(--fresh-strong));stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.learn-icon .dot{stroke:none}.learn-icon .dot-general{fill:var(--general)}.learn-icon .dot-food{fill:var(--food)}.learn-icon .dot-recycle{fill:var(--recycle)}.learn-icon .dot-bulky{fill:var(--bulky)}
 .learn-steps strong{font-size:18px;line-height:1.4}
 .learn-steps small{font-size:15px;line-height:1.5;color:var(--muted)}
 .learn-meter{height:6px;margin-top:14px;border-radius:999px;background:color-mix(in srgb,var(--fresh) 18%,transparent);overflow:hidden}
@@ -305,6 +306,14 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .video-card{position:relative;padding:14px 14px 18px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
 .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--mint) 0 18px,var(--mint-2) 18px 36px)}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+/* 이 사이트 영상: 누르기 전 대표 그림 + 재생 버튼(main.js renderVideos), 누르면 영상 플레이어 */
+.video-frame video{position:absolute;inset:0;width:100%;height:100%;background:#000}
+.video-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:100%;padding:0;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.video-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.video-cover .play-circle,.video-cover-label{position:relative;transition:transform .2s}
+.video-cover img~.video-cover-label{padding:2px 12px;border-radius:999px;background:color-mix(in srgb,var(--white) 88%,transparent)}
+.video-cover:hover .play-circle,.video-cover:focus-visible .play-circle{transform:scale(1.08)}
+.video-cover:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:-3px}
 .video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--ink-2);font-size:16px;font-weight:700}
 .play-circle{display:grid;place-items:center;width:68px;height:68px;border-radius:50%;background:var(--white);border:2.5px solid var(--video)}
 .play-circle svg{width:26px;height:26px;fill:var(--video-ink);margin-left:4px}
@@ -354,6 +363,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .action-link:hover{background:var(--link-dark);border-color:var(--link-dark)}
 .game-status{margin-top:12px;font-size:15px;font-weight:700;color:var(--soon-ink)}
 .game-copy{grid-area:copy;align-self:end}
+/* 게임이 실제로 올라오면(main.js setupGame → .is-ready) '곧 열려요' 대신 '해 보세요' 문구 */
+.game-live,.game-stage.is-ready .game-soon{display:none}
+.game-stage.is-ready .game-live{display:block}
 .game-cta{grid-area:cta;align-self:start;display:flex;flex-direction:column;align-items:flex-start}
 .game-cta .action-link{margin-top:0;border-color:var(--fresh-strong);background:var(--fresh-strong)}
 .game-cta .action-link:hover{border-color:var(--fresh-hover);background:var(--fresh-hover)}

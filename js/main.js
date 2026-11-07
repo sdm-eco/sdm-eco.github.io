@@ -61,9 +61,9 @@
     var done = {};
     try { done = JSON.parse(localStorage.getItem(PROGRESS_KEY)) || {}; } catch (e) {}
     var ready = {
-      video: (config.videos || []).some(function (v) { return v && v.youtubeId; }),
+      video: videoList().length > 0,
       guide: true,
-      game: !!(config.game && config.game.url)
+      game: false // 게임이 실제로 올라와 있는지 확인한 뒤 바뀜 (setupGame)
     };
     var countEl = document.querySelector("[data-learn-count]");
     var barEl = document.querySelector("[data-learn-bar]");
@@ -102,60 +102,166 @@
     // 배출방법: 3D 체험 하나를 마지막 단계까지 보면 완료 (eco3d.js가 알림)
     document.addEventListener("eco:lab-done", function () { mark("guide"); });
 
-    // 영상: 실제 영상이 연결된 뒤, 영상 칸이 화면에 절반 이상 3초 보이면 완료로 봄
-    // 한계: 재생했는지는 알 수 없음. 정확히 하려면 YouTube IFrame API의 재생 종료(ENDED)로 바꿀 것
-    if (ready.video && "IntersectionObserver" in window) {
-      var timer = null;
-      new IntersectionObserver(function (entries) {
-        var seen = entries[entries.length - 1].isIntersecting;
-        clearTimeout(timer);
-        if (seen) timer = setTimeout(function () { mark("video"); }, 3000);
-      }, { threshold: 0.5 }).observe(document.querySelector(".video-grid"));
+    // 영상: 연결된 영상을 모두 거의 끝까지(90%) 보면 완료. 편마다 본 기록을 따로 남김(video-0, video-1 …)
+    function watched(index) {
+      if (done["video-" + index]) return;
+      done["video-" + index] = true;
+      var all = videoList().every(function (v) { return done["video-" + v.index]; });
+      if (all) mark("video");
+      else try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(done)); } catch (e) {}
     }
+    // 게임: 실제로 올라와 있는 것을 확인하면 '준비 중' 대신 다음 할 단계로 보임
+    function gameReady() { ready.game = true; render(); }
 
-    return { render: render, mark: mark };
+    return { render: render, mark: mark, watched: watched, gameReady: gameReady };
   }
 
+  // 설정의 주소를 이 사이트 안의 주소로 바꿈(다른 사이트 주소면 빈 값: 보안 정책상 어차피 막힘)
+  function sameSite(raw) {
+    if (!raw) return "";
+    try {
+      var u = new URL(raw, location.href);
+      if (u.origin === location.origin) return u.href;
+    } catch (e) { /* 주소 형식이 아님 */ }
+    console.warn("config.js의 영상·자막 주소는 이 사이트 안의 파일이어야 합니다:", raw);
+    return "";
+  }
+  // 연결된 영상 목록 (src가 있는 것만, 화면 칸 번호 index 포함)
+  function videoList() {
+    return (config.videos || []).map(function (v, i) { return { cfg: v || {}, index: i, src: sameSite(v && v.src) }; })
+      .filter(function (v) { return v.src; });
+  }
+  var CAPTION_LABEL = { ko: "한국어", zh: "中文", en: "English", vi: "Tiếng Việt" };
+
+  // 교육 영상 칸: 이 사이트의 영상 파일을 재생 (YouTube 광고 없음)
+  //  - 누르기 전에는 대표 그림과 재생 버튼만 보이고, 영상 파일은 누를 때 처음 받음(데이터·GitHub 전송량 절약)
+  //  - 자막: 4개 언어 자막 파일을 붙이고, 사이트 언어에 맞는 자막만 켬. 언어를 바꾸면 재생 중에도 자막이 바뀜
+  //  - 거의 끝까지(90%) 보면 학습 띠의 영상 단계에 기록
   function renderVideos() {
-    document.querySelectorAll("[data-video-index]").forEach(function (frame) {
-      var video = (config.videos || [])[Number(frame.dataset.videoIndex)];
-      if (!video || !video.youtubeId) return;
-      var src = "https://www.youtube-nocookie.com/embed/" + encodeURIComponent(video.youtubeId) +
-        "?rel=0&hl=" + current + "&cc_lang_pref=" + current + "&cc_load_policy=1";
-      var iframe = frame.querySelector("iframe");
-      if (!iframe) {
-        iframe = document.createElement("iframe");
-        iframe.allow = "accelerometer; encrypted-media; gyroscope; picture-in-picture";
-        iframe.allowFullscreen = true;
-        iframe.loading = "lazy";
-        frame.innerHTML = "";
-        frame.appendChild(iframe);
+    videoList().forEach(function (v) {
+      var frame = document.querySelector('[data-video-index="' + v.index + '"]');
+      if (!frame) return;
+      var title = frame.closest(".video-card").querySelector("h3").textContent;
+      var player = frame.querySelector("video");
+      if (player) { // 이미 재생을 시작한 칸: 자막 언어와 이름만 맞춤
+        player.setAttribute("aria-label", title);
+        showCaption(player);
+        return;
       }
-      iframe.title = frame.closest(".video-card").querySelector("h3").textContent;
-      if (iframe.src !== src) iframe.src = src;
+      var cover = frame.querySelector(".video-cover");
+      if (!cover) {
+        frame.innerHTML = "";
+        cover = document.createElement("button");
+        cover.type = "button";
+        cover.className = "video-cover";
+        var poster = sameSite(v.cfg.poster);
+        cover.innerHTML = (poster ? '<img alt="" loading="lazy">' : "") +
+          '<span class="play-circle" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span><span class="video-cover-label"></span>';
+        if (poster) cover.querySelector("img").src = poster;
+        cover.addEventListener("click", function () { play(frame, v); });
+        frame.appendChild(cover);
+      }
+      cover.querySelector(".video-cover-label").textContent = t("video.play");
+      cover.setAttribute("aria-label", t("video.play") + ": " + title);
     });
   }
 
+  function play(frame, v) {
+    var player = document.createElement("video");
+    player.controls = true;
+    player.playsInline = true;
+    player.preload = "auto";
+    var poster = sameSite(v.cfg.poster);
+    if (poster) player.poster = poster;
+    player.setAttribute("aria-label", frame.closest(".video-card").querySelector("h3").textContent);
+    var source = document.createElement("source");
+    source.src = v.src;
+    source.type = "video/mp4";
+    player.appendChild(source);
+    var caps = v.cfg.captions || {};
+    LANGS.forEach(function (lang) {
+      var src = sameSite(caps[lang]);
+      if (!src) return;
+      var track = document.createElement("track");
+      track.kind = "subtitles";
+      track.srclang = lang;
+      track.label = CAPTION_LABEL[lang];
+      track.src = src;
+      track.default = lang === current; // 브라우저가 스스로 다른 언어 자막을 고르지 않게 사이트 언어를 기본으로
+      player.appendChild(track);
+    });
+    // 브라우저가 영상 정보를 읽은 뒤 자막을 다시 고르는 경우가 있어 그때 한 번 더 맞춤
+    player.addEventListener("loadedmetadata", function () { showCaption(player); });
+    var counted = false;
+    player.addEventListener("timeupdate", function () {
+      if (!counted && player.duration && player.currentTime / player.duration >= 0.9) {
+        counted = true;
+        if (progress) progress.watched(v.index);
+      }
+    });
+    frame.innerHTML = "";
+    frame.appendChild(player);
+    showCaption(player);
+    player.play().catch(function () { /* 자동 재생이 막히면 재생 버튼으로 직접 시작 */ });
+    player.focus();
+  }
+
+  // 사이트 언어의 자막만 보이게 (그 언어 자막이 없으면 모두 끔)
+  function showCaption(player) {
+    Array.prototype.forEach.call(player.textTracks, function (track) {
+      track.mode = track.language === current ? "showing" : "disabled";
+    });
+  }
+
+  // 설정(config.js)의 게임 주소를 검사: https 주소만 씀(내 컴퓨터에서 시험할 때 localhost는 http도). 아니면 "준비 중"으로 둠
+  function gameUrl() {
+    var raw = config.game && config.game.url;
+    if (!raw) return "";
+    try {
+      var u = new URL(raw, location.href);
+      if (u.protocol === "https:" || (u.protocol === "http:" && /^(localhost|127\.0\.0\.1)$/.test(u.hostname))) return u.href;
+    } catch (e) { /* 주소 형식이 아님 */ }
+    console.warn("config.js의 game.url은 https 주소여야 합니다:", raw);
+    return "";
+  }
+
+  // 게임 주소가 있어도 실제로 올라와 있는지(파일이 있는지) 먼저 확인. 같은 사이트 주소일 때만 확인 가능(다른 사이트면 있다고 봄)
   function setupGame() {
     var button = document.getElementById("game-play");
     var status = document.getElementById("game-status");
     var stage = document.getElementById("game-stage");
     var game = config.game || {};
+    var url = gameUrl(), live = false;
+    if (url) {
+      var check = new URL(url).origin === location.origin
+        ? fetch(url, { method: "HEAD", cache: "no-store" }).then(function (r) { return r.ok; })
+        : Promise.resolve(true);
+      check.then(function (ok) {
+        if (!ok) return;
+        live = true;
+        status.hidden = true;
+        stage.classList.add("is-ready");
+        if (progress) progress.gameReady();
+      }).catch(function () { /* 확인 실패: 준비 중으로 둠 */ });
+    }
 
     button.addEventListener("click", function () {
-      if (!game.url) {
+      if (!live) {
         status.hidden = false;
         return;
       }
       if (progress) progress.mark("game");
       if (!game.embed) {
-        window.open(game.url, "_blank", "noopener");
+        window.open(url, "_blank", "noopener");
         return;
       }
       var iframe = document.createElement("iframe");
-      iframe.src = game.url;
+      iframe.src = url;
       iframe.title = t("game.title");
       iframe.allow = "fullscreen; autoplay";
+      // 게임 화면이 이 페이지를 다른 곳으로 옮기거나 새 창·양식 제출을 못 하게 제한 (게임 실행·저장·마우스 잠금만 허용)
+      // 한계: 게임이 이 사이트와 같은 주소(sdm-eco.github.io)에 있으면 allow-same-origin 때문에 제한을 풀 수 있음 → 다른 주소에 둘 때 효과가 큼
+      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock");
       stage.innerHTML = "";
       stage.classList.add("is-playing");
       stage.appendChild(iframe);
@@ -626,7 +732,11 @@
         birds.push({ el: el, k: k });
       }
       birds.forEach(function (b, i) {
-        b.el.innerHTML = '<svg viewBox="0 0 12 6" width="' + size + '" height="' + size / 2 + '"><path style="animation-duration:' + b.k[2] + 's;animation-delay:-' + i * 0.17 + 's" d="M0 4.2Q3 0.6 6 4Q9 0.6 12 4.2"/></svg>';
+        b.el.innerHTML = '<svg viewBox="0 0 12 6" width="' + size + '" height="' + size / 2 + '"><path d="M0 4.2Q3 0.6 6 4Q9 0.6 12 4.2"/></svg>';
+        // 날갯짓 빠르기·엇갈림은 style 속성 대신 스크립트로 (콘텐츠 보안 정책이 HTML의 style 속성을 막음)
+        var wing = b.el.querySelector("path");
+        wing.style.animationDuration = b.k[2] + "s";
+        wing.style.animationDelay = -i * 0.17 + "s";
       });
       start();
     }
