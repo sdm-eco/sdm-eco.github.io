@@ -125,8 +125,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:58% 45%;filter:var(--scene-filter);animation:scene-in 1.4s ease-out backwards}
 @keyframes scene-in{from{opacity:0;transform:scale(1.03)}}
 /* 그림 속 수거함의 ♻가 은은하게 밝아졌다 흐려졌다 반복(main.js setupBinMarks): 같은 그림을 겹쳐 흰 화살표만 남겨(검정은 screen으로 안 보임) 빛나게 */
-/* 머리카락이 바람에 살랑임(main.js setupHairSway): 그림과 같은 색 보정을 걸어 겹친 조각이 티 나지 않게 */
-.hair-sway{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter)}
+/* 배너 인물 움직임(main.js setupFigures: 머리카락·끄덕임·손짓): 그림과 같은 색 보정을 걸어 겹친 조각이 티 나지 않게 */
+.fig-move{position:absolute;z-index:1;pointer-events:none;filter:var(--scene-filter)}
 /* 먼 하늘의 작은 새(main.js setupBirds): 색연필 톤의 흐린 회갈색 ㅅ, 날개를 위아래로 */
 .bird{position:absolute;left:0;top:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1.2s}
 .bird svg{display:block;overflow:visible}

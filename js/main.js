@@ -327,27 +327,60 @@
     return sync;
   }
 
-  // 배너 그림 속 두 번째 여학생(단발)의 머리끝이 바람에 찰랑임
-  // 원본 그림 좌표 box에서 잘라낸 두 장을 그림 위에 겹침:
-  //   plate: 머리카락을 지우고 주변 색으로 메운 판(머리가 움직여도 밑의 원래 머리카락이 비치지 않게)
-  //   piece: 머리카락만 따낸 조각 → 정수리·귀 위는 고정, 귀 아래로 갈수록 진자처럼 좌우로 흔듦(끝이 조금 늦게 따라옴)
+  // 배너 그림 속 인물의 작은 움직임 (그림 위에 원본에서 따낸 조각을 겹쳐 픽셀을 옮겨 그림)
+  //  - 두 번째 여학생(단발): 머리끝이 바람에 찰랑임
+  //  - 파란 재킷 남학생: 말하며 설명하듯 손이 들썩임 (잠깐 말하고 쉬기를 반복)
+  // 원본 그림 좌표 box에서 잘라낸 그림들:
+  //   plate: 움직이는 부분을 지우고 주변 색으로 메운 판 (움직여 드러난 자리에 원래 모습이 비치지 않게)
+  //   layers: 판 위에 아래→위 순서로 겹치는 조각. move가 이번 그림에서 각 점이 밀린 거리(dx, dy)를 정함
   // 움직임 줄이기 설정이면 안 움직이고, 배너가 화면 밖이거나 탭이 숨으면 멈춤
   // 한계: 픽셀마다 CPU로 계산(조각이 작아 가벼움, 초당 30번). 조각이 크거나 많아지면 WebGL로 옮길 것
-  function setupHairSway() {
+  function setupFigures() {
     var scene = document.querySelector(".hero-scene");
     var img = scene && scene.querySelector("img");
     if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // box: 조각 왼쪽 위(원본 그림 좌표), from~to: 흔들리기 시작하는 높이(귀)~머리끝(조각 안 y),
-    // face: 이 x보다 오른쪽(얼굴 옆 머리)은 덜 흔듦, amp: 머리끝 최대 흔들림(원본 px), period: 한 번 왕복(초)
-    var HAIR = [{ src: "img/hair-girl2.png", plate: "img/hair-girl2-plate.png", box: [735, 200], from: 32, to: 86, face: 72, amp: 4.3, period: 2.8 }];
+    var smooth = function (t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
+
+    // 여학생: 상자 105x92. 머리카락이 귀 높이(y 32)에서 0 → 머리끝(y 86)에서 1로 흔들림,
+    //   얼굴 옆 머리(x 72 오른쪽)는 0.55배, 끝 최대 4.3px, 2.8초 왕복. 판은 머리카락 아래쪽 둘레만 메운 것
+    var girl = {
+      box: [735, 200], plate: "img/hair-girl2-plate.png", layers: ["img/hair-girl2.png"],
+      frame: function (t) { this.ph = t * Math.PI * 2 / 2.8; },
+      move: function (layer, x, y, d) {
+        var k = smooth((y - 32) / 54) * (x > 72 ? 0.55 : 1);
+        // 진자처럼 좌우로: 끝으로 갈수록 크게, 조금 늦게(1.1*k) 따라오고, 끝 가닥만 잔물결이 살짝 더해짐. 밖으로 흔들릴 때 끝이 살짝 들림
+        var hx = 4.3 * k * Math.sin(this.ph - 1.1 * k) + 0.18 * 4.3 * k * k * Math.sin(this.ph * 2.6 + x * 0.09);
+        d[0] = hx;
+        d[1] = -0.12 * Math.abs(hx);
+      }
+    };
+    // 남학생 손: 상자 84x58, 손목(77, 44)을 축으로 손끝으로 갈수록 크게 돎
+    //  - 8초마다 5초 동안 천천히(1.4초에 한 번) 들썩이고 나머지는 쉼. 최대 0.07라디안(손끝 약 4px)
+    var boy = {
+      box: [878, 294], plate: "img/fig-boy3-plate.png", layers: ["img/fig-boy3-hand.png"],
+      frame: function (t) {
+        var c = (t + 2) % 8;
+        this.ang = c < 5 ? 0.07 * Math.sin(Math.PI * c / 5) * Math.sin(Math.PI * 2 * c / 1.4) : 0;
+      },
+      move: function (layer, x, y, d) {
+        var rx = x - 77, ry = y - 44;
+        var a = this.ang * smooth(Math.sqrt(rx * rx + ry * ry) / 55), c = Math.cos(a), s = Math.sin(a);
+        // 그릴 점(x, y)이 원래 있던 자리 = 축 기준으로 -a만큼 돌린 자리 → 밀린 거리는 그 차이
+        d[0] = rx - (rx * c + ry * s);
+        d[1] = ry - (-rx * s + ry * c);
+      }
+    };
+    var FIGS = [girl, boy];
     var items = [], visible = true, running = false, last = 0;
 
-    HAIR.forEach(function (h) {
-      var piece = new Image(), plate = new Image(), n = 0;
-      var done = function () { if (++n === 2) { items.push(prepare(h, piece, plate)); place(); } };
-      piece.onload = plate.onload = done;
-      piece.src = h.src;
-      plate.src = h.plate;
+    FIGS.forEach(function (f) {
+      var srcs = [f.plate].concat(f.layers), pics = [], n = 0;
+      srcs.forEach(function (src, i) {
+        var im = new Image();
+        im.onload = function () { if (++n === srcs.length) { items.push(prepare(f, pics)); place(); } };
+        im.src = src;
+        pics[i] = im;
+      });
     });
 
     function pixels(image, w, ht) {
@@ -359,52 +392,47 @@
       return g.getImageData(0, 0, w, ht).data;
     }
 
-    function prepare(h, piece, plate) {
-      var w = piece.naturalWidth, ht = piece.naturalHeight;
+    function prepare(f, pics) {
+      var w = pics[0].naturalWidth, ht = pics[0].naturalHeight;
       var cv = document.createElement("canvas");
       cv.width = w;
       cv.height = ht;
-      cv.className = "hair-sway";
+      cv.className = "fig-move";
       cv.setAttribute("aria-hidden", "true");
       scene.appendChild(cv);
       var ctx = cv.getContext("2d");
-      // 흔들림 정도: 귀 높이(from)에서 0 → 머리끝(to)에서 1로 부드럽게, 얼굴 옆 머리는 0.55배
-      var weight = new Float32Array(w * ht);
-      for (var y = 0; y < ht; y++) {
-        var t = Math.min(1, Math.max(0, (y - h.from) / (h.to - h.from)));
-        var k = t * t * (3 - 2 * t);
-        for (var x = 0; x < w; x++) weight[y * w + x] = k * (x > h.face ? 0.55 : 1);
-      }
-      return { h: h, w: w, ht: ht, data: pixels(piece, w, ht), plate: pixels(plate, w, ht), cv: cv, ctx: ctx, out: ctx.createImageData(w, ht), weight: weight };
+      return { f: f, w: w, ht: ht, plate: pixels(pics[0], w, ht), layers: pics.slice(1).map(function (im) { return pixels(im, w, ht); }), cv: cv, ctx: ctx, out: ctx.createImageData(w, ht) };
     }
 
-    // 메운 판 위에, (dx, dy)만큼 밀린 머리카락을 겹쳐 그림 (이웃 네 점 사이로 섞어 가져와 부드럽게)
+    // 판 위에 조각들을 차례로 덮어 그림. 조각은 (dx, dy)만큼 밀린 자리에서 이웃 네 점을 섞어 가져와 부드럽게
+    var d = [0, 0];
     function draw(it, time) {
-      var h = it.h, w = it.w, ht = it.ht, src = it.data, pl = it.plate, od = it.out.data, wt = it.weight;
-      var ph = (time / 1000) * Math.PI * 2 / h.period;
+      var f = it.f, w = it.w, ht = it.ht, pl = it.plate, od = it.out.data;
+      f.frame(time / 1000);
       for (var y = 0; y < ht; y++) {
         for (var x = 0; x < w; x++) {
-          var i = y * w + x, k = wt[i], o = i * 4;
-          // 진자처럼 좌우로: 끝으로 갈수록 크게, 조금 늦게(1.1*k) 따라오고, 끝 가닥만 잔물결이 살짝 더해짐
-          var swing = Math.sin(ph - 1.1 * k);
-          var dx = h.amp * k * swing + 0.18 * h.amp * k * k * Math.sin(ph * 2.6 + x * 0.09);
-          var dy = -0.12 * Math.abs(dx); // 밖으로 흔들릴 때 끝이 살짝 들림
-          var sx = x - dx, sy = y - dy;
-          var x0 = Math.floor(sx), y0 = Math.floor(sy), fx = sx - x0, fy = sy - y0;
-          var r = 0, g = 0, b = 0, a = 0;
-          for (var n = 0; n < 4; n++) {
-            var xx = x0 + (n & 1), yy = y0 + (n >> 1);
-            if (xx < 0 || yy < 0 || xx >= w || yy >= ht) continue;
-            var f = ((n & 1) ? fx : 1 - fx) * ((n >> 1) ? fy : 1 - fy), j = (yy * w + xx) * 4, al = src[j + 3] * f;
-            r += src[j] * al; g += src[j + 1] * al; b += src[j + 2] * al; a += al;
+          var o = (y * w + x) * 4;
+          var R = pl[o], G = pl[o + 1], B = pl[o + 2], A = pl[o + 3];
+          for (var l = 0; l < it.layers.length; l++) {
+            var src = it.layers[l];
+            f.move(l, x, y, d);
+            var sx = x - d[0], sy = y - d[1];
+            var x0 = Math.floor(sx), y0 = Math.floor(sy), fx = sx - x0, fy = sy - y0;
+            var r = 0, g = 0, b = 0, a = 0;
+            for (var n = 0; n < 4; n++) {
+              var xx = x0 + (n & 1), yy = y0 + (n >> 1);
+              if (xx < 0 || yy < 0 || xx >= w || yy >= ht) continue;
+              var wt = ((n & 1) ? fx : 1 - fx) * ((n >> 1) ? fy : 1 - fy), j = (yy * w + xx) * 4, al = src[j + 3] * wt;
+              r += src[j] * al; g += src[j + 1] * al; b += src[j + 2] * al; a += al;
+            }
+            if (a < 0.5) continue;
+            var k = a / 255, outA = a + A * (1 - k);
+            R = (r + R * A * (1 - k)) / outA;
+            G = (g + G * A * (1 - k)) / outA;
+            B = (b + B * A * (1 - k)) / outA;
+            A = outA;
           }
-          // 판(pa) 위에 머리카락(a)을 덮어 그림
-          var pa = pl[o + 3], A = a / 255, outA = a + pa * (1 - A);
-          if (outA < 0.5) { od[o + 3] = 0; continue; }
-          od[o] = ((a ? r / a : 0) * a + pl[o] * pa * (1 - A)) / outA;
-          od[o + 1] = ((a ? g / a : 0) * a + pl[o + 1] * pa * (1 - A)) / outA;
-          od[o + 2] = ((a ? b / a : 0) * a + pl[o + 2] * pa * (1 - A)) / outA;
-          od[o + 3] = outA;
+          od[o] = R; od[o + 1] = G; od[o + 2] = B; od[o + 3] = A;
         }
       }
       it.ctx.putImageData(it.out, 0, 0);
@@ -414,7 +442,7 @@
       var m = sceneMap(scene, img);
       if (!m) return;
       items.forEach(function (it) {
-        var p = m.at(it.h.box[0], it.h.box[1]);
+        var p = m.at(it.f.box[0], it.f.box[1]);
         it.cv.style.left = p[0] + "px";
         it.cv.style.top = p[1] + "px";
         it.cv.style.width = it.w * m.s + "px";
@@ -737,7 +765,7 @@
   setupGameDemo();
   setupHeroScene();
   setupBinMarks();
-  setupHairSway();
+  setupFigures();
   setupWaterfall();
   setupBirds();
   progress = setupProgress();
