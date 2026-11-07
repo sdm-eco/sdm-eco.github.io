@@ -4,21 +4,21 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261107u";
-import food from "./scene-food.js?v=20261107u";
-import general from "./scene-general.js?v=20261107u";
-import bulky from "./scene-bulky.js?v=20261107u";
-import can from "./scene-can.js?v=20261107u";
-import vinyl from "./scene-vinyl.js?v=20261107u";
-import carton from "./scene-carton.js?v=20261107u";
-import medicine from "./scene-medicine.js?v=20261107u";
-import battery from "./scene-battery.js?v=20261107u";
-import glass from "./scene-glass.js?v=20261107u";
-import paper from "./scene-paper.js?v=20261107u";
-import appliance from "./scene-appliance.js?v=20261107u";
-import confuse from "./scene-confuse.js?v=20261107u";
+import pet from "./scene-pet.js?v=20261108g";
+import food from "./scene-food.js?v=20261108g";
+import general from "./scene-general.js?v=20261108g";
+import bulky from "./scene-bulky.js?v=20261108g";
+import can from "./scene-can.js?v=20261108g";
+import vinyl from "./scene-vinyl.js?v=20261108g";
+import carton from "./scene-carton.js?v=20261108g";
+import medicine from "./scene-medicine.js?v=20261108g";
+import battery from "./scene-battery.js?v=20261108g";
+import glass from "./scene-glass.js?v=20261108g";
+import paper from "./scene-paper.js?v=20261108g";
+import appliance from "./scene-appliance.js?v=20261108g";
+import confuse from "./scene-confuse.js?v=20261108g";
 
-import { GROUND } from "./eco3d-util.js?v=20261107u";
+import { GROUND } from "./eco3d-util.js?v=20261108g";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,

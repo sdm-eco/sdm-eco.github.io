@@ -1,6 +1,6 @@
 // 종이팩 장면 (클레이 스타일)
 // 종이팩 따로 배출 안내(기후에너지환경부 등): 비우고 → 헹구고 → 납작하게 → 종이팩끼리 따로 배출
-import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261107u";
+import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108g";
 
 const W = 1.0, HB = 1.6, D = 1.0, ROOF = 0.45; // 몸통 폭·높이·깊이, 지붕 높이
 const PIV = GROUND + 1.0;
