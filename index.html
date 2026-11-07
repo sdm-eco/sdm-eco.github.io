@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.min.css">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261107i">
+<link rel="stylesheet" href="css/style.css?v=20261107p">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -184,14 +184,14 @@
           <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.25"></div></div>
           <h3 data-i18n="cat.recycle">재활용품</h3>
-          <p data-i18n="cat.recycle.sub">종이·플라스틱·유리·캔</p>
+          <p data-i18n="cat.recycle.sub">페트병·캔·비닐·종이팩</p>
           <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
         <article class="guide-card cat-bulky">
           <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.3"></div></div>
           <h3 data-i18n="cat.bulky">대형·특수폐기물</h3>
-          <p data-i18n="cat.bulky.sub">신고 후 배출</p>
+          <p data-i18n="cat.bulky.sub">가구·의약품·건전지</p>
           <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
         </article>
       </div>
@@ -235,6 +235,7 @@
 <dialog class="eco-dialog cat-recycle" id="pet-dialog" aria-labelledby="pet-dialog-title">
   <button type="button" class="eco-close" data-eco-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
   <div class="eco-lab" data-eco-lab="pet">
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="pet" aria-pressed="true"><span data-i18n="item.pet">투명 페트병</span></button><button type="button" data-eco-item="can" aria-pressed="false"><span data-i18n="item.can">캔</span></button><button type="button" data-eco-item="vinyl" aria-pressed="false"><span data-i18n="item.vinyl">비닐</span></button><button type="button" data-eco-item="carton" aria-pressed="false"><span data-i18n="item.carton">종이팩</span></button></div>
     <div class="eco-stage">
       <canvas class="eco-canvas" aria-hidden="true"></canvas>
       <span class="eco-badge" aria-hidden="true">3D</span>
@@ -258,6 +259,83 @@
         <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
       </div>
       <p class="eco-note" data-i18n="pet.note">색이 있는 페트병은 투명 페트병이 아니라 플라스틱류로 버려요.</p>
+    </div>
+  </div>
+  <div class="eco-lab" data-eco-lab="can" hidden>
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="pet" aria-pressed="false"><span data-i18n="item.pet">투명 페트병</span></button><button type="button" data-eco-item="can" aria-pressed="true"><span data-i18n="item.can">캔</span></button><button type="button" data-eco-item="vinyl" aria-pressed="false"><span data-i18n="item.vinyl">비닐</span></button><button type="button" data-eco-item="carton" aria-pressed="false"><span data-i18n="item.carton">종이팩</span></button></div>
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
+      <h3 id="can-dialog-title" data-i18n="can.title">캔, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="can.s1.title">내용물 비우기</strong><small data-i18n="can.s1.desc">남은 음료를 모두 비워요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="can.s2.title">물로 헹구기</strong><small data-i18n="can.s2.desc">안쪽을 물로 헹궈 이물질을 없애요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="can.s3.title">눌러서 찌그러뜨리기</strong><small data-i18n="can.s3.desc">부피가 줄도록 눌러서 납작하게 만들어요.</small></span></button></li>
+        <li><button type="button" data-step="4"><span class="eco-num">4</span><span><strong data-i18n="can.s4.title">캔류로 내놓기</strong><small data-i18n="can.s4.desc">아파트는 캔류 수거함에, 단독주택은 투명 봉투에 담아 내놓아요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="eco-auto" data-eco-auto data-state="paused"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5l8.5 5.5L5 13.5z"/></svg><span class="l-pause" data-i18n="lab.pause">일시정지</span><span class="l-play" data-i18n="lab.play">자동 재생</span></button>
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="can.note">부탄가스·스프레이 캔은 끝까지 다 쓰고 구멍을 뚫어 가스를 뺀 뒤 버려요.</p>
+    </div>
+  </div>
+  <div class="eco-lab" data-eco-lab="vinyl" hidden>
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="pet" aria-pressed="false"><span data-i18n="item.pet">투명 페트병</span></button><button type="button" data-eco-item="can" aria-pressed="false"><span data-i18n="item.can">캔</span></button><button type="button" data-eco-item="vinyl" aria-pressed="true"><span data-i18n="item.vinyl">비닐</span></button><button type="button" data-eco-item="carton" aria-pressed="false"><span data-i18n="item.carton">종이팩</span></button></div>
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
+      <h3 id="vinyl-dialog-title" data-i18n="vinyl.title">비닐, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="vinyl.s1.title">내용물 비우기</strong><small data-i18n="vinyl.s1.desc">과자 부스러기 같은 내용물을 털어 내요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="vinyl.s2.title">음식물이 묻었다면 헹구기</strong><small data-i18n="vinyl.s2.desc">물로 헹궈요. 씻어도 지워지지 않으면 종량제 봉투에 버려요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="vinyl.s3.title">따로 모아 투명 봉투에</strong><small data-i18n="vinyl.s3.desc">비닐끼리 모아 투명 봉투에 담아 배출 요일에 내놓아요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="eco-auto" data-eco-auto data-state="paused"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5l8.5 5.5L5 13.5z"/></svg><span class="l-pause" data-i18n="lab.pause">일시정지</span><span class="l-play" data-i18n="lab.play">자동 재생</span></button>
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="vinyl.note">과자·라면 봉지 같은 비닐 포장재와 일회용 비닐봉지도 비닐로 버려요.</p>
+    </div>
+  </div>
+  <div class="eco-lab" data-eco-lab="carton" hidden>
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="pet" aria-pressed="false"><span data-i18n="item.pet">투명 페트병</span></button><button type="button" data-eco-item="can" aria-pressed="false"><span data-i18n="item.can">캔</span></button><button type="button" data-eco-item="vinyl" aria-pressed="false"><span data-i18n="item.vinyl">비닐</span></button><button type="button" data-eco-item="carton" aria-pressed="true"><span data-i18n="item.carton">종이팩</span></button></div>
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
+      <h3 id="carton-dialog-title" data-i18n="carton.title">종이팩, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="carton.s1.title">내용물 비우기</strong><small data-i18n="carton.s1.desc">남은 우유·주스를 모두 비워요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="carton.s2.title">물로 헹구기</strong><small data-i18n="carton.s2.desc">안쪽을 물로 헹궈요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="carton.s3.title">펼쳐서 납작하게</strong><small data-i18n="carton.s3.desc">입구를 펼치고 눌러서 납작하게 만들어요.</small></span></button></li>
+        <li><button type="button" data-step="4"><span class="eco-num">4</span><span><strong data-i18n="carton.s4.title">종이팩끼리 따로 내놓기</strong><small data-i18n="carton.s4.desc">신문·상자 같은 일반 종이와 섞지 말고 종이팩 수거함에 넣어요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="eco-auto" data-eco-auto data-state="paused"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5l8.5 5.5L5 13.5z"/></svg><span class="l-pause" data-i18n="lab.pause">일시정지</span><span class="l-play" data-i18n="lab.play">자동 재생</span></button>
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="carton.note">우유팩·두유팩·생수팩 모두 종이팩이에요. 300세대 이상 아파트 등은 2027년 1월부터 종이팩 따로 배출이 전면 시행돼요.</p>
     </div>
   </div>
 </dialog>
@@ -321,6 +399,7 @@
 <dialog class="eco-dialog cat-bulky" id="bulky-dialog" aria-labelledby="bulky-dialog-title">
   <button type="button" class="eco-close" data-eco-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
   <div class="eco-lab" data-eco-lab="bulky">
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="bulky" aria-pressed="true"><span data-i18n="item.bulky">대형 폐기물</span></button><button type="button" data-eco-item="medicine" aria-pressed="false"><span data-i18n="item.medicine">폐의약품</span></button><button type="button" data-eco-item="battery" aria-pressed="false"><span data-i18n="item.battery">건전지·형광등</span></button></div>
     <div class="eco-stage">
       <canvas class="eco-canvas" aria-hidden="true"></canvas>
       <span class="eco-badge" aria-hidden="true">3D</span>
@@ -344,6 +423,56 @@
       <p class="eco-note" data-i18n="bulky.note">버리기 전에 재사용할 수 있는지 먼저 확인해요. 새 가전을 사면 판매자가 같은 종류의 헌 가전을 무료로 가져가요. 무단투기는 과태료 최대 100만 원이에요.</p>
     </div>
   </div>
+  <div class="eco-lab" data-eco-lab="medicine" hidden>
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="bulky" aria-pressed="false"><span data-i18n="item.bulky">대형 폐기물</span></button><button type="button" data-eco-item="medicine" aria-pressed="true"><span data-i18n="item.medicine">폐의약품</span></button><button type="button" data-eco-item="battery" aria-pressed="false"><span data-i18n="item.battery">건전지·형광등</span></button></div>
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
+      <h3 id="medicine-dialog-title" data-i18n="medicine.title">폐의약품, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="medicine.s1.title">알약은 포장된 그대로</strong><small data-i18n="medicine.s1.desc">알약·가루약은 뜯지 말고 포장된 그대로 모아요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="medicine.s2.title">물약·연고는 용기째</strong><small data-i18n="medicine.s2.desc">물약·시럽·연고는 마개를 닫아 용기째 모아요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="medicine.s3.title">폐의약품 수거함에 넣기</strong><small data-i18n="medicine.s3.desc">주민센터·보건소·구청 등의 수거함에 넣어요. 알약은 봉투에 ‘폐의약품’이라고 써서 밀봉하면 우체통에도 넣을 수 있어요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="eco-auto" data-eco-auto data-state="paused"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5l8.5 5.5L5 13.5z"/></svg><span class="l-pause" data-i18n="lab.pause">일시정지</span><span class="l-play" data-i18n="lab.play">자동 재생</span></button>
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="medicine.note">약을 하수구나 쓰레기통에 버리면 물과 땅을 오염시켜요. 물약은 우체통에 넣을 수 없고, 우체통용 회수봉투는 주민센터에서 받아요.</p>
+    </div>
+  </div>
+  <div class="eco-lab" data-eco-lab="battery" hidden>
+    <div class="eco-items" role="group" data-i18n-attr="aria-label:lab.items" aria-label="품목 고르기"><button type="button" data-eco-item="bulky" aria-pressed="false"><span data-i18n="item.bulky">대형 폐기물</span></button><button type="button" data-eco-item="medicine" aria-pressed="false"><span data-i18n="item.medicine">폐의약품</span></button><button type="button" data-eco-item="battery" aria-pressed="true"><span data-i18n="item.battery">건전지·형광등</span></button></div>
+    <div class="eco-stage">
+      <canvas class="eco-canvas" aria-hidden="true"></canvas>
+      <span class="eco-badge" aria-hidden="true">3D</span>
+      <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+    </div>
+    <div class="eco-panel">
+      <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
+      <h3 id="battery-dialog-title" data-i18n="battery.title">폐건전지·폐형광등, 이렇게 버려요</h3>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <ol class="eco-steps">
+        <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="battery.s1.title">다 쓴 건전지 빼서 모으기</strong><small data-i18n="battery.s1.desc">기기에서 건전지를 빼서 따로 모아요.</small></span></button></li>
+        <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="battery.s2.title">형광등은 깨지지 않게</strong><small data-i18n="battery.s2.desc">다 쓴 형광등은 깨지지 않게 그대로 모아요.</small></span></button></li>
+        <li><button type="button" data-step="3"><span class="eco-num">3</span><span><strong data-i18n="battery.s3.title">전용 수거함에 넣기</strong><small data-i18n="battery.s3.desc">아파트는 단지 안 수거함, 주택은 주민센터나 골목에 있는 수거함에 넣어요.</small></span></button></li>
+      </ol>
+      <div class="eco-actions">
+        <button type="button" class="eco-auto" data-eco-auto data-state="paused"><svg class="i-pause" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3h3v10H4zM9 3h3v10H9z"/></svg><svg class="i-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M5 2.5l8.5 5.5L5 13.5z"/></svg><span class="l-pause" data-i18n="lab.pause">일시정지</span><span class="l-play" data-i18n="lab.play">자동 재생</span></button>
+        <button type="button" class="action-link" data-eco-next><span data-i18n="lab.next">다음 단계</span></button>
+        <button type="button" class="eco-reset" data-eco-reset data-i18n="lab.reset">처음부터</button>
+      </div>
+      <p class="eco-note" data-i18n="battery.note">LED 전구·일반 전구는 수거함에 넣지 말고 종량제 봉투에 버려요. 전등 케이스도 수거함에 넣으면 안 돼요.</p>
+    </div>
+  </div>
 </dialog>
 
 <footer class="footer">
@@ -360,9 +489,9 @@
 </footer>
 
 <script src="js/config.js?v=20261104b"></script>
-<script src="js/i18n.js?v=20261106b"></script>
+<script src="js/i18n.js?v=20261107p"></script>
 <script src="js/main.js?v=20261107k"></script>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
-<script type="module" src="js/eco3d.js?v=20261106b"></script>
+<script type="module" src="js/eco3d.js?v=20261107p"></script>
 </body>
 </html>

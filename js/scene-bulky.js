@@ -1,7 +1,7 @@
 // 대형 폐기물 장면
 // 서대문구청 안내: 구 홈페이지 인터넷 접수 또는 동별 대행업체 전화로 배출 신고 → 수수료 납부
 // → "신고필증"을 출력해 배출 품목에 붙임 → 약속한 날 내놓으면 수거
-import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, houseFront } from "./eco3d-util.js";
+import { GROUND, TAU, clamp01, easeInOut, backOut, lerp, canvasTexture, addShadow, houseFront } from "./eco3d-util.js?v=20261107p";
 
 const CHAIR = [-0.35, 0.2];        // 의자 처음 위치 (x, z)
 const CHAIR_OUT = [0.3, -0.95];    // 집 앞에 내놓는 곳

@@ -4,16 +4,22 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js";
-import food from "./scene-food.js";
-import general from "./scene-general.js";
-import bulky from "./scene-bulky.js";
+import pet from "./scene-pet.js?v=20261107p";
+import food from "./scene-food.js?v=20261107p";
+import general from "./scene-general.js?v=20261107p";
+import bulky from "./scene-bulky.js?v=20261107p";
+import can from "./scene-can.js?v=20261107p";
+import vinyl from "./scene-vinyl.js?v=20261107p";
+import carton from "./scene-carton.js?v=20261107p";
+import medicine from "./scene-medicine.js?v=20261107p";
+import battery from "./scene-battery.js?v=20261107p";
 
-const SCENES = { pet: pet, food: food, general: general, bulky: bulky };
+const SCENES = { pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery };
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 document.querySelectorAll("[data-eco-lab]").forEach(initLab);
 document.querySelectorAll("[data-eco-loop]").forEach(initLoop);
+setupItems();
 setupDialogs();
 
 function initLab(lab) {
@@ -87,10 +93,16 @@ function initLab(lab) {
     auto.hidden = reduced;
     auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
   }
+  // 열 때마다(품목을 바꿔 보일 때도) "드래그해서 돌려 보세요" 안내를 다시 보이고 1단계부터 자동 진행
+  // (드래그하면 createView가 is-touched로 숨김)
+  function start() { held = false; stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); }
+  function stop() { held = false; setPlaying(false); }
+  lab.addEventListener("eco:start", start);
+  lab.addEventListener("eco:stop", stop);
   if (dialog) {
-    // 열 때마다 "드래그해서 돌려 보세요" 안내를 다시 보임 (드래그하면 createView가 is-touched로 숨김)
-    dialog.addEventListener("eco:open", function () { held = false; stage.classList.remove("is-touched"); setStep(0); setPlaying(!reduced); });
-    dialog.addEventListener("close", function () { held = false; setPlaying(false); });
+    // 한 창에 품목이 여럿이면 지금 보이는 품목만 시작
+    dialog.addEventListener("eco:open", function () { if (!lab.hidden) start(); });
+    dialog.addEventListener("close", stop);
   }
   setStep(0);
 
@@ -101,6 +113,43 @@ function initLab(lab) {
 }
 
 function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+// 한 창에 품목이 여럿(예: 페트병·캔·비닐·종이팩): 창 위 품목 버튼([data-eco-item="이름"])으로 체험을 바꿔 보임.
+// 숨은 품목의 3D는 처음 보일 때 불러옴(mount의 IntersectionObserver). 창을 닫으면 다음에 첫 품목부터 보임
+function setupItems() {
+  document.querySelectorAll("dialog.eco-dialog").forEach(function (dialog) {
+    const labs = Array.from(dialog.querySelectorAll("[data-eco-lab]"));
+    if (labs.length < 2) return;
+    const tabs = Array.from(dialog.querySelectorAll("[data-eco-item]"));
+
+    function show(name, focus) {
+      labs.forEach(function (lab) {
+        const on = lab.dataset.ecoLab === name;
+        if (!on && !lab.hidden) lab.dispatchEvent(new Event("eco:stop"));
+        lab.hidden = !on;
+        if (on) dialog.setAttribute("aria-labelledby", lab.querySelector("h3").id);
+      });
+      tabs.forEach(function (tab) { tab.setAttribute("aria-pressed", String(tab.dataset.ecoItem === name)); });
+      if (focus) {
+        const lab = labs.find(function (l) { return !l.hidden; });
+        const btn = lab.querySelector('[data-eco-item="' + name + '"]');
+        btn.focus({ preventScroll: true });
+        // 휴대폰에서 버튼 줄이 옆으로 밀리는 경우: 고른 버튼이 닫기 버튼(오른쪽 64px)에 가리지 않게 줄을 밀어 둠
+        const row = btn.parentElement, r = row.getBoundingClientRect(), b = btn.getBoundingClientRect();
+        row.scrollLeft = Math.max(0, b.right - (r.right - 64));
+        lab.dispatchEvent(new Event("eco:start"));
+      }
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        if (tab.getAttribute("aria-pressed") !== "true") show(tab.dataset.ecoItem, true);
+      });
+    });
+    dialog.addEventListener("close", function () { show(labs[0].dataset.ecoLab, false); });
+    show(labs[0].dataset.ecoLab, false);
+  });
+}
 
 // data-eco-widget 안의 [data-eco-mark="n"] 요소에 지금 단계를 is-on으로 표시
 function initLoop(stage) {

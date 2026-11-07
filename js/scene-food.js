@@ -1,7 +1,7 @@
 // 음식물 쓰레기 장면
 // 서대문구청 안내: 물기 제거 후 배출, 뼈·조개/달걀 껍데기·핵과류 씨 등은 일반쓰레기,
 // 단독주택은 음식물 전용 봉투, 공동주택은 전용 수거함
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, binGroup, seeded } from "./eco3d-util.js";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, binGroup, seeded } from "./eco3d-util.js?v=20261107p";
 
 const BASE = GROUND + 0.12;   // 바구니 다리 높이만큼 띄움
 const G_BIN = [-1.85, 0.25];   // 일반쓰레기통 위치 (x, z)

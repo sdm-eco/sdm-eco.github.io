@@ -128,6 +128,78 @@ export function houseFront(THREE, signMap) {
   return g;
 }
 
+// 헹구기 단계 공통: 위에서 내려오는 수도꼭지와 물줄기, 그리고 기울인 그릇 입구에서 쏟아지는 방울
+// 쓰는 법: const f = createFaucet(THREE, scene, x, y);  매 프레임 f.update(나타남 0~1, 물 나옴 여부, dt)
+//          f.pour(obj, 입구(obj 기준 좌표), 기울기 그룹, 방울 모음, dt)  ← 쏟는 동안만 부름
+export function createFaucet(THREE, scene, x, y) {
+  const g = new THREE.Group();
+  const metal = new THREE.MeshStandardMaterial({ color: 0xc9d2d6, metalness: 0.85, roughness: 0.25 });
+  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 1.1, 20), metal);
+  pipe.rotation.z = Math.PI / 2;
+  pipe.position.set(0.55, 0.25, 0);
+  const elbow = new THREE.Mesh(new THREE.SphereGeometry(0.11, 20, 12), metal);
+  const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.11, 0.35, 20), metal);
+  spout.position.y = 0.08;
+  elbow.position.y = 0.25;
+  const knob = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 20), new THREE.MeshStandardMaterial({ color: 0x3b8fd0, roughness: 0.4 }));
+  knob.position.set(0.55, 0.4, 0);
+  g.add(pipe, elbow, spout, knob);
+  g.position.set(x, y, 0);
+  g.visible = false;
+  scene.add(g);
+  const water = new THREE.MeshStandardMaterial({ color: 0x8fd0f5, roughness: 0.1, transparent: true, opacity: 0.85 });
+  const drops = createDrops(THREE, scene, water, 90, 0.045);
+  const p = new THREE.Vector3(), vel = new THREE.Vector3(), mouth = new THREE.Vector3(), axis = new THREE.Vector3();
+  let clock = 0, pourClock = 0;
+  return {
+    water: water,
+    drops: drops,
+    update: function (show, flowing, dt) {
+      g.visible = show > 0.001;
+      g.position.y = y + (1 - show) * 0.8;
+      g.scale.setScalar(Math.max(show, 0.001));
+      clock = flowing ? clock + dt : 0;
+      while (clock > 0.018) {
+        clock -= 0.018;
+        drops.emit(p.set(x + (Math.random() - 0.5) * 0.08, y - 0.1, (Math.random() - 0.5) * 0.08), vel.set(0, -1.5, 0));
+      }
+      drops.update(dt);
+    },
+    pour: function (obj, local, tilt, set, dt) {
+      pourClock += dt;
+      obj.localToWorld(mouth.copy(local));
+      axis.set(0, 1, 0).applyQuaternion(tilt.quaternion);
+      while (pourClock > 0.025) {
+        pourClock -= 0.025;
+        set.emit(mouth, axis.clone().multiplyScalar(1.4).add(vel.set((Math.random() - 0.5) * 0.5, 0, (Math.random() - 0.5) * 0.5)));
+      }
+    },
+    clear: function () { drops.clear(); clock = 0; pourClock = 0; }
+  };
+}
+
+// 비우기(empty)·헹구기(rinse) 단계의 진행 값: 기울기(0~1), 수도꼭지 보임·물 나옴, 쏟는 중인지
+// 헹구기 = 수도꼭지가 내려와 물을 받음(0~0.45) → 사라짐 → 기울여 물을 쏟음(0.55~1)
+export function pourPhase(v) {
+  const pour = v.$key === "empty" ? v.$p : 0;
+  const r = v.$key === "rinse" ? v.$p : 0;
+  const rq = clamp01((r - 0.55) / 0.45);
+  return {
+    tilt: Math.max(Math.sin(Math.PI * pour), Math.sin(Math.PI * rq)),
+    faucet: smooth(0, 0.12, r) * (1 - smooth(0.45, 0.55, r)),
+    flowing: r > 0.12 && r < 0.42,
+    pouring: pour > 0.32 && pour < 0.78,
+    rinsing: rq > 0.32 && rq < 0.78
+  };
+}
+
+// 수거함 단계(bp 0~1): 들어 올렸다가(최고 lift) 수거함 안 end 높이로 떨어뜨림
+export function dropHeight(bp, lift, end) {
+  if (bp > 0.12 && bp < 0.55) return easeInOut(clamp01((bp - 0.12) / 0.38)) * lift;
+  if (bp >= 0.55) { const q = clamp01((bp - 0.55) / 0.45); return lerp(lift, end, q * q); }
+  return 0;
+}
+
 // 떨어지는 물방울 (중력으로 떨어지다 바닥에서 사라짐)
 export function createDrops(THREE, scene, material, count, size) {
   const mesh = new THREE.InstancedMesh(new THREE.SphereGeometry(size, 8, 6), material, count);
