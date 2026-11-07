@@ -1,7 +1,7 @@
 // 투명 페트병 장면 (클레이 스타일 시범)
 // 배출 순서: 서울시 안내(내용물 비우기 → 라벨 제거 → 압착 → 뚜껑 닫기 → 투명 페트병 전용 수거함)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108j";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, densePoints, canvasTexture, addShadow, stickerTexture, createDrops, CLAY, clayMat, clayBin, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108k";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
 
 // 페트병 옆모습 (반지름, 높이) — 바닥에서 입구까지
 const PROFILE = [[0, 0], [0.42, 0], [0.58, 0.04], [0.62, 0.16], [0.62, 0.95], [0.57, 1.08], [0.62, 1.2],
@@ -23,6 +23,7 @@ export default {
   moves: [null, [["cap", 1.3], ["liquid", 2.4]], [["label", 1.6]], [["crush", 1.4]], [["cap", 1.1]], [["bin", 2.0]]],
   spin: 0.5, // 자동 재생 때 라벨 무늬가 보이는 각도
   clay: true, // 클레이 스타일 조명·그림자 (eco3d.js)
+  endOrbit: true, // 마지막 단계가 끝나면 드래그로 수거함까지 장면 전체가 돎 (앞 단계는 물건만)
   build: build
 };
 

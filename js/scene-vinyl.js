@@ -1,8 +1,8 @@
 // 비닐 장면 (클레이 스타일)
 // 서울시·서대문구 폐비닐 안내: 내용물 비우기 → 음식물이 묻었다면 헹구기 → 따로 모아 배출
 // (재활용품 분리배출 안내: 비닐류는 투명 비닐봉투에 담아 배출 / 씻어도 오염이 남은 비닐은 종량제 봉투)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, addShadow, createDrops, createFaucet, seeded, CLAY, clayMat, tiltCurve, wobble } from "./eco3d-util.js?v=20261108j";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, addShadow, createDrops, createFaucet, seeded, CLAY, clayMat, tiltCurve, wobble } from "./eco3d-util.js?v=20261108k";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
 
 const W = 1.3, H = 1.8, T = 0.22; // 과자 봉지 폭·높이·불룩한 두께
 const PIV = GROUND + 1.0;
@@ -22,6 +22,7 @@ export default {
   spin: 0.5,
   camera: [0.3, -0.3],
   clay: true, // 클레이 스타일 조명·그림자 (eco3d.js)
+  endOrbit: true, // 마지막 단계가 끝나면 드래그로 수거함까지 장면 전체가 돎 (앞 단계는 물건만)
   build: build
 };
 

@@ -1,8 +1,8 @@
 // 캔 장면 (클레이 스타일 시범)
 // 서대문구청 안내(재활용품 분리배출·올바른 쓰레기 배출방법): 내용물을 비우고 이물질 제거 → 압착 →
 // 캔류로 배출 (단독주택은 투명 비닐봉투에 담아 배출요일에)
-import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108j";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
+import { GROUND, TAU, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108k";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
 
 const R = 0.6, H = 1.9;   // 캔 반지름·높이
 const SQUASH = 0.38;      // 찌그러졌을 때 높이 비율
@@ -21,6 +21,7 @@ export default {
   spin: 0.4,
   camera: [0.3, -0.35],
   clay: true, // 클레이 스타일 조명·그림자 (eco3d.js)
+  endOrbit: true, // 마지막 단계가 끝나면 드래그로 수거함까지 장면 전체가 돎 (앞 단계는 물건만)
   build: build
 };
 

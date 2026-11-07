@@ -4,22 +4,22 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
 //    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108j";
-import food from "./scene-food.js?v=20261108j";
-import general from "./scene-general.js?v=20261108j";
-import bulky from "./scene-bulky.js?v=20261108j";
-import can from "./scene-can.js?v=20261108j";
-import vinyl from "./scene-vinyl.js?v=20261108j";
-import carton from "./scene-carton.js?v=20261108j";
-import medicine from "./scene-medicine.js?v=20261108j";
-import battery from "./scene-battery.js?v=20261108j";
-import glass from "./scene-glass.js?v=20261108j";
-import paper from "./scene-paper.js?v=20261108j";
-import appliance from "./scene-appliance.js?v=20261108j";
-import confuse from "./scene-confuse.js?v=20261108j";
+import pet from "./scene-pet.js?v=20261108k";
+import food from "./scene-food.js?v=20261108k";
+import general from "./scene-general.js?v=20261108k";
+import bulky from "./scene-bulky.js?v=20261108k";
+import can from "./scene-can.js?v=20261108k";
+import vinyl from "./scene-vinyl.js?v=20261108k";
+import carton from "./scene-carton.js?v=20261108k";
+import medicine from "./scene-medicine.js?v=20261108k";
+import battery from "./scene-battery.js?v=20261108k";
+import glass from "./scene-glass.js?v=20261108k";
+import paper from "./scene-paper.js?v=20261108k";
+import appliance from "./scene-appliance.js?v=20261108k";
+import confuse from "./scene-confuse.js?v=20261108k";
 
-import { GROUND } from "./eco3d-util.js?v=20261108j";
-import { sfx } from "./eco3d-sound.js?v=20261108j";
+import { GROUND } from "./eco3d-util.js?v=20261108k";
+import { sfx } from "./eco3d-sound.js?v=20261108k";
 
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
@@ -350,6 +350,10 @@ function createView(lib, stage, canvas, def, opts) {
     });
   }
 
+  // 마지막 단계에서 장면 전체를 돌릴 때 함께 돌릴 방향 조명(그림자 포함)과 처음 자리
+  const lights = [];
+  scene.traverse(function (o) { if (o.isDirectionalLight) lights.push({ light: o, base: o.position.clone() }); });
+
   // 단계 애니메이션: 값을 0~1 사이에서 직선으로 바꾸고, 부드럽게 보이는 처리는 장면이 맡음
   const states = def.states, moves = def.moves;
   // $sound: 체험 창의 3D만 효과음을 냄(카드 미리보기는 조용히), $k0·$p0: 이번 그림 직전 진행 상태(효과음 순간 판단용)
@@ -391,12 +395,17 @@ function createView(lib, stage, canvas, def, opts) {
   }
 
   // 드래그로 좌우 회전 (세로 스크롤은 막지 않음)
-  let dragging = false, lastX = 0, velocity = 0;
+  //  - 보통은 spin 그룹(장면이 고른 물건)만 돌림
+  //  - def.endOrbit 장면은 마지막 단계 움직임이 다 끝난 뒤 장면 전체를 돌림: 물건이 이미 수거함에 들어가
+  //    물건만 돌면 어색하므로. 실제로는 카메라·조명을 반대로 돌려 같은 모습을 냄(orbit, 라디안)
+  let dragging = false, lastX = 0, velocity = 0, orbiting = false, orbit = 0, orbitShown = 0;
+  function atEnd() { return !!def.endOrbit && shown === states.length - 1 && !active && !queue.length; }
   if (opts.interactive) {
     canvas.addEventListener("pointerdown", function (e) {
       dragging = true;
       lastX = e.clientX;
       velocity = 0;
+      orbiting = atEnd();
       canvas.setPointerCapture(e.pointerId);
       stage.classList.add("is-touched");
     });
@@ -404,7 +413,8 @@ function createView(lib, stage, canvas, def, opts) {
       if (!dragging) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
-      spin.rotation.y += dx * 0.012;
+      if (orbiting) orbit -= dx * 0.012;
+      else spin.rotation.y += dx * 0.012;
       velocity = dx * 0.7;
     });
     const endDrag = function () { dragging = false; };
@@ -423,13 +433,27 @@ function createView(lib, stage, canvas, def, opts) {
     runTweens(dt);
     if (!dragging) {
       velocity *= Math.pow(0.04, dt);
-      spin.rotation.y += velocity * dt;
+      if (orbiting) orbit -= velocity * dt;
+      else spin.rotation.y += velocity * dt;
+    }
+    // 마지막 단계를 벗어나면(앞 단계·처음부터) 장면 전체 회전을 1초쯤에 걸쳐 원래 방향으로 되돌림
+    if (orbit && shown < states.length - 1) {
+      orbiting = false;
+      orbit *= Math.pow(0.01, dt);
+      if (Math.abs(orbit) < 0.001) orbit = 0;
     }
     world.update(v, dt);
-    if (def.clay && !reduced) {
-      idle += dt;
-      camera.position.set(camBase.x + Math.sin(idle * 0.45) * 0.4, camBase.y + Math.sin(idle * 0.31) * 0.1, camBase.z);
+    const sway = def.clay && !reduced;
+    if (sway) idle += dt;
+    if (sway || orbit || orbitShown) {
+      const x = camBase.x + (sway ? Math.sin(idle * 0.45) * 0.4 : 0), y = camBase.y + (sway ? Math.sin(idle * 0.31) * 0.1 : 0);
+      const c = Math.cos(orbit), s = Math.sin(orbit);
+      camera.position.set(x * c + camBase.z * s, y, camBase.z * c - x * s);
       camera.lookAt(0, lookY, 0);
+      if (orbit !== orbitShown) {
+        lights.forEach(function (l) { l.light.position.set(l.base.x * c + l.base.z * s, l.base.y, l.base.z * c - l.base.x * s); });
+        orbitShown = orbit;
+      }
     }
   }
 

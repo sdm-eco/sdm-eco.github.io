@@ -1,7 +1,7 @@
 // 종이팩 장면 (클레이 스타일)
 // 종이팩 따로 배출 안내(기후에너지환경부 등): 비우고 → 헹구고 → 납작하게 → 종이팩끼리 따로 배출
-import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108j";
-import { sfx, hit } from "./eco3d-sound.js?v=20261108j";
+import { GROUND, clamp01, smooth, easeInOut, backOut, lerp, canvasTexture, stickerTexture, createDrops, createFaucet, CLAY, clayMat, clayBin, tiltCurve, wobble } from "./eco3d-util.js?v=20261108k";
+import { sfx, hit } from "./eco3d-sound.js?v=20261108k";
 
 const W = 1.0, HB = 1.6, D = 1.0, ROOF = 0.45; // 몸통 폭·높이·깊이, 지붕 높이
 const PIV = GROUND + 1.0;
@@ -19,6 +19,7 @@ export default {
   spin: 0.6,
   camera: [0.3, -0.3],
   clay: true, // 클레이 스타일 조명·그림자 (eco3d.js)
+  endOrbit: true, // 마지막 단계가 끝나면 드래그로 수거함까지 장면 전체가 돎 (앞 단계는 물건만)
   build: build
 };
 
