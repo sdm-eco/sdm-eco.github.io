@@ -260,9 +260,166 @@
     }).observe(demo);
   }
 
+  // 배너 그림 속 짧은 분리배출 장면 (페이지를 열 때 한 번, 약 6초)
+  // 그림이 색연필 질감이라 물건 그림 대신 빛으로만 표현: 여학생 손 → 노란 통, 남학생 손 → 초록 통으로 반짝이는 별이 날아 들어가고
+  // 통 입구가 은은하게 빛나며 반짝임과 빛나는 ♻가 떠올랐다 사라짐
+  // 그림은 object-fit:cover라 그림 좌표(원본 1344×756)를 화면 좌표로 바꿔 놓음. 움직임 줄이기 설정이면 재생 안 함
+  // 배너 그림(object-fit:cover, 원본 1344×756)의 좌표를 지금 화면 좌표로 바꾸는 함수. s = 그림 배율
+  function sceneMap(scene, img) {
+    var IW = 1344, IH = 756;
+    var w = scene.clientWidth, h = scene.clientHeight;
+    if (!w || !h) return null;
+    var pos = getComputedStyle(img).objectPosition.split(" ").map(function (v) { return parseFloat(v) / 100; });
+    var s = Math.max(w / IW, h / IH);
+    return { s: s, at: function (x, y) { return [(w - IW * s) * pos[0] + x * s, (h - IH * s) * pos[1] + y * s]; } };
+  }
+
+  // 그림 속 수거함에 그려진 ♻ 두 개가 은은하게 밝아졌다 흐려졌다를 계속 반복 (CSS 애니메이션, 두 통이 번갈아)
+  // 같은 그림을 ♻ 자리에만 겹쳐 놓고 CSS 필터로 흰 화살표만 남겨(나머지는 검정 → screen 합성으로 안 보임) 빛나게 함
+  // → 그려진 ♻와 모양이 정확히 같음. 화면 크기가 바뀌면 자리를 다시 맞춤. 움직임 줄이기 설정이면 보이지 않음
+  function setupBinMarks() {
+    var scene = document.querySelector(".hero-scene");
+    var img = scene && scene.querySelector("img");
+    if (!img || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var BOX = 48; // ♻ 둘레를 덮는 칸 크기(그림 원본 기준 px)
+    var marks = [[761, 484], [888, 484]].map(function (p, i) {
+      var el = document.createElement("span");
+      el.className = "bin-mark";
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = "<i></i><i></i>"; // 또렷한 화살표 + 번진 빛무리
+      el.style.setProperty("--bg", "url(" + img.currentSrc + ")");
+      el.style.animationDelay = i * 1.6 + "s";
+      if (i === 0) el.classList.add("is-green"); // 초록 통은 ♻가 더 어두워 기준이 다름
+      scene.appendChild(el);
+      return { el: el, p: p };
+    });
+    function place() {
+      var m = sceneMap(scene, img);
+      if (!m) return;
+      var o = m.at(0, 0), size = BOX * m.s;
+      marks.forEach(function (k) {
+        var q = m.at(k.p[0], k.p[1]), left = q[0] - size / 2, top = q[1] - size / 2;
+        k.el.style.left = left + "px";
+        k.el.style.top = top + "px";
+        k.el.style.width = k.el.style.height = size + "px";
+        k.el.style.setProperty("--bs", 1344 * m.s + "px " + 756 * m.s + "px");
+        k.el.style.setProperty("--bp", o[0] - left + "px " + (o[1] - top) + "px");
+      });
+    }
+    new ResizeObserver(place).observe(scene);
+    if (img.complete) place(); else img.addEventListener("load", place, { once: true });
+  }
+
+  function setupHeroScene() {
+    var scene = document.querySelector(".hero-scene");
+    var img = scene && scene.querySelector("img");
+    if (!img || !scene.animate || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    function play() {
+      var m = sceneMap(scene, img);
+      if (!m) return;
+      var s = m.s, at = m.at;
+      var layer = document.createElement("div");
+      layer.className = "scene-fx";
+      scene.appendChild(layer);
+
+      // 손에서 통 입구까지 반짝이는 별(빛 구슬)이 포물선을 따라 날아 들어가고, 지나간 자리에 작은 반짝임이 잠깐 남음
+      function orb(from, to, lift, delay, dur) {
+        var c = [(from[0] + to[0]) / 2, Math.min(from[1], to[1]) - lift * s];
+        var pt = function (t) {
+          var u = 1 - t;
+          return [u * u * from[0] + 2 * u * t * c[0] + t * t * to[0], u * u * from[1] + 2 * u * t * c[1] + t * t * to[1]];
+        };
+        var size = Math.max(16, 30 * s);
+        var el = document.createElement("span");
+        el.className = "scene-orb";
+        el.style.width = el.style.height = size + "px";
+        layer.appendChild(el);
+        var frames = [];
+        for (var k = 0; k <= 20; k++) {
+          var t = k / 20, p = pt(t);
+          frames.push({
+            transform: "translate(" + p[0] + "px," + p[1] + "px) translate(-50%,-50%) rotate(" + t * 180 + "deg) scale(" + (t < .1 ? t * 10 : t > .9 ? 1 - (t - .9) * 6 : 1) + ")",
+            opacity: t < .08 ? t / .08 : t > .92 ? (1 - t) / .08 : 1
+          });
+        }
+        var a = el.animate(frames, { duration: dur, delay: delay, easing: "cubic-bezier(.45,0,.55,1)", fill: "both" });
+        // 지나간 자리의 작은 반짝임(꼬리)
+        [.25, .45, .65, .82].forEach(function (t) {
+          var p = pt(t), d = document.createElement("span");
+          d.className = "scene-spark";
+          d.style.left = p[0] + "px";
+          d.style.top = p[1] + "px";
+          d.style.width = d.style.height = Math.max(8, 13 * s) + "px";
+          layer.appendChild(d);
+          d.animate([
+            { transform: "translate(-50%,-50%) scale(0)", opacity: 0 },
+            { transform: "translate(-50%,-50%) scale(1) rotate(45deg)", opacity: .9, offset: .3 },
+            { transform: "translate(-50%,-30%) scale(.3) rotate(90deg)", opacity: 0 }
+          ], { duration: 900, delay: delay + dur * t, easing: "ease-out", fill: "both" });
+        });
+        return a;
+      }
+      // 통 입구가 은은하게 빛나고, 반짝임 몇 개가 퍼지고, 빛나는 ♻가 떠올랐다 사라짐
+      function glow(p, delay, dur) {
+        var g = document.createElement("span");
+        g.className = "scene-glow";
+        g.style.left = p[0] + "px";
+        g.style.top = p[1] + "px";
+        g.style.width = 150 * s + "px";
+        g.style.height = 56 * s + "px";
+        layer.appendChild(g);
+        g.animate([
+          { transform: "translate(-50%,-50%) scale(.5)", opacity: 0 },
+          { transform: "translate(-50%,-50%) scale(1.05)", opacity: 1, offset: .3 },
+          { transform: "translate(-50%,-50%) scale(1)", opacity: .8, offset: .6 },
+          { transform: "translate(-50%,-50%) scale(1.1)", opacity: 0 }
+        ], { duration: dur, delay: delay, easing: "ease-out", fill: "both" });
+        [[-46, -14, 0], [40, -22, 160], [-14, -40, 320], [26, -6, 480], [4, -58, 620]].forEach(function (d) {
+          var sp = document.createElement("span");
+          sp.className = "scene-spark";
+          sp.style.left = p[0] + d[0] * s + "px";
+          sp.style.top = p[1] + d[1] * s + "px";
+          sp.style.width = sp.style.height = Math.max(10, 18 * s) + "px";
+          layer.appendChild(sp);
+          sp.animate([
+            { transform: "translate(-50%,-50%) scale(0) rotate(0)", opacity: 0 },
+            { transform: "translate(-50%,-50%) scale(1) rotate(45deg)", opacity: 1, offset: .4 },
+            { transform: "translate(-50%,-120%) scale(.4) rotate(90deg)", opacity: 0 }
+          ], { duration: dur * .7, delay: delay + d[2] * 2, easing: "ease-out", fill: "both" });
+        });
+        var m = document.createElement("span");
+        m.className = "scene-mark";
+        m.textContent = "♻";
+        m.style.left = p[0] + "px";
+        m.style.top = p[1] - 34 * s + "px";
+        m.style.fontSize = Math.max(18, 40 * s) + "px";
+        layer.appendChild(m);
+        // ♻는 통 입구에서 위로 길게(약 120px × 그림 배율) 천천히 떠오르며, 끝 무렵에야 흐려짐
+        var rise = function (k) { return "translate(-50%,-50%) translateY(" + (-120 * s * k) + "px)"; };
+        return m.animate([
+          { transform: rise(0) + " scale(.6)", opacity: 0 },
+          { transform: rise(.12) + " scale(1)", opacity: 1, offset: .15 },
+          { transform: rise(.75) + " scale(1)", opacity: 1, offset: .75 },
+          { transform: rise(1) + " scale(1)", opacity: 0 }
+        ], { duration: dur * 1.7, delay: delay + 300, easing: "linear", fill: "both" });
+      }
+      var yellowBin = at(878, 438), greenBin = at(748, 438);
+      orb(at(826, 366), yellowBin, 70, 0, 2600);
+      glow(yellowBin, 2000, 2600);
+      orb(at(722, 420), greenBin, 40, 1400, 2200);
+      glow(greenBin, 3200, 2600).onfinish = function () { layer.remove(); };
+    }
+
+    var start = function () { setTimeout(play, 1600); };
+    if (img.complete) start(); else img.addEventListener("load", start, { once: true });
+  }
+
   startAtTopOnReload();
   setupGame();
   setupGameDemo();
+  setupHeroScene();
+  setupBinMarks();
   progress = setupProgress();
   applyLang(detectLang());
 })();
