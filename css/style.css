@@ -209,6 +209,16 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .section-tint{background:var(--paper)}
 .section-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:20px}
 .section h2{font-size:37px;line-height:1.4;letter-spacing:-1.4px;margin:0;font-weight:850;text-wrap:balance}
+/* 섹션 제목: 작은 영어 꼬리표 + 가는 첫 줄 / 굵은 둘째 줄 (팀원 사이트 sdm-eco.vercel.app 구성 참고) */
+.eyebrow{display:block;margin-bottom:6px;color:var(--fresh-strong);font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.section h2 .h2-light{display:block;font-weight:400;color:var(--ink-2)}
+.section h2 .h2-bold{display:block}
+/* 맨 위로(main.js setupToTop): 첫 화면을 지나 내려가면 나타남 */
+.to-top{position:fixed;right:22px;bottom:22px;z-index:50;display:grid;place-items:center;width:52px;height:52px;padding:0;border:1.5px solid color-mix(in srgb,var(--fresh-strong) 30%,transparent);border-radius:50%;background:var(--white);color:var(--fresh-strong);box-shadow:0 8px 22px -8px color-mix(in srgb,var(--ink) 45%,transparent);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s,transform .25s,visibility .25s}
+.to-top.is-on{opacity:1;visibility:visible;transform:none}
+.to-top:hover{background:var(--mint)}
+.to-top:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:3px}
+.to-top svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .section-lead{font-size:17px;color:var(--muted);text-wrap:balance}
 
 /* 넓은 화면: 왼쪽 제목 기둥 + 오른쪽 타일 (구청 시안 구성). 좁아지면 제목이 위로 */
@@ -437,6 +447,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .section{padding:26px 0}
   .section-head{flex-direction:column;align-items:flex-start;gap:8px}
   .section h2{font-size:30px}
+  .eyebrow{font-size:13px}
+  .to-top{right:14px;bottom:14px;width:46px;height:46px}
   .video-grid{grid-template-columns:1fr}
   /* 좁은 화면: 영상 칸이 작아져 배지·재생 버튼이 겹치지 않게 줄임 */
   .video-ep,.video-soon{padding:2px 11px;font-size:13px}

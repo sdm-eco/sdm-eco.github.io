@@ -54,6 +54,29 @@
     if (progress) progress.render();
   }
 
+  // 맨 위로 버튼: 첫 화면 높이만큼 내려가면 보이고, 누르면 맨 위로 (움직임 줄이기 설정이면 바로 이동)
+  //   버튼을 누른 뒤에는 키보드 이용자를 위해 맨 위의 '본문 바로가기'(없으면 로고)로 초점을 옮김
+  function setupToTop() {
+    var btn = document.querySelector(".to-top");
+    if (!btn) return;
+    var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var on = false;
+    function update() {
+      var show = window.scrollY > window.innerHeight * 0.8;
+      if (show === on) return;
+      on = show;
+      btn.classList.toggle("is-on", on);
+      btn.tabIndex = on ? 0 : -1;
+    }
+    window.addEventListener("scroll", update, { passive: true });
+    update();
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
+      var first = document.querySelector("a[href], button");
+      if (first && first !== btn) first.focus({ preventScroll: true });
+    });
+  }
+
   // 영상 칸 주제 태그(한 줄): 칸보다 길면 is-over(오른쪽 끝 흐림), 끝까지 밀었으면 is-end(흐림 없앰)
   // 언어를 바꾸면 글 길이가 달라지므로 언어를 바꿀 때마다 다시 잼
   var tagRowsWatched = false;
@@ -900,6 +923,7 @@
 
   startAtTopOnReload();
   setupGame();
+  setupToTop();
   setupGameDemo();
   setupHeroScene();
   setupBinMarks();

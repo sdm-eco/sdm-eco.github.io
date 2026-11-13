@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261114e">
+<link rel="stylesheet" href="css/style.css?v=20261114f">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -126,7 +126,8 @@
     <div class="wrap section-split">
       <div class="section-head">
         <div>
-          <h2 data-i18n="video.title">분리배출 영상</h2>
+          <span class="eyebrow" aria-hidden="true">Videos</span>
+          <h2><span class="h2-light" data-i18n="video.sub">보면서 배우는</span> <span class="h2-bold" data-i18n="video.title">분리배출 영상</span></h2>
         </div>
       </div>
       <div class="video-grid">
@@ -164,7 +165,8 @@
     <div class="wrap section-split">
       <div class="section-head">
         <div>
-          <h2 data-i18n="guide.title">무엇을 버리나요?</h2>
+          <span class="eyebrow" aria-hidden="true">Sorting Guide</span>
+          <h2><span class="h2-light" data-i18n="guide.title">무엇을 버리나요?</span> <span class="h2-bold" data-i18n="guide.title2">품목별 배출 방법</span></h2>
         </div>
         <p class="section-lead" data-i18n="guide.lead">버릴 물건을 고르면 그림으로 버리는 순서를 보여 줘요.</p>
       </div>
@@ -205,7 +207,8 @@
     <div class="wrap section-split">
       <div class="section-head">
         <div>
-          <h2 data-i18n="game.title">분리배출 게임</h2>
+          <span class="eyebrow" aria-hidden="true">Game</span>
+          <h2><span class="h2-light" data-i18n="game.sub">배운 내용을 확인하는</span> <span class="h2-bold" data-i18n="game.title">분리배출 게임</span></h2>
         </div>
       </div>
       <div class="game-stage" id="game-stage">
@@ -582,9 +585,12 @@
   </div>
 </footer>
 
+<!-- 맨 위로(main.js setupToTop): 조금 내려가면 화면 오른쪽 아래에 나타남 -->
+<button type="button" class="to-top" data-i18n-attr="aria-label:top.label" aria-label="맨 위로" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
 <script src="js/config.js?v=20261108t"></script>
-<script src="js/i18n.js?v=20261114b"></script>
-<script src="js/main.js?v=20261114e"></script>
+<script src="js/i18n.js?v=20261114f"></script>
+<script src="js/main.js?v=20261114f"></script>
 <script type="module" src="js/eco3d.js?v=20261114b"></script>
 </body>
 </html>
