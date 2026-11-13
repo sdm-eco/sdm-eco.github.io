@@ -481,8 +481,7 @@
   }
 
   // 배너 그림 속 인물의 작은 움직임 (그림 위에 원본에서 따낸 조각을 겹쳐 픽셀을 옮겨 그림)
-  //  - 두 번째 여학생(단발): 머리끝이 바람에 찰랑임
-  //  - 파란 재킷 남학생: 말하며 설명하듯 손이 들썩임 (잠깐 말하고 쉬기를 반복)
+  //  - 두 번째 여학생(단발): 머리끝이 바람에 찰랑임 (파란 재킷 남학생의 손짓은 빼기로 함)
   // 원본 그림 좌표 box에서 잘라낸 그림들:
   //   plate: 움직이는 부분을 지우고 주변 색으로 메운 판 (움직여 드러난 자리에 원래 모습이 비치지 않게)
   //   layers: 판 위에 아래→위 순서로 겹치는 조각. move가 이번 그림에서 각 점이 밀린 거리(dx, dy)를 정함
@@ -495,35 +494,20 @@
     var smooth = function (t) { t = Math.min(1, Math.max(0, t)); return t * t * (3 - 2 * t); };
 
     // 여학생: 상자 105x92. 머리카락이 귀 높이(y 32)에서 0 → 머리끝(y 86)에서 1로 흔들림,
-    //   얼굴 옆 머리(x 72 오른쪽)는 0.55배, 끝 최대 4.3px, 2.8초 왕복. 판은 머리카락 아래쪽 둘레만 메운 것
+    //   얼굴 옆 머리(x 72 오른쪽)는 0.55배, 끝 최대 SWAY px, 2.8초 왕복. 판은 머리카락 아래쪽 둘레만 메운 것
+    var SWAY = 7;
     var girl = {
       box: [735, 200], plate: "img/hair-girl2-plate.png", layers: ["img/hair-girl2.png"],
       frame: function (t) { this.ph = t * Math.PI * 2 / 2.8; },
       move: function (layer, x, y, d) {
         var k = smooth((y - 32) / 54) * (x > 72 ? 0.55 : 1);
         // 진자처럼 좌우로: 끝으로 갈수록 크게, 조금 늦게(1.1*k) 따라오고, 끝 가닥만 잔물결이 살짝 더해짐. 밖으로 흔들릴 때 끝이 살짝 들림
-        var hx = 4.3 * k * Math.sin(this.ph - 1.1 * k) + 0.18 * 4.3 * k * k * Math.sin(this.ph * 2.6 + x * 0.09);
+        var hx = SWAY * k * Math.sin(this.ph - 1.1 * k) + 0.18 * SWAY * k * k * Math.sin(this.ph * 2.6 + x * 0.09);
         d[0] = hx;
         d[1] = -0.12 * Math.abs(hx);
       }
     };
-    // 남학생 손: 상자 84x58, 손목(77, 44)을 축으로 손끝으로 갈수록 크게 돎
-    //  - 8초마다 5초 동안 천천히(1.4초에 한 번) 들썩이고 나머지는 쉼. 최대 0.07라디안(손끝 약 4px)
-    var boy = {
-      box: [878, 294], plate: "img/fig-boy3-plate.png", layers: ["img/fig-boy3-hand.png"],
-      frame: function (t) {
-        var c = (t + 2) % 8;
-        this.ang = c < 5 ? 0.07 * Math.sin(Math.PI * c / 5) * Math.sin(Math.PI * 2 * c / 1.4) : 0;
-      },
-      move: function (layer, x, y, d) {
-        var rx = x - 77, ry = y - 44;
-        var a = this.ang * smooth(Math.sqrt(rx * rx + ry * ry) / 55), c = Math.cos(a), s = Math.sin(a);
-        // 그릴 점(x, y)이 원래 있던 자리 = 축 기준으로 -a만큼 돌린 자리 → 밀린 거리는 그 차이
-        d[0] = rx - (rx * c + ry * s);
-        d[1] = ry - (-rx * s + ry * c);
-      }
-    };
-    var FIGS = [girl, boy];
+    var FIGS = [girl];
     var items = [], visible = true, running = false, last = 0;
 
     FIGS.forEach(function (f) {
