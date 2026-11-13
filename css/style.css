@@ -247,6 +247,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-hint{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--white) 90%,transparent);color:var(--ink-2);font-size:15px;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .4s}
 .eco-hint svg{width:18px;height:18px;fill:none;stroke:var(--fresh-strong);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .eco-stage.is-touched .eco-hint,.eco-stage.is-fallback .eco-hint{opacity:0}
+/* 그림(2D) 장면: 돌려 볼 수 없으니 드래그 안내·3D 표시를 숨김 (eco3d.js initLab) */
+.eco-stage.is-2d .eco-hint,.eco-stage.is-2d .eco-badge{display:none}
 /* 효과음 켜기·끄기(eco3d.js setupSound): 3D 영역 오른쪽 위, 꺼짐이면 X 표시 */
 .eco-sound{position:absolute;right:16px;top:14px;z-index:1;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid color-mix(in srgb,var(--fresh-strong) 30%,transparent);border-radius:50%;background:var(--white);color:var(--fresh-strong)}
 .eco-sound svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}

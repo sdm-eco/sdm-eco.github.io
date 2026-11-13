@@ -17,6 +17,20 @@ import glass from "./scene-glass.js?v=20261108r";
 import paper from "./scene-paper.js?v=20261108r";
 import appliance from "./scene-appliance.js?v=20261108r";
 import confuse from "./scene-confuse.js?v=20261108r";
+import pet2d from "./scene-pet2d.js?v=20261108r";
+import food2d from "./scene-food2d.js?v=20261108r";
+import general2d from "./scene-general2d.js?v=20261108r";
+import bulky2d from "./scene-bulky2d.js?v=20261108r";
+import can2d from "./scene-can2d.js?v=20261108r";
+import vinyl2d from "./scene-vinyl2d.js?v=20261108r";
+import carton2d from "./scene-carton2d.js?v=20261108r";
+import medicine2d from "./scene-medicine2d.js?v=20261108r";
+import battery2d from "./scene-battery2d.js?v=20261108r";
+import glass2d from "./scene-glass2d.js?v=20261108r";
+import paper2d from "./scene-paper2d.js?v=20261108r";
+import appliance2d from "./scene-appliance2d.js?v=20261108r";
+import confuse2d from "./scene-confuse2d.js?v=20261108r";
+import { create2DView } from "./eco2d.js?v=20261108r";
 
 import { GROUND } from "./eco3d-util.js?v=20261108r";
 import { sfx } from "./eco3d-sound.js?v=20261108r";
@@ -24,6 +38,10 @@ import { sfx } from "./eco3d-sound.js?v=20261108r";
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
   glass: glass, paper: paper, appliance: appliance, confuse: confuse
+};
+// 체험 창에서 그림(2D)으로 바꿔 보여 줄 품목 (값이 null이면 3D 장면). 카드 미리보기 3D는 SCENES 그대로
+const LAB2D = {
+  pet: pet2d, food: food2d, general: general2d, bulky: bulky2d, can: can2d, vinyl: vinyl2d, carton: carton2d, medicine: medicine2d, battery: battery2d, glass: glass2d, paper: paper2d, appliance: appliance2d, confuse: confuse2d
 };
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let webglOK = null; // hasWebGL()의 확인 결과 (아래 시작 코드보다 먼저 선언해야 함)
@@ -35,8 +53,10 @@ setupDialogs();
 setupSound();
 
 function initLab(lab) {
-  const def = SCENES[lab.dataset.ecoLab];
+  const def = LAB2D[lab.dataset.ecoLab] || SCENES[lab.dataset.ecoLab];
   const stage = lab.querySelector(".eco-stage");
+  // 그림(2D) 장면: 드래그 안내·3D 표시를 숨김(CSS .is-2d)
+  if (def.kind === "2d") stage.classList.add("is-2d");
   let canvas = lab.querySelector(".eco-canvas");
   const buttons = Array.from(lab.querySelectorAll("[data-step]"));
   const next = lab.querySelector("[data-eco-next]");
@@ -305,6 +325,25 @@ function loadThree() {
 // 화면 근처에 오면 Three.js를 불러와 장면을 만듦. 실패하면 is-fallback
 // 돌려주는 함수를 부르면 아직 만들기 전인 대기를 취소함
 function mount(stage, canvas, def, opts, onReady) {
+  // 그림(2D) 장면은 WebGL·Three.js 없이 그림만 불러와 그림 (eco2d.js)
+  if (def.kind === "2d") {
+    let cancelled2d = false;
+    const loader2d = new IntersectionObserver(async function (entries) {
+      if (!entries.some(function (e) { return e.isIntersecting; })) return;
+      loader2d.disconnect();
+      try {
+        const view = await create2DView(stage, canvas, def, opts);
+        if (cancelled2d) { view.destroy(); return; }
+        stage.classList.add("is-ready");
+        onReady(view);
+      } catch (err) {
+        console.error(err);
+        stage.classList.add("is-fallback");
+      }
+    }, { rootMargin: "300px" });
+    loader2d.observe(stage);
+    return function () { cancelled2d = true; loader2d.disconnect(); };
+  }
   if (!hasWebGL()) {
     stage.classList.add("is-fallback");
     return function () {};
