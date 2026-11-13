@@ -242,6 +242,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .cat-bulky{--cat:var(--bulky);--cat-bg:var(--bulky-bg);--cat-hi:var(--bulky-hi);--cat-ink:var(--white)}
 .guide-card[class*="cat-"]{background:var(--cat-bg)}
 .guide-card:has(.eco-open){cursor:pointer}
+/* 마우스를 올리면: 카드가 살짝 떠오르고 그림이 조금 커지며 버튼에 색이 들어옴 (마우스가 있는 기기만, 움직임 줄이기 설정이면 색만) */
+@media(hover:hover){
+  .guide-card{transition:transform .35s cubic-bezier(.2,.7,.2,1),box-shadow .35s}
+  .guide-card .card-3d{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .guide-card:hover{transform:translateY(-6px);box-shadow:0 28px 40px -24px color-mix(in srgb,var(--ink) 62%,transparent)}
+  .guide-card:hover .card-3d{transform:scale(1.06)}
+  .guide-card:hover .eco-open{background:var(--fresh-strong);color:var(--white)}
+}
+@media(hover:hover) and (prefers-reduced-motion:reduce){
+  .guide-card:hover,.guide-card:hover .card-3d{transform:none}
+}
 /* 4대 아이콘(img/cat-*.webp, 입체 그림)은 흰 원 위에, 둘레는 카테고리 색 */
 .cat-pic{display:grid;place-items:center;flex:none;width:56px;height:56px;margin-bottom:6px;border-radius:50%;background:var(--white);box-shadow:0 0 0 2px var(--cat),0 0 0 7px var(--cat-hi)}
 .cat-pic img{width:42px;height:42px;object-fit:contain}
