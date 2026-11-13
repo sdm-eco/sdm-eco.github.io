@@ -1,6 +1,7 @@
 // 폐건전지·폐형광등 장면 — 그림(2D)
 // 서대문구 폐금속자원 배출 안내: 공동주택은 단지 내 수거함, 단독주택은 인근 주민센터·주택 골목 수거함
 // 그림: img/scene/battery/*.webp (battery_assets.py가 만든 조각, 크기·위치는 meta.json 값을 아래 숫자로 옮김)
+//       수거함은 구청 검토 의견의 예시 그림(battery_bin_gu.py, bin-meta.json): 윗칸 파란 받침 = 형광등, 오른쪽 노란 투입구 = 건전지
 //       형광등은 알맞은 그림이 없어 canvas로 그림(유리관 + 양 끝 은색 마개와 핀)
 // 단계 값은 3D 장면(scene-battery.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
@@ -13,7 +14,8 @@ const REMOTE = { w: 352, h: 480 };
 // 리모컨 칸 속 건전지: 리모컨 그림 안 가운데 자리(x, y)와 기울기(rot, 시계 방향), 칸 입구 네 꼭짓점(hole)
 const CELL = { w: 39, h: 105.8, x: 140.7, y: 380.1, rot: 0.5044, hole: [[142, 321.3], [184.9, 331.9], [140.3, 431.3], [92.4, 421]] };
 const PILE = { w: 42, h: 132 };     // 미리 모아 둔 건전지(cell-l, cell-r)
-const BIN = { w: 363, h: 470, hole: { x: 325, y: 185, r: 18 }, top: { x: 190, y: 45 }, plate: { x: 176, y: 356, w: 168, h: 78 }, rot: -0.09 };
+// 수거함 그림 안 자리: open = 윗칸 입구(선반 아래 top ~ 파란 받침 테두리 rim, 좌우 x0~x1), slot = 노란 투입구 안쪽, plate = 아래 받침 앞 이름표
+const BIN = { w: 486, h: 400, open: { top: 38.3, rim: 81.3, x0: 23.8, x1: 449.9 }, slot: { x0: 388.4, x1: 429, y0: 242.7, y1: 256.6 }, plate: { cx: 185, cy: 330, w: 150, h: 64 } };
 
 // 장면 배치 (설계 크기 820×760 기준, eco2d.js)
 const GY = 700;
@@ -27,9 +29,13 @@ const STACK_X = 362;                                               // 뺀 건전
 const PILE_X = [345, 388];                                         // 미리 모아 둔 건전지(세워 둠)
 const TUBE = { L: 380, D: 38 };
 const TUBE_X = 610, TUBE_Y = GY - TUBE.D / 2;                      // 형광등을 내려놓는 자리(가운데)
-const BIN_X = 618;
-const HOLE = [BIN_X - BIN.w / 2 + BIN.hole.x, GY - BIN.h + BIN.hole.y]; // 건전지 넣는 둥근 구멍
-const TOPH = [BIN_X - BIN.w / 2 + BIN.top.x, GY - BIN.h + BIN.top.y];   // 윗면 형광등 구멍
+const KN = 330 / BIN.h;                                            // 수거함 크기 배율 (높이 330)
+const BIN_X = 605;
+const BL = BIN_X - BIN.w * KN / 2, BT = GY - BIN.h * KN;            // 수거함 그림 왼쪽 위
+const SLOT = { x0: BL + BIN.slot.x0 * KN, x1: BL + BIN.slot.x1 * KN, y0: BT + BIN.slot.y0 * KN, y1: BT + BIN.slot.y1 * KN };
+const HOLE = [(SLOT.x0 + SLOT.x1) / 2, (SLOT.y0 + SLOT.y1) / 2];   // 건전지 넣는 노란 투입구 가운데
+const OPEN = { x: BL + (BIN.open.x0 + BIN.open.x1) / 2 * KN, top: BT + BIN.open.top * KN, rim: BT + BIN.open.rim * KN };
+OPEN.y = (OPEN.top + OPEN.rim) / 2;                                 // 형광등을 들이미는 높이(윗칸 가운데)
 const CELL_IN = 0.22, CELL_GAP = 0.1, CELL_FLY = 0.22; // 수거함 단계: 건전지 출발, 간격, 날아가는 시간 (3D와 같음)
 
 export default {
@@ -61,26 +67,13 @@ function draw(ctx, v, s) {
     for (let i = 0; i < 4; i++) kick += wobble(clamp01((bp - CELL_IN - i * CELL_GAP - CELL_FLY * 0.9) / 0.1), 1) * 0.7;
     kick += wobble(clamp01((bp - 0.88) / 0.12), 2);
     const sy = 1 - kick * 0.06;
-    shadow(ctx, BIN_X, BIN.w * 1.1, 1 - drop / 760);
+    shadow(ctx, BIN_X, BIN.w * KN * 1.05, 1 - drop / 760);
     ctx.save();
     ctx.translate(BIN_X, GY - drop);
-    ctx.rotate(wobble(clamp01((bt - 0.6) / 0.4), 2) * 0.03);
-    ctx.scale(1 / Math.sqrt(sy), sy);
+    ctx.rotate(wobble(clamp01((bt - 0.6) / 0.4), 2) * 0.02);
+    ctx.scale(KN / Math.sqrt(sy), KN * sy);
     ctx.drawImage(img.bin, -BIN.w / 2, -BIN.h, BIN.w, BIN.h);
     binPlate(ctx);
-    // 윗면 가운데 형광등 넣는 구멍(그림에 없어 그림)
-    ctx.save();
-    ctx.translate(-BIN.w / 2 + BIN.top.x, -BIN.h + BIN.top.y);
-    ctx.rotate(BIN.rot);
-    ctx.fillStyle = "#5d6468";
-    ctx.beginPath();
-    ctx.ellipse(0, 0, 30, 9, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = "#2b3033";
-    ctx.beginPath();
-    ctx.ellipse(0, 1.5, 25, 6.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
     ctx.restore();
   }
 
@@ -149,7 +142,7 @@ function flyCell(c, bp, start) {
   const q = easeInOut(raw);
   c.x = lerp(c.x, HOLE[0], q);
   c.y = lerp(c.y, HOLE[1], q) - Math.sin(Math.PI * q) * 150;
-  c.rot = lerp(c.rot, Math.PI * 2, q);
+  c.rot = lerp(c.rot, Math.PI * 2.5, q);                 // 한 바퀴 돌며 눕힘(노란 투입구가 가로로 길어서)
   c.s = q > 0.7 ? lerp(1, 0.3, smooth(0.7, 1, q)) : 1;
   c.into = q > 0.86;
   c.sh *= 1 - q;
@@ -168,7 +161,7 @@ function drawCell(ctx, img, c) {
   }
   if (c.into) {
     ctx.beginPath();
-    ctx.arc(HOLE[0], HOLE[1], BIN.hole.r, 0, Math.PI * 2);
+    ctx.rect(SLOT.x0, SLOT.y0, SLOT.x1 - SLOT.x0, SLOT.y1 - SLOT.y0);
     ctx.clip();
   }
   put(ctx, img[c.im], c.x, c.y, c.w, c.h, { rot: c.rot, sx: c.s, sy: c.s, py: 0.5 });
@@ -176,7 +169,7 @@ function drawCell(ctx, img, c) {
 }
 
 // 형광등: 2단계에 위에서 점점 느려지며 내려와 살며시 놓이고(작게 흔들림) 은은하게 빛남
-// 3단계에 살짝 가라앉았다(준비) 일어서며 떠올라(조금 작아짐 = 뒤로 감) 수거함 윗면 구멍 위로 → 점점 빠르게 쏙
+// 3단계에 살짝 가라앉았다(준비) 눕힌 채 떠올라(조금 작아짐 = 안으로 들어감) 수거함 윗칸 앞으로 → 파란 받침 속으로 쏙
 function drawTubeStep(ctx, v) {
   const tp = v.tube, bp = v.box;
   if (tp <= 0) return;
@@ -185,23 +178,22 @@ function drawTubeStep(ctx, v) {
   let x = TUBE_X, y = lerp(150, TUBE_Y, down), rot = wobble(clamp01((tp - 0.72) / 0.28), 2) * 0.04, s = 1;
   const glow = Math.sin(Math.PI * clamp01((tp - 0.6) / 0.4)) * 0.9;
   const q = clamp01((bp - 0.6) / 0.4);
-  let clipY = null, shA = smooth(0, 0.75, tp);
+  let inside = false, shA = smooth(0, 0.75, tp);
   if (q > 0) {
     const prep = q < 0.12 ? Math.sin(Math.PI * q / 0.12) : 0;
-    const rise = easeInOut(clamp01((q - 0.1) / 0.3)), slide = easeInOut(clamp01((q - 0.36) / 0.24));
+    const rise = easeInOut(clamp01((q - 0.1) / 0.45));
     const sk = clamp01((q - 0.6) / 0.35), sink = sk * sk;
-    s = lerp(1, 0.64, rise);
-    const standY = TOPH[1] - TUBE.L * s / 2 - 14;
-    rot = Math.PI / 2 * backOut(clamp01((q - 0.1) / 0.3));
-    x = lerp(TUBE_X, TOPH[0], slide);
-    y = lerp(TUBE_Y, standY, rise) + prep * 4 + sink * (TUBE.L * s + 30);
-    if (sk > 0) clipY = TOPH[1];
+    s = lerp(1, 0.85, rise);
+    x = lerp(TUBE_X, OPEN.x, rise);
+    y = lerp(TUBE_Y, OPEN.y, rise) - Math.sin(Math.PI * rise) * 70 + prep * 4 + sink * (OPEN.rim - OPEN.y + TUBE.D);
+    rot = Math.sin(Math.PI * rise) * 0.05;
+    inside = rise >= 1;          // 윗칸 안: 선반 아래 ~ 받침 테두리 위만 보임
     shA *= 1 - rise;
     if (sk >= 1) return;
   }
   shadow(ctx, x, TUBE.L * 1.05 * s, shA);
   ctx.save();
-  if (clipY !== null) { ctx.beginPath(); ctx.rect(-500, -500, 2000, clipY + 500); ctx.clip(); }
+  if (inside) { ctx.beginPath(); ctx.rect(-500, OPEN.top, 2000, OPEN.rim - OPEN.top); ctx.clip(); }
   drawTube(ctx, x, y, TUBE.L * s, TUBE.D * s, rot, glow);
   ctx.restore();
 }
@@ -256,12 +248,11 @@ function drawTube(ctx, x, y, L, d, rot, glow) {
   ctx.restore();
 }
 
-// 수거함 아래 파란 서랍 앞 흰 이름표 + 사이트 언어로 '건전지·형광등' (그림에 글자가 없어 여기서 씀)
+// 수거함 아래 파란 받침 앞 흰 이름표 + 사이트 언어로 '건전지·형광등' (그림에 글자가 없어 여기서 씀, 좌표는 수거함 그림 기준)
 function binPlate(ctx) {
   const P = BIN.plate;
   ctx.save();
-  ctx.translate(-BIN.w / 2 + P.x, -BIN.h + P.y);
-  ctx.rotate(BIN.rot);
+  ctx.translate(-BIN.w / 2 + P.cx, -BIN.h + P.cy);
   ctx.shadowColor = "rgba(0,0,0,0.18)";
   ctx.shadowBlur = 4;
   ctx.shadowOffsetY = 1;
@@ -281,6 +272,6 @@ function sounds(v) {
   if (hit(v, "tube", 0.74)) sfx.play("clink");                         // 형광등 살며시 놓임
   if (hit(v, "box", 0.12)) sfx.play("thud");                           // 수거함 쿵
   if (hit(v, "box", CELL_IN + CELL_FLY * 0.9) || hit(v, "box", CELL_IN + 2 * CELL_GAP + CELL_FLY * 0.9)) sfx.play("rattle"); // 구멍에 달그락 (4개 중 두 번만)
-  if (hit(v, "box", 0.86)) sfx.play("slide");                          // 형광등 윗면 구멍으로 쏙
+  if (hit(v, "box", 0.86)) sfx.play("slide");                          // 형광등이 윗칸 받침 속으로 쏙
   if (hit(v, "box", 0.95)) sfx.play("chime");                          // 끝 띵동
 }
