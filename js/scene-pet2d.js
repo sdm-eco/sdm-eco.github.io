@@ -2,7 +2,7 @@
 // 배출 순서: 서울시 안내(내용물 비우기 → 라벨 제거 → 압착 → 뚜껑 닫기 → 투명 페트병 전용 수거함)
 // 그림: img/scene/pet/*.webp (실사풍 그림을 조각으로 나눈 것, 위치는 meta.json 값을 아래 숫자로 옮김)
 // 단계 값은 3D 장면(scene-pet.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261108r";
 

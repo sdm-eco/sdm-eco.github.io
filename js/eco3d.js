@@ -1,50 +1,31 @@
-// 분리배출 3D 체험 (페트병·음식물·일반쓰레기·대형폐기물 장면 공통 장치)
-// 단계 버튼은 3D 없이도 동작하고, Three.js는 장면이 화면 근처에 왔을 때만 불러옵니다.
+// 분리배출 체험 (그림 2D 장면 공통 장치 — 파일 이름은 3D 장면 시절 그대로)
+// 단계 버튼은 그림 없이도 동작하고, 장면 그림은 화면 근처에 왔을 때만 불러옵니다.
 //  [data-eco-lab="이름"]   단계 버튼으로 직접 조작하는 체험
-//  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 3D (대문·카드 장식용)
-//    data-eco-zoom="1.4"   작은 칸에서 물건이 잘 보이도록 카메라를 당김 (기본 1)
+//  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 장면 (카드 장식용)
+//    data-eco-zoom="1.2"   작은 칸에서 물건이 잘 보이도록 확대 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet.js?v=20261108r";
-import food from "./scene-food.js?v=20261108r";
-import general from "./scene-general.js?v=20261108r";
-import bulky from "./scene-bulky.js?v=20261108r";
-import can from "./scene-can.js?v=20261108r";
-import vinyl from "./scene-vinyl.js?v=20261108r";
-import carton from "./scene-carton.js?v=20261108r";
-import medicine from "./scene-medicine.js?v=20261108r";
-import battery from "./scene-battery.js?v=20261108r";
-import glass from "./scene-glass.js?v=20261108r";
-import paper from "./scene-paper.js?v=20261108r";
-import appliance from "./scene-appliance.js?v=20261108r";
-import confuse from "./scene-confuse.js?v=20261108r";
-import pet2d from "./scene-pet2d.js?v=20261108r";
-import food2d from "./scene-food2d.js?v=20261114a";
-import general2d from "./scene-general2d.js?v=20261114a";
-import bulky2d from "./scene-bulky2d.js?v=20261108r";
-import can2d from "./scene-can2d.js?v=20261108r";
-import vinyl2d from "./scene-vinyl2d.js?v=20261108r";
-import carton2d from "./scene-carton2d.js?v=20261108r";
-import medicine2d from "./scene-medicine2d.js?v=20261108r";
-import battery2d from "./scene-battery2d.js?v=20261114a";
-import glass2d from "./scene-glass2d.js?v=20261108r";
-import paper2d from "./scene-paper2d.js?v=20261108r";
-import appliance2d from "./scene-appliance2d.js?v=20261108r";
-import confuse2d from "./scene-confuse2d.js?v=20261114a";
+import pet from "./scene-pet2d.js?v=20261108r";
+import food from "./scene-food2d.js?v=20261114a";
+import general from "./scene-general2d.js?v=20261114a";
+import bulky from "./scene-bulky2d.js?v=20261108r";
+import can from "./scene-can2d.js?v=20261108r";
+import vinyl from "./scene-vinyl2d.js?v=20261108r";
+import carton from "./scene-carton2d.js?v=20261108r";
+import medicine from "./scene-medicine2d.js?v=20261108r";
+import battery from "./scene-battery2d.js?v=20261114a";
+import glass from "./scene-glass2d.js?v=20261108r";
+import paper from "./scene-paper2d.js?v=20261108r";
+import appliance from "./scene-appliance2d.js?v=20261108r";
+import confuse from "./scene-confuse2d.js?v=20261114a";
 import { create2DView } from "./eco2d.js?v=20261108r";
-
-import { GROUND } from "./eco3d-util.js?v=20261108r";
 import { sfx } from "./eco3d-sound.js?v=20261108r";
 
+// 품목별 장면 (scene-*2d.js, eco2d.js 형식)
 const SCENES = {
   pet: pet, food: food, general: general, bulky: bulky, can: can, vinyl: vinyl, carton: carton, medicine: medicine, battery: battery,
   glass: glass, paper: paper, appliance: appliance, confuse: confuse
 };
-// 체험 창에서 그림(2D)으로 바꿔 보여 줄 품목 (값이 null이면 3D 장면). 카드 미리보기 3D는 SCENES 그대로
-const LAB2D = {
-  pet: pet2d, food: food2d, general: general2d, bulky: bulky2d, can: can2d, vinyl: vinyl2d, carton: carton2d, medicine: medicine2d, battery: battery2d, glass: glass2d, paper: paper2d, appliance: appliance2d, confuse: confuse2d
-};
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-let webglOK = null; // hasWebGL()의 확인 결과 (아래 시작 코드보다 먼저 선언해야 함)
 
 document.querySelectorAll("[data-eco-lab]").forEach(initLab);
 document.querySelectorAll("[data-eco-loop]").forEach(initLoop);
@@ -53,18 +34,16 @@ setupDialogs();
 setupSound();
 
 function initLab(lab) {
-  const def = LAB2D[lab.dataset.ecoLab] || SCENES[lab.dataset.ecoLab];
+  const def = SCENES[lab.dataset.ecoLab];
   const stage = lab.querySelector(".eco-stage");
-  // 그림(2D) 장면: 드래그 안내·3D 표시를 숨김(CSS .is-2d)
-  if (def.kind === "2d") stage.classList.add("is-2d");
-  let canvas = lab.querySelector(".eco-canvas");
+  const canvas = lab.querySelector(".eco-canvas");
   const buttons = Array.from(lab.querySelectorAll("[data-step]"));
   const next = lab.querySelector("[data-eco-next]");
   const reset = lab.querySelector("[data-eco-reset]");
   const last = buttons.length;
   let step = 0;
   let view = null;
-  let cancelMount = null; // 3D를 불러오는 중이면 그 대기를 취소하는 함수
+  let cancelMount = null; // 장면 그림을 불러오는 중이면 그 대기를 취소하는 함수
 
   function setStep(n) {
     step = n;
@@ -79,15 +58,13 @@ function initLab(lab) {
     if (n === last) document.dispatchEvent(new CustomEvent("eco:lab-done", { detail: lab.dataset.ecoLab }));
   }
 
-  // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 3D 움직임이 끝난 뒤 DWELL만큼 읽을 시간을 줌.
+  // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 움직임이 끝난 뒤 DWELL만큼 읽을 시간을 줌.
   // 단계 버튼·다음 단계를 누르면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
-  // 3D를 드래그하는 동안에는 읽을 시간을 세지 않고, 손을 떼면 그 단계의 읽을 시간을 처음부터 다시 셈.
   // 움직임 줄이기 설정이면 자동 진행 없이 지금처럼 직접 누르는 방식만 씀.
   const DWELL = 3500;
   const auto = lab.querySelector("[data-eco-auto]");
   const dialog = lab.closest("dialog");
   let run = 0; // 진행 회차. 멈추거나 새로 시작하면 올라가서 이전 회차의 대기를 무효로 만듦
-  let held = false; // 3D를 누르고(드래그하고) 있는 동안 true
 
   function setPlaying(on) {
     run++;
@@ -97,12 +74,12 @@ function initLab(lab) {
 
   async function autoLoop(id) {
     if (step >= last) setStep(0);
-    // 3D가 뜰 때까지 기다림 (보지도 않은 단계가 넘어가 완료 처리되지 않도록). 3D를 못 쓰는 기기면 글 단계만 시간으로 진행
+    // 장면이 뜰 때까지 기다림 (보지도 않은 단계가 넘어가 완료 처리되지 않도록). 그림을 못 띄우면 글 단계만 시간으로 진행
     while (id === run && !view && !stage.classList.contains("is-fallback")) await wait(100);
     while (id === run && step < last) {
       while (id === run && view && view.busy()) await wait(100);
       const need = step === 0 ? 1200 : DWELL;
-      for (let t = 0; id === run && t < need; t = held ? 0 : t + 100) await wait(100);
+      for (let t = 0; id === run && t < need; t += 100) await wait(100);
       if (id !== run) return;
       setStep(step + 1);
     }
@@ -113,22 +90,8 @@ function initLab(lab) {
     btn.addEventListener("click", function () { setPlaying(false); setStep(Number(btn.dataset.step)); });
   });
   next.addEventListener("click", function () { setPlaying(false); setStep(Math.min(step + 1, last)); });
-  reset.addEventListener("click", function () { held = false; setStep(0); setPlaying(!reduced); });
-  // 3D가 뜨기 전에도 캔버스 밖에서 손을 떼는 것을 받도록 누르는 순간 포인터를 붙잡음 (캔버스를 새로 바꿀 때마다 다시 붙임)
-  function watchHold(c) {
-    c.addEventListener("pointerdown", function (e) {
-      held = true;
-      try { c.setPointerCapture(e.pointerId); } catch (err) { /* 이미 끝난 포인터면 무시 */ }
-    });
-    ["pointerup", "pointercancel", "lostpointercapture"].forEach(function (type) {
-      c.addEventListener(type, function () { held = false; });
-    });
-  }
-  watchHold(canvas);
-
-  // 3D 불러오기·반납: 브라우저가 동시에 쓸 수 있는 WebGL 장치 수(크롬 16개)에 한도가 있어
-  // 13개 품목을 다 열면 먼저 연 3D가 꺼졌음 → 지금 보이는 품목만 장치를 쓰고, 안 보이게 되면 반납
-  // 반납한 캔버스는 다시 쓸 수 없어 같은 모양의 새 캔버스로 바꿔 끼움
+  reset.addEventListener("click", function () { setStep(0); setPlaying(!reduced); });
+  // 장면 불러오기·반납: 지금 보이는 품목만 그리고, 안 보이게 되면(창을 닫거나 다른 품목) 그리기를 멈춤
   function load() {
     if (view || cancelMount) return;
     cancelMount = mount(stage, canvas, def, { interactive: true }, function (v) {
@@ -142,20 +105,15 @@ function initLab(lab) {
     if (!view) return;
     view.destroy();
     view = null;
-    const fresh = canvas.cloneNode(false);
-    canvas.replaceWith(fresh);
-    canvas = fresh;
-    watchHold(canvas);
     stage.classList.remove("is-ready");
   }
   if (auto) {
     auto.hidden = reduced;
     auto.addEventListener("click", function () { setPlaying(auto.dataset.state !== "playing"); });
   }
-  // 열 때마다(품목을 바꿔 보일 때도) "드래그해서 돌려 보세요" 안내를 다시 보이고 1단계부터 자동 진행
-  // (드래그하면 createView가 is-touched로 숨김)
-  function start() { held = false; stage.classList.remove("is-touched"); load(); setStep(0); setPlaying(!reduced); }
-  function stop() { held = false; setPlaying(false); unload(); }
+  // 열 때마다(품목을 바꿔 보일 때도) 1단계부터 자동 진행
+  function start() { load(); setStep(0); setPlaying(!reduced); }
+  function stop() { setPlaying(false); unload(); }
   lab.addEventListener("eco:start", start);
   lab.addEventListener("eco:stop", stop);
   if (dialog) {
@@ -180,7 +138,7 @@ function setupSound() {
 }
 
 // 한 창에 품목이 여럿(예: 페트병·캔·비닐·종이팩): 창 위 품목 버튼([data-eco-item="이름"])으로 체험을 바꿔 보임.
-// 숨은 품목의 3D는 처음 보일 때 불러옴(mount의 IntersectionObserver). 창을 닫으면 다음에 첫 품목부터 보임
+// 숨은 품목의 장면은 처음 보일 때 불러옴(mount의 IntersectionObserver). 창을 닫으면 다음에 첫 품목부터 보임
 function setupItems() {
   document.querySelectorAll("dialog.eco-dialog").forEach(function (dialog) {
     const labs = Array.from(dialog.querySelectorAll("[data-eco-lab]"));
@@ -219,8 +177,8 @@ function setupItems() {
 
 // data-eco-widget 안의 [data-eco-mark="n"] 요소에 지금 단계를 is-on으로 표시
 function initLoop(stage) {
-  // 카드 미리보기도 체험 창과 같은 그림(2D) 장면을 씀 (2D가 없으면 3D)
-  const def = LAB2D[stage.dataset.ecoLoop] || SCENES[stage.dataset.ecoLoop];
+  // 카드 미리보기도 체험 창과 같은 장면을 씀
+  const def = SCENES[stage.dataset.ecoLoop];
   const root = stage.closest("[data-eco-widget]") || stage;
   const marks = Array.from(root.querySelectorAll("[data-eco-mark]"));
   const canvas = stage.querySelector("canvas") || stage.appendChild(document.createElement("canvas"));
@@ -229,9 +187,7 @@ function initLoop(stage) {
     marks.forEach(function (m) { m.classList.toggle("is-on", Number(m.dataset.ecoMark) === n); });
   }
 
-  // data-eco-zoom은 3D 카메라용, 그림(2D)은 data-eco-zoom2d(없으면 1)
-  const zoom = def.kind === "2d" ? Number(stage.dataset.ecoZoom2d) || 1 : Number(stage.dataset.ecoZoom) || 1;
-  mount(stage, canvas, def, { interactive: false, zoom: zoom }, async function (view) {
+  mount(stage, canvas, def, { interactive: false, zoom: Number(stage.dataset.ecoZoom) || 1 }, async function (view) {
     view.goTo(0, true);
     if (reduced) return;
     await wait(1200);
@@ -301,64 +257,16 @@ function setupDialogs() {
   }
 }
 
-// WebGL을 쓸 수 있는지 한 번만 확인하고, 확인용으로 만든 장치는 바로 반납(장치 수 한도를 차지하지 않게)
-function hasWebGL() {
-  if (webglOK === null) {
-    try {
-      const gl = document.createElement("canvas").getContext("webgl2") || document.createElement("canvas").getContext("webgl");
-      webglOK = !!gl;
-      const lose = gl && gl.getExtension("WEBGL_lose_context");
-      if (lose) lose.loseContext();
-    } catch (e) {
-      webglOK = false;
-    }
-  }
-  return webglOK;
-}
-
-let threeLib = null;
-function loadThree() {
-  if (!threeLib) {
-    threeLib = Promise.all([import("three"), import("three/addons/environments/RoomEnvironment.js"), import("three/addons/geometries/RoundedBoxGeometry.js")])
-      .then(function (mods) { return { THREE: mods[0], RoomEnvironment: mods[1].RoomEnvironment, ext: { RoundedBoxGeometry: mods[2].RoundedBoxGeometry } }; });
-  }
-  return threeLib;
-}
-
-// 화면 근처에 오면 Three.js를 불러와 장면을 만듦. 실패하면 is-fallback
+// 화면 근처에 오면 장면 그림을 불러와 그림(eco2d.js). 실패하면 is-fallback(글 단계만)
 // 돌려주는 함수를 부르면 아직 만들기 전인 대기를 취소함
 function mount(stage, canvas, def, opts, onReady) {
-  // 그림(2D) 장면은 WebGL·Three.js 없이 그림만 불러와 그림 (eco2d.js)
-  if (def.kind === "2d") {
-    let cancelled2d = false;
-    const loader2d = new IntersectionObserver(async function (entries) {
-      if (!entries.some(function (e) { return e.isIntersecting; })) return;
-      loader2d.disconnect();
-      try {
-        const view = await create2DView(stage, canvas, def, opts);
-        if (cancelled2d) { view.destroy(); return; }
-        stage.classList.add("is-ready");
-        onReady(view);
-      } catch (err) {
-        console.error(err);
-        stage.classList.add("is-fallback");
-      }
-    }, { rootMargin: "300px" });
-    loader2d.observe(stage);
-    return function () { cancelled2d = true; loader2d.disconnect(); };
-  }
-  if (!hasWebGL()) {
-    stage.classList.add("is-fallback");
-    return function () {};
-  }
   let cancelled = false;
   const loader = new IntersectionObserver(async function (entries) {
     if (!entries.some(function (e) { return e.isIntersecting; })) return;
     loader.disconnect();
     try {
-      const lib = await loadThree();
-      if (cancelled) return;
-      const view = createView(lib, stage, canvas, def, opts);
+      const view = await create2DView(stage, canvas, def, opts);
+      if (cancelled) { view.destroy(); return; }
       stage.classList.add("is-ready");
       onReady(view);
     } catch (err) {
@@ -368,235 +276,4 @@ function mount(stage, canvas, def, opts, onReady) {
   }, { rootMargin: "300px" });
   loader.observe(stage);
   return function () { cancelled = true; loader.disconnect(); };
-}
-
-// 클레이(점토) 스타일 조명: 위아래로 은은한 하늘·바닥 빛 + 따뜻한 주광(부드러운 그림자) + 뒤쪽 테두리 빛
-// 바닥에는 그림자만 받는 투명한 판을 깔아 물건이 바닥에 붙어 보이게 함 (def.clay인 장면만)
-// 한계: 그림자 지도 1장(1024px)·VSM 흐림이라 아주 작은 물건의 그림자는 흐릿함. 더 선명하게 하려면 mapSize를 늘릴 것
-function clayLook(THREE, renderer, scene, sun) {
-  renderer.toneMappingExposure = 1.02;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.VSMShadowMap;
-  sun.color.set(0xfff3e4);
-  sun.intensity = 1.7;
-  sun.position.set(-1.8, 8, 4);
-  sun.castShadow = true;
-  sun.shadow.mapSize.set(1024, 1024);
-  sun.shadow.radius = 14;
-  sun.shadow.blurSamples = 16;
-  sun.shadow.bias = -0.0005;
-  const cam = sun.shadow.camera;
-  cam.left = -4; cam.right = 4; cam.top = 4; cam.bottom = -4; cam.near = 1; cam.far = 16;
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xdcefe3, 0.9));
-  const rim = new THREE.DirectionalLight(0xdcecff, 0.9);
-  rim.position.set(3, 3, -5);
-  scene.add(rim);
-  const floor = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({ color: 0x2d5a44, opacity: 0.22 }));
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = GROUND;
-  floor.receiveShadow = true;
-  scene.add(floor);
-}
-
-function createView(lib, stage, canvas, def, opts) {
-  const THREE = lib.THREE;
-  const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-  const scene = new THREE.Scene();
-  const pmrem = new THREE.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new lib.RoomEnvironment(), 0.04).texture;
-  const sun = new THREE.DirectionalLight(0xffffff, 1.3);
-  sun.position.set(3, 5, 4);
-  scene.add(sun);
-  if (def.clay) clayLook(THREE, renderer, scene, sun);
-
-  const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 50);
-  camera.position.set(0, 0.6, 8.2);
-
-  // 드래그로 돌리는 그룹 — 장면이 원하는 자리에 붙임
-  const spin = new THREE.Group();
-  // ext: 장면이 쓸 수 있는 three.js 부가 도구 (둥근 상자 등)
-  const world = def.build(THREE, scene, spin, lib.ext);
-  // 클레이 장면: 불투명한 물건만 부드러운 그림자를 드리움 (물방울·투명한 병·바닥 그림자 판은 제외)
-  if (def.clay) {
-    scene.traverse(function (o) {
-      if (o.isMesh && !o.isInstancedMesh && !o.userData.noShadow && !(o.material && o.material.transparent)) o.castShadow = true;
-    });
-  }
-
-  // 마지막 단계에서 장면 전체를 돌릴 때 함께 돌릴 방향 조명(그림자 포함)과 처음 자리
-  const lights = [];
-  scene.traverse(function (o) { if (o.isDirectionalLight) lights.push({ light: o, base: o.position.clone() }); });
-
-  // 단계 애니메이션: 값을 0~1 사이에서 직선으로 바꾸고, 부드럽게 보이는 처리는 장면이 맡음
-  const states = def.states, moves = def.moves;
-  // $sound: 체험 창의 3D만 효과음을 냄(카드 미리보기는 조용히), $k0·$p0: 이번 그림 직전 진행 상태(효과음 순간 판단용)
-  const v = Object.assign({ $key: null, $p: 0, $k0: null, $p0: 0, $sound: !!opts.interactive }, states[0]);
-  let shown = 0;
-  let active = null;
-  const queue = [];
-
-  function goTo(n, instant) {
-    if (instant || reduced || n < shown) {
-      queue.length = 0;
-      active = null;
-      if (orbiting) { orbiting = false; velocity = 0; }
-      if (instant || reduced) orbit = 0;
-      Object.assign(v, states[n], { $key: null, $p: 0 });
-      if (world.reset) world.reset();
-      shown = n;
-      return;
-    }
-    for (let s = shown + 1; s <= n; s++) {
-      moves[s].forEach(function (m) {
-        queue.push({ key: m[0], from: states[s - 1][m[0]], to: states[s][m[0]], dur: m[1], t: 0 });
-      });
-    }
-    shown = Math.max(shown, n);
-  }
-
-  function runTweens(dt) {
-    if (!active) active = queue.shift() || null;
-    if (!active) return;
-    active.t += dt;
-    const p = Math.min(1, active.t / active.dur);
-    v[active.key] = active.from + (active.to - active.from) * p;
-    v.$key = active.key;
-    v.$p = p;
-    if (p >= 1) {
-      v.$key = null;
-      v.$p = 0;
-      active = null;
-    }
-  }
-
-  // 드래그로 좌우 회전 (세로 스크롤은 막지 않음)
-  //  - 보통은 spin 그룹(장면이 고른 물건)만 돌림
-  //  - def.endOrbit 장면은 마지막 단계 움직임이 다 끝난 뒤 장면 전체를 돌림: 물건이 이미 수거함에 들어가
-  //    물건만 돌면 어색하므로. 실제로는 카메라·조명을 반대로 돌려 같은 모습을 냄(orbit, 라디안)
-  let dragging = false, lastX = 0, velocity = 0, orbiting = false, orbit = 0, orbitShown = 0;
-  function atEnd() { return !!def.endOrbit && shown === states.length - 1 && !active && !queue.length; }
-  if (opts.interactive) {
-    canvas.addEventListener("pointerdown", function (e) {
-      dragging = true;
-      lastX = e.clientX;
-      velocity = 0;
-      orbiting = atEnd();
-      canvas.setPointerCapture(e.pointerId);
-      stage.classList.add("is-touched");
-    });
-    canvas.addEventListener("pointermove", function (e) {
-      if (!dragging) return;
-      const dx = e.clientX - lastX;
-      lastX = e.clientX;
-      if (orbiting) orbit -= dx * 0.012;
-      else spin.rotation.y += dx * 0.012;
-      velocity = dx * 0.7;
-    });
-    const endDrag = function () { dragging = false; };
-    canvas.addEventListener("pointerup", endDrag);
-    canvas.addEventListener("pointercancel", endDrag);
-  } else {
-    spin.rotation.y = def.spin || 0;
-  }
-
-  // 클레이 장면: 카메라가 아주 천천히 좌우로 흔들려(숨 쉬듯) 멈춰 있어도 입체감이 보임
-  const camBase = new THREE.Vector3();
-  let lookY = 0, idle = 0;
-  function update(dt) {
-    v.$k0 = v.$key;
-    v.$p0 = v.$p;
-    runTweens(dt);
-    if (!dragging) {
-      velocity *= Math.pow(0.04, dt);
-      if (orbiting) orbit -= velocity * dt;
-      else spin.rotation.y += velocity * dt;
-    }
-    // 마지막 단계를 벗어나면(앞 단계·처음부터) 장면 전체 회전을 1초쯤에 걸쳐 원래 방향으로 되돌림
-    if (orbit && shown < states.length - 1) {
-      if (orbiting) { orbiting = false; velocity = 0; }
-      orbit *= Math.pow(0.01, dt);
-      if (Math.abs(orbit) < 0.001) orbit = 0;
-    }
-    world.update(v, dt);
-    const sway = def.clay && !reduced;
-    if (sway) idle += dt;
-    if (sway || orbit || orbitShown) {
-      const x = camBase.x + (sway ? Math.sin(idle * 0.45) * 0.4 : 0), y = camBase.y + (sway ? Math.sin(idle * 0.31) * 0.1 : 0);
-      const c = Math.cos(orbit), s = Math.sin(orbit);
-      camera.position.set(x * c + camBase.z * s, y, camBase.z * c - x * s);
-      camera.lookAt(0, lookY, 0);
-      if (orbit !== orbitShown) {
-        lights.forEach(function (l) { l.light.position.set(l.base.x * c + l.base.z * s, l.base.y, l.base.z * c - l.base.x * s); });
-        orbitShown = orbit;
-      }
-    }
-  }
-
-  function resize() {
-    const w = stage.clientWidth, h = stage.clientHeight;
-    if (!w || !h) return;
-    renderer.setSize(w, h, false);
-    camera.aspect = w / h;
-    // 세로로 긴 화면에서도 장면이 잘리지 않도록 거리를 맞춤
-    const fit = 2.65 / Math.tan((camera.fov * Math.PI) / 360);
-    const cam = def.camera || [0.6, 0.1];
-    camera.position.set(0, cam[0], Math.max(fit, fit * 0.95 / camera.aspect) / (opts.zoom || 1));
-    camera.lookAt(0, cam[1], 0);
-    camBase.copy(camera.position);
-    lookY = cam[1];
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-  }
-  const sizer = new ResizeObserver(resize);
-  sizer.observe(stage);
-  resize();
-
-  // 화면에 보일 때만 그림
-  let visible = false, running = false, prev = 0, dead = false;
-  function frame(now) {
-    if (dead || !visible || document.hidden) { running = false; return; }
-    const dt = Math.min((now - prev) / 1000, 0.05);
-    prev = now;
-    update(dt);
-    renderer.render(scene, camera);
-    requestAnimationFrame(frame);
-  }
-  function start() {
-    if (dead || running || !visible || document.hidden) return;
-    running = true;
-    prev = performance.now();
-    requestAnimationFrame(frame);
-  }
-  const watcher = new IntersectionObserver(function (entries) {
-    visible = entries[entries.length - 1].isIntersecting;
-    start();
-  });
-  watcher.observe(stage);
-  document.addEventListener("visibilitychange", start);
-
-  update(0);
-  renderer.render(scene, camera);
-
-  return {
-    goTo: goTo,
-    // 그리기를 멈추고 WebGL 장치를 반납 (이 캔버스는 다시 쓸 수 없음)
-    destroy: function () {
-      dead = true;
-      sizer.disconnect();
-      watcher.disconnect();
-      document.removeEventListener("visibilitychange", start);
-      pmrem.dispose();
-      renderer.dispose();
-      renderer.forceContextLoss();
-    },
-    busy: function () {
-      // 체험 창에서 3D가 화면 밖이면(휴대폰에서 설명을 읽으려 내린 경우 등) 그리기가 멈춰 움직임이 끝나지 않음
-      // → 남은 움직임을 건너뛰고 그 단계의 완성 모습으로 바로 맞춤. 카드 장식 3D는 지금처럼 보일 때 이어서 움직임
-      if (opts.interactive && (!visible || document.hidden) && (active || queue.length)) goTo(shown, true);
-      return !!active || queue.length > 0;
-    }
-  };
 }

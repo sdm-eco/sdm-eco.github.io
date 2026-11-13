@@ -3,7 +3,7 @@
 // 그림: img/scene/paper/*.webp (paper_assets.py가 만듦, 위치는 meta.json 값을 아래 숫자로 옮김)
 //       신문 더미·끈·뭉친 테이프는 그림이 없어 도형으로 그림
 // 단계 값은 3D 장면(scene-paper.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade } from "./eco2d-util.js?v=20261108r";
 

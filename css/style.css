@@ -239,17 +239,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-items button:hover{border-color:var(--leaf);background:var(--wash)}
 .eco-items button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
 .eco-stage{position:relative;min-height:540px;background:radial-gradient(ellipse at 50% 38%,var(--white),transparent 62%),radial-gradient(ellipse at 50% 100%,var(--cat-hi,var(--mint-hi)),transparent 55%),var(--cat-bg,var(--mint))}
-.eco-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;opacity:0;transition:opacity .6s}
-.eco-canvas:active{cursor:grabbing}
+.eco-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .6s}
 .eco-stage.is-ready .eco-canvas{opacity:1}
-.eco-badge{position:absolute;left:20px;top:20px;padding:2px 12px;border:1px solid color-mix(in srgb,var(--fresh-strong) 40%,transparent);border-radius:999px;background:var(--white);color:var(--fresh-strong);font-size:13px;font-weight:800}
-/* 안내는 3D 영역 위쪽(3D 배지와 같은 줄): 창이 화면보다 길어 아래가 잘려도 보이도록 */
-.eco-hint{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:color-mix(in srgb,var(--white) 90%,transparent);color:var(--ink-2);font-size:15px;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .4s}
-.eco-hint svg{width:18px;height:18px;fill:none;stroke:var(--fresh-strong);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.eco-stage.is-touched .eco-hint,.eco-stage.is-fallback .eco-hint{opacity:0}
-/* 그림(2D) 장면: 돌려 볼 수 없으니 드래그 안내·3D 표시를 숨김 (eco3d.js initLab) */
-.eco-stage.is-2d .eco-hint,.eco-stage.is-2d .eco-badge{display:none}
-/* 효과음 켜기·끄기(eco3d.js setupSound): 3D 영역 오른쪽 위, 꺼짐이면 X 표시 */
+/* 효과음 켜기·끄기(eco3d.js setupSound): 장면 오른쪽 위, 꺼짐이면 X 표시 */
 .eco-sound{position:absolute;right:16px;top:14px;z-index:1;display:grid;place-items:center;width:44px;height:44px;padding:0;border:1px solid color-mix(in srgb,var(--fresh-strong) 30%,transparent);border-radius:50%;background:var(--white);color:var(--fresh-strong)}
 .eco-sound svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .eco-sound .spk{fill:currentColor}
@@ -306,25 +298,30 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 
 .video-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
 .video-card{position:relative;padding:14px 14px 18px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
-.video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:repeating-linear-gradient(135deg,var(--mint) 0 18px,var(--mint-2) 18px 36px)}
+/* 편마다 색 바탕 + 오른쪽 아래 캐릭터(img/video-ep*.webp), 왼쪽 위 편 배지·준비 중 배지, 왼쪽 아래 재생 버튼 */
+.video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--forest)}
+.ep-1 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
+.ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#183a73,#2a5ea8 60%,#4a82c9)}
+.video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto}
+.video-ep,.video-soon{display:inline-block;padding:4px 13px;border-radius:999px;color:var(--white);font-size:14px;font-weight:800;line-height:1.5}
+.video-ep{position:absolute;left:20px;top:20px;z-index:1;border:1.5px solid color-mix(in srgb,var(--white) 80%,transparent)}
+.video-soon{position:absolute;left:20px;top:58px;background:color-mix(in srgb,#000 30%,transparent)}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* 이 사이트 영상: 누르기 전 대표 그림 + 재생 버튼(main.js renderVideos), 누르면 영상 플레이어 */
-.video-frame video{position:absolute;inset:0;width:100%;height:100%;background:#000}
-.video-cover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;width:100%;padding:0;border:0;background:transparent;color:var(--ink-2);font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.video-frame video{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:#000}
+.video-cover{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;gap:12px;width:100%;padding:20px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:800;cursor:pointer}
 .video-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .video-cover .play-circle,.video-cover-label{position:relative;transition:transform .2s}
-.video-cover img~.video-cover-label{padding:2px 12px;border-radius:999px;background:color-mix(in srgb,var(--white) 88%,transparent)}
+.video-cover-label{margin-bottom:18px;padding:3px 13px;border-radius:999px;background:var(--white)}
 .video-cover:hover .play-circle,.video-cover:focus-visible .play-circle{transform:scale(1.08)}
 .video-cover:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:-3px}
-.video-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--ink-2);font-size:16px;font-weight:700}
-.play-circle{display:grid;place-items:center;width:68px;height:68px;border-radius:50%;background:var(--white);border:2.5px solid var(--video)}
-.play-circle svg{width:26px;height:26px;fill:var(--video-ink);margin-left:4px}
-.video-meta{display:flex;align-items:center;gap:10px;margin:18px 8px 0}
-.ep{font-size:15px;font-weight:700;color:var(--video-ink)}
-.video-card h3{margin:6px 8px 4px;font-size:24px;letter-spacing:-.6px}
-.video-card:has(.video-placeholder) .video-meta{position:absolute;top:26px;left:26px;margin:0}
-.video-card:has(.video-placeholder) .ep{padding:1px 10px;border:1px solid var(--video-line);border-radius:999px;background:var(--video-bg);color:var(--video-ink)}
-.video-card:has(.video-placeholder) h3{margin-top:14px}
+.video-placeholder .play-circle{position:absolute;left:20px;bottom:20px}
+.play-circle{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--white);box-shadow:0 6px 18px color-mix(in srgb,#000 18%,transparent)}
+.play-circle svg{width:24px;height:24px;fill:var(--ink);margin-left:4px}
+.video-card h3{margin:18px 8px 6px;font-size:24px;letter-spacing:-.6px}
+.video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
+.video-tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 8px 0;padding:0;list-style:none}
+.video-tags li{padding:5px 13px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-2);font-size:14px;font-weight:700}
 
 /* 바탕은 초록·크림으로 두고 색은 통 4개가 맡음 (노랑 = 음식물이라 넓은 노란 면은 피함) */
 .game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 60%,transparent),transparent 55%),linear-gradient(90deg,var(--mint),var(--sun));overflow:hidden}
@@ -429,6 +426,13 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .section-head{flex-direction:column;align-items:flex-start;gap:8px}
   .section h2{font-size:30px}
   .video-grid{grid-template-columns:1fr}
+  /* 좁은 화면: 영상 칸이 작아져 배지·재생 버튼이 겹치지 않게 줄임 */
+  .video-ep,.video-soon{padding:2px 11px;font-size:13px}
+  .video-ep{left:14px;top:14px}
+  .video-soon{left:14px;top:48px}
+  .video-placeholder .play-circle{left:14px;bottom:14px;width:52px;height:52px}
+  .video-cover{padding:14px}
+  .video-char{right:4%}
   .eco-stage{min-height:360px}
   .eco-panel{padding:22px 18px}
   /* 휴대폰: 품목 버튼은 한 줄로 두고 옆으로 밀어서 봄(잘린 버튼이 더 있다는 표시) — 두 줄이 되면 3D가 너무 아래로 밀림 */

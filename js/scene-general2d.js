@@ -3,7 +3,7 @@
 // 그림: img/scene/general/*.webp (general_assets.py가 만듦), 종량제 봉투는 구청 자료의 서대문구 봉투 사진(img/scene/common/bag-*.webp),
 //       집 앞·달·안내판은 그림이 없어 canvas 도형으로 그림
 // 단계 값은 3D 장면(scene-general.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, t, fitText, binLabel } from "./eco2d-util.js?v=20261108r";
 

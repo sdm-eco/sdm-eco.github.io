@@ -4,7 +4,7 @@
 //       수거함은 구청 검토 의견의 예시 그림(battery_bin_gu.py, bin-meta.json): 윗칸 파란 받침 = 형광등, 오른쪽 노란 투입구 = 건전지
 //       형광등은 알맞은 그림이 없어 canvas로 그림(유리관 + 양 끝 은색 마개와 핀)
 // 단계 값은 3D 장면(scene-battery.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261108r";
 

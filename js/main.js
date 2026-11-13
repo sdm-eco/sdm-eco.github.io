@@ -150,7 +150,9 @@
       }
       var cover = frame.querySelector(".video-cover");
       if (!cover) {
-        frame.innerHTML = "";
+        // 바탕 그림·캐릭터·편 배지는 그대로 두고 '영상 준비 중' 칸만 걷어 냄
+        var waiting = frame.querySelector(".video-placeholder");
+        if (waiting) waiting.remove();
         cover = document.createElement("button");
         cover.type = "button";
         cover.className = "video-cover";

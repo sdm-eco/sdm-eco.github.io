@@ -4,7 +4,7 @@
 // 그림: img/scene/food/*.webp (food_assets.py가 물빠짐 바구니·수거함을 조각으로 나눔), 물은 canvas 도형
 //       종량제 봉투(일반용·음식물용)는 구청 자료의 서대문구 봉투 사진 (scene-general2d.js drawBag)
 // 단계 값은 3D 장면(scene-food.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText } from "./eco2d-util.js?v=20261108r";
 import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114a";

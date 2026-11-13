@@ -5,7 +5,7 @@
 //       수도꼭지는 공용 img/scene/common/faucet.webp (그림에 붙은 물줄기는 가리고 여기서 물줄기를 그림)
 //       종량제 봉투는 구청 자료의 서대문구 봉투 사진(scene-general2d.js drawBag), ✕/✓ 표지는 도형으로 그림
 // 단계 값은 3D 장면(scene-confuse.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText, binLabel } from "./eco2d-util.js?v=20261108r";
 import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114a";

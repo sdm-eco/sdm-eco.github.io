@@ -4,7 +4,7 @@
 // 그림: img/scene/bulky/chair.webp (나무 의자). 휴대폰·신고필증·집 앞·달력은 그림이 없어 도형으로 그림
 // 단계 값은 3D 장면(scene-bulky.js)과 같아 효과음 순간도 같게 맞춤
 // 휴대폰·필증·손가락 그리기는 폐가전 장면(scene-appliance2d.js)도 가져다 씀(export)
-import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { shadow as shade, t, fitText } from "./eco2d-util.js?v=20261108r";
 

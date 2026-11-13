@@ -2,7 +2,7 @@
 // 배출 순서: 서대문구청 안내(내용물 비우기 → 물로 헹구기 → 눌러 찌그러뜨리기 → 캔류 수거함)
 // 그림: img/scene/can/*.webp (can_assets.py가 만든 조각, 위치는 meta.json 값을 아래 숫자로 옮김), 수도꼭지는 공용 그림
 // 단계 값은 3D 장면(scene-can.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261108r";
 

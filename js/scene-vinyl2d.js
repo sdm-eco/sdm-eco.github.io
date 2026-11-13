@@ -3,7 +3,7 @@
 // 그림: img/scene/vinyl/*.webp (vinyl_assets.py가 실사풍 그림을 조각으로 나눔, 위치 값은 meta.json을 아래 숫자로 옮김)
 //       수도꼭지는 공용 img/scene/common/faucet.webp (그림에 붙은 물줄기는 가리고 여기서 물줄기를 그림)
 // 단계 값은 3D 장면(scene-vinyl.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, wobble, seeded } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, wobble, seeded } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw } from "./eco2d-util.js?v=20261108r";
 

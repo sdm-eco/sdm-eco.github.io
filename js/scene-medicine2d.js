@@ -3,7 +3,7 @@
 // → 주민센터·보건소·구청 등 폐의약품 수거함
 // 그림: img/scene/medicine/*.webp (medicine_assets.py가 만든 조각, 크기·위치는 meta.json 값을 아래 숫자로 옮김)
 // 단계 값은 3D 장면(scene-medicine.js)과 같아 효과음 순간도 같게 맞춤
-import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261108r";
 

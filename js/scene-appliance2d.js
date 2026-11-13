@@ -4,7 +4,7 @@
 // 그림: img/scene/appliance/*.webp (냉장고·전기 주전자·선풍기). 휴대폰·접수증·손수레·트럭은 그림이 없어 도형으로 그림
 // 단계 값은 3D 장면(scene-appliance.js)과 같아 효과음 순간도 같게 맞춤
 // 휴대폰·접수증·손가락 그리기는 대형 폐기물 장면(scene-bulky2d.js)의 것을 같이 씀
-import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
+import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, fitText } from "./eco2d-util.js?v=20261108r";
 import { rr, PHONE, drawPhone, screenTop, doneScreen, tapFinger, drawPermit } from "./scene-bulky2d.js?v=20261108r";
