@@ -1,12 +1,15 @@
 // 일반 쓰레기 장면 — 그림(2D)
 // 배출 순서: 서대문구청 안내(재활용품은 따로 골라내기 → 타는 쓰레기는 종량제 봉투에 담아 묶기 → 저녁 6시부터 내 집 앞에 내놓기)
-// 그림: img/scene/general/*.webp (general_assets.py가 만듦), 종량제 봉투·집 앞·달·안내판은 그림이 없어 canvas 도형으로 그림
+// 그림: img/scene/general/*.webp (general_assets.py가 만듦), 종량제 봉투는 구청 자료의 서대문구 봉투 사진(img/scene/common/bag-*.webp),
+//       집 앞·달·안내판은 그림이 없어 canvas 도형으로 그림
 // 단계 값은 3D 장면(scene-general.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, t, fitText, binLabel } from "./eco2d-util.js?v=20261108r";
 
 const D = "img/scene/general/";
+// 종량제 봉투 사진 (구청 검토 의견 자료, bags_cut.py가 배경을 지움): 일반용(흰색)·음식물용(노랑)
+export const BAG_IMG = { general: "img/scene/common/bag-general.webp", food: "img/scene/common/bag-food.webp" };
 // 그림 조각의 원래 크기 (general_assets.py가 잰 값)
 const SIZE = { tissue: [217, 180], sponge: [177, 130], leaves: [210, 150], can: [145, 236], glass: [131, 370] };
 const BIN = { w: 329, h: 400, rim: 34, label: { x: 127, y: 126, w: 147, h: 79 } };
@@ -45,7 +48,7 @@ export default {
   moves: [null, [["sort", 2.8]], [["bag", 3.8]], [["out", 3.2]]],
   images: {
     tissue: D + "tissue.webp", sponge: D + "sponge.webp", leaves: D + "leaves.webp",
-    can: D + "can.webp", glass: D + "glass.webp", bin: D + "bin.webp"
+    can: D + "can.webp", glass: D + "glass.webp", bin: D + "bin.webp", bag: BAG_IMG.general
   },
   draw: draw
 };
@@ -88,13 +91,13 @@ function draw(ctx, v, s) {
   const bagX = lerp(BAG_X, OUT_X, carry);
   const bagLift = bounceDrop(clamp01(bp / 0.22)) * 520 + Math.sin(Math.PI * carry) * 120;
   const k = 1 - jiggle * 0.05 - crouch * 0.12 + (carry > 0 && carry < 0.5 ? Math.sin(Math.PI * carry / 0.5) * 0.07 : 0) - land * 0.06;
-  const bag = { full: landed / ORDER.length, tie: tie, sx: 1 / Math.sqrt(k), sy: k, rot: Math.sin(Math.PI * carry) * -0.12 + tied * 0.04, label: "item.general" };
+  const bag = { img: img.bag, full: landed / ORDER.length, tie: tie, sx: 1 / Math.sqrt(k), sy: k, rot: Math.sin(Math.PI * carry) * -0.12 + tied * 0.04 };
   const showBag = bp > 0;
   if (showBag) {
     shadow(ctx, bagX, BAG_W * 1.1, 1 - smooth(0, 300, bagLift));
     drawBag(ctx, bagX, GY - bagLift, BAG_W, BAG_H, Object.assign({ part: "back" }, bag));
   }
-  const mouthY = GY - bagLift - (BAG_H * 0.82 - BAG_W * 0.04) * k;   // 입구 앞 테두리 (bagShape의 my + mr/2)
+  const mouthY = GY - bagLift - bagMouth(BAG_H) * k;   // 열린 입구 높이
 
   // ── 바닥의 쓰레기 (뒤쪽 줄 먼저) ──
   TRASH.forEach(function (it, n) {
@@ -140,173 +143,81 @@ function hop(ctx, im, it, q, tx, ty, arc) {
   ctx.restore();
 }
 
-// 종량제 봉투 (canvas 도형): 아래가 불룩한 크림색 비닐 자루 + 초록 띠에 이름, 열린 입구 양옆에 손잡이 고리
-//   묶으면 입구가 오므라들고 손잡이 끝이 두 귀처럼 매듭 위로 삐져나옴
-//   x, gy: 바닥 가운데, w·h: 크기, o = { full 0~1(불룩), tie 0~1(묶음), sx, sy(눌림), rot, label(i18n 키), part }
-//   part "back": 뒤판(입구 안쪽·손잡이), "front": 앞판(몸통·띠·이름), "all": 둘 다
+// 종량제 봉투: 서대문구 봉투 사진(BAG_IMG)
+//   열린 봉투 = 사진에서 매듭·목(위쪽 BAG.top 비율)을 떼어 낸 몸통 + 그 자리에 입구(타원)를 그림
+//   묶으면 입구가 오므라들고, 떼어 냈던 매듭·목이 몸통 위로 쑥 자라 사진 그대로의 묶인 봉투가 됨
+//   x, gy: 바닥 가운데, h: 묶인 봉투 높이(너비는 사진 비율이라 w는 쓰지 않음)
+//   o = { img(봉투 사진), kind "general"|"food", full 0~1(불룩), tie 0~1(묶음), sx, sy(눌림), rot, part }
+//   part "back": 입구 안쪽, "front": 봉투 사진, "all": 둘 다
 //   열린 봉투에 물건을 넣을 때는 "back" → 물건 → "front" 순서로 그리면 물건이 앞판 뒤로 들어감
-// 음식물 장면(scene-food2d.js)에서도 일반쓰레기를 담는 봉투로 씀
+// 음식물(scene-food2d.js)·헷갈리는 쓰레기(scene-confuse2d.js) 장면에서도 씀
+const BAG = {
+  top: 0.3,  // 열린 봉투에서 떼어 내는 윗부분(매듭·목) 비율 — 이 줄의 봉투 폭이 입구 폭(mw, 사진 너비 비율)
+  general: { mw: 0.76, inner: ["#9fa49a", "#e2e4dc"], rim: "rgba(255,255,255,0.95)" },
+  food: { mw: 0.64, inner: ["#9c8210", "#e9d04a"], rim: "#fbe773" }
+};
+// 열린 봉투 입구의 바닥에서 높이 (물건을 넣을 때 겨냥하는 곳)
+export function bagMouth(h) { return h * (1 - BAG.top); }
 export function drawBag(ctx, x, gy, w, h, o) {
   o = o || {};
+  const im = o.img, K = BAG[o.kind || "general"];
+  if (!im) return;
   const tie = o.tie || 0, part = o.part || "all";
+  const dw = h * im.width / im.height * (0.97 + 0.05 * (o.full || 0));
+  const bodyH = bagMouth(h), my = -bodyH;
+  const open = 1 - smooth(0, 0.35, tie);                       // 입구가 보이는 정도
+  const grow = backOut(clamp01((tie - 0.15) / 0.85));          // 매듭·목이 자라난 정도
+  const mrx = dw * K.mw / 2 * lerp(0.3, 1, open), mry = mrx * 0.2;
   ctx.save();
   ctx.translate(x, gy);
   if (o.rot) ctx.rotate(o.rot);
   ctx.scale(o.sx || 1, o.sy || 1);
-  if (part !== "front" && tie < 0.999) bagPanel(ctx, w, h, o, true);
-  if (part !== "back") bagPanel(ctx, w, h, o, false);
-  ctx.restore();
-}
-// 봉투 윤곽 (오른쪽 절반을 곡선으로 잘게 나눈 뒤 왼쪽은 거울처럼)
-//   앞판의 윗선은 입구 타원의 아래쪽 반, 뒤판의 윗선은 위쪽 반 → 둘 사이로 봉투 속이 보임
-function bagShape(w, h, full, tie, back) {
-  const hw = w / 2;
-  const bw = hw * 0.9, bul = hw * (0.03 + 0.09 * full);
-  const sw = lerp(hw * 0.94, hw * 0.6, tie);
-  const mw = lerp(hw * 0.7, hw * 0.06, tie), my = lerp(-h * 0.82, -h * 0.86, tie), mr = mw * 0.24;
-  const pts = [[0, 0]];
-  function seg(p0, c1, c2, p1) {
-    for (let i = 1; i <= 12; i++) {
-      const s = i / 12, u = 1 - s;
-      pts.push([u * u * u * p0[0] + 3 * u * u * s * c1[0] + 3 * u * s * s * c2[0] + s * s * s * p1[0],
-        u * u * u * p0[1] + 3 * u * u * s * c1[1] + 3 * u * s * s * c2[1] + s * s * s * p1[1]]);
-    }
-  }
-  const c = hw * 0.1;
-  pts.push([bw - c, 0]);
-  seg([bw - c, 0], [bw, 0], [bw, 0], [bw, -c]);
-  seg([bw, -c], [bw + bul, -h * 0.22], [sw + bul * 0.6, -h * 0.42], [sw, -h * 0.56]);
-  seg([sw, -h * 0.56], [sw, -h * 0.68], [mw + hw * 0.06 * (1 - tie), my + h * 0.08], [mw, my]);
-  // 입구 테두리 (가운데까지 타원 반쪽)
-  for (let i = 1; i <= 16; i++) {
-    const a = (i / 16) * Math.PI / 2;
-    pts.push([mw * Math.cos(a), my + (back ? -1 : 1) * mr * Math.sin(a)]);
-  }
-  const left = pts.slice(0, -1).reverse().map(function (p) { return [-p[0], p[1]]; });
-  return { pts: pts.concat(left), mw: mw, my: my, mr: mr };
-}
-function bagPanel(ctx, w, h, o, back) {
-  const tie = o.tie || 0, hw = w / 2;
-  const sh = bagShape(w, h, o.full || 0, tie, back);
-  function path() {
-    ctx.beginPath();
-    sh.pts.forEach(function (p, i) { if (i) ctx.lineTo(p[0], p[1]); else ctx.moveTo(p[0], p[1]); });
-    ctx.closePath();
-  }
-  ctx.lineJoin = "round";
-  if (back) {
-    // 손잡이 고리 (입구 양옆에서 위로 둥글게, 묶으면 사라짐)
-    const ha = 1 - smooth(0.15, 0.45, tie);
-    if (ha > 0.01) {
-      ctx.save();
-      ctx.globalAlpha = ha;
-      ctx.lineCap = "round";
-      [-1, 1].forEach(function (sg) {
-        ctx.beginPath();
-        ctx.ellipse(sg * sh.mw * 0.66, sh.my + h * 0.01, sh.mw * 0.3, h * 0.13, sg * 0.12, Math.PI * 1.05, Math.PI * 1.95);
-        ctx.strokeStyle = "rgba(120,125,105,0.55)";
-        ctx.lineWidth = w * 0.075 + 4;
-        ctx.stroke();
-        ctx.strokeStyle = "#f3f1e8";
-        ctx.lineWidth = w * 0.075;
-        ctx.stroke();
-      });
-      ctx.restore();
-    }
-    // 뒤판 안쪽: 입구 아래로 갈수록 어두운 봉투 속
-    const g = ctx.createLinearGradient(0, sh.my - sh.mr, 0, sh.my + sh.mr);
-    g.addColorStop(0, "#d7d4c7");
-    g.addColorStop(1, "#7d847a");
-    path();
+  if (part !== "front" && open > 0.01) {
+    // 입구 안쪽: 뒤쪽 테두리 아래가 어두운 봉투 속
+    ctx.globalAlpha = open;
+    const g = ctx.createLinearGradient(0, my - mry, 0, my + mry);
+    g.addColorStop(0, K.inner[0]);
+    g.addColorStop(1, K.inner[1]);
     ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.ellipse(0, my, mrx, mry, 0, 0, Math.PI * 2);
     ctx.fill();
-    ctx.strokeStyle = "rgba(120,125,105,0.5)";
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    return;
+    ctx.globalAlpha = 1;
   }
-  // 앞판: 가장자리는 조금 어둡고 가운데 왼쪽이 밝은 크림색 비닐
-  const g = ctx.createLinearGradient(-hw, 0, hw, 0);
-  g.addColorStop(0, "#d4d1c2");
-  g.addColorStop(0.3, "#fbfaf3");
-  g.addColorStop(0.6, "#f2f0e6");
-  g.addColorStop(1, "#c8c5b5");
-  path();
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.save();
-  path();
-  ctx.clip();
-  // 바닥 쪽 그늘
-  const gb = ctx.createLinearGradient(0, 0, 0, -h * 0.25);
-  gb.addColorStop(0, "rgba(90,95,80,0.22)");
-  gb.addColorStop(1, "rgba(90,95,80,0)");
-  ctx.fillStyle = gb;
-  ctx.fillRect(-w, -h * 0.25, w * 2, h * 0.27);
-  // 초록 띠 두 줄 (가운데가 살짝 처져 둥근 몸통처럼)
-  function band(y0, y1) {
-    ctx.beginPath();
-    ctx.moveTo(-w, y0);
-    ctx.quadraticCurveTo(0, y0 + h * 0.02, w, y0);
-    ctx.lineTo(w, y1);
-    ctx.quadraticCurveTo(0, y1 + h * 0.02, -w, y1);
-    ctx.closePath();
-    ctx.fillStyle = "#52b183";
-    ctx.fill();
-  }
-  band(-h * 0.46, -h * 0.34);
-  band(-h * 0.31, -h * 0.295);
-  // 비닐 주름 (입구 쪽에서 아래로, 묶으면 목 쪽으로 모임)
-  ctx.strokeStyle = "rgba(80,85,70,0.12)";
-  ctx.lineWidth = Math.max(2, w * 0.012);
-  ctx.lineCap = "round";
-  [-0.6, -0.25, 0.15, 0.5].forEach(function (k, i) {
-    ctx.beginPath();
-    ctx.moveTo(k * sh.mw * 1.1, sh.my + sh.mr * 0.8);
-    ctx.quadraticCurveTo(k * hw * 1.1 + (i % 2 ? 10 : -10), -h * 0.6, k * hw * 1.05, -h * (0.5 - (i % 2) * 0.06));
-    ctx.stroke();
-  });
-  // 왼쪽 반짝임
-  const gl = ctx.createRadialGradient(-hw * 0.45, -h * 0.58, 2, -hw * 0.45, -h * 0.58, hw * 0.5);
-  gl.addColorStop(0, "rgba(255,255,255,0.75)");
-  gl.addColorStop(1, "rgba(255,255,255,0)");
-  ctx.fillStyle = gl;
-  ctx.fillRect(-w, -h, w * 2, h);
-  ctx.restore();
-  path();
-  ctx.strokeStyle = "rgba(120,125,105,0.5)";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  // 입구 앞 테두리를 조금 두툼하게
-  if (tie < 0.5) {
-    ctx.beginPath();
-    ctx.ellipse(0, sh.my + 2, sh.mw, sh.mr, 0, 0.05, Math.PI - 0.05);
-    ctx.strokeStyle = "rgba(255,255,255,0.9)";
-    ctx.lineWidth = 4;
-    ctx.stroke();
-  }
-  if (o.label) fitText(ctx, t(o.label), 0, -h * 0.392, w * 0.72, h * 0.07, 800, "#ffffff");
-  if (tie > 0.5) {
-    // 매듭: 모은 손잡이 끝이 두 귀처럼 삐져나옴
-    const kk = Math.max(backOut(clamp01((tie - 0.5) / 0.5)), 0.001);
+  if (part !== "back") {
+    const sw = im.width, sh = im.height, cut = sh * BAG.top;
+    // 몸통: 열려 있으면 입구 앞 테두리(타원 아래쪽 반)보다 아래만 보임
     ctx.save();
-    ctx.translate(0, sh.my - 4);
-    ctx.scale(kk, kk);
-    ctx.fillStyle = "#f6f4ec";
-    ctx.strokeStyle = "rgba(120,125,105,0.55)";
-    ctx.lineWidth = 2;
-    [-1, 1].forEach(function (sg) {
+    if (open > 0.01) {
       ctx.beginPath();
-      ctx.ellipse(sg * w * 0.1, -h * 0.035, w * 0.115, w * 0.05, sg * -0.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-    });
-    ctx.beginPath();
-    ctx.ellipse(0, 0, w * 0.05, w * 0.045, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
+      ctx.moveTo(-dw, my);
+      ctx.lineTo(-mrx, my);
+      ctx.ellipse(0, my, mrx, mry * open, 0, Math.PI, 0, true);
+      ctx.lineTo(dw, my);
+      ctx.lineTo(dw, 20);
+      ctx.lineTo(-dw, 20);
+      ctx.closePath();
+      ctx.clip();
+    }
+    ctx.drawImage(im, 0, cut, sw, sh - cut, -dw / 2, my, dw, bodyH);
     ctx.restore();
+    // 매듭·목: 묶을 때 몸통 위로 자라남 (아랫단은 몸통 윗단에 붙어 있음)
+    if (grow > 0.001) {
+      const th = h * BAG.top * grow, tw = dw * lerp(0.55, 1, Math.min(grow, 1));
+      ctx.drawImage(im, 0, 0, sw, cut, -tw / 2, my - th, tw, th + 1);
+    }
+    // 입구 앞 테두리 (비닐 끝이 조금 두툼하게 보이도록)
+    if (open > 0.01) {
+      ctx.globalAlpha = open;
+      ctx.beginPath();
+      ctx.ellipse(0, my, mrx, mry, 0, 0.05, Math.PI - 0.05);
+      ctx.strokeStyle = K.rim;
+      ctx.lineWidth = 4;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
   }
+  ctx.restore();
 }
 
 // 집 앞 (canvas 도형): 처마·벽·초록 문·불 켜진 창·현관등, 배출 시간 안내판(달 + 18:00 ~), 하늘의 달

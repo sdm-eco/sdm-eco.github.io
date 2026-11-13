@@ -1,11 +1,13 @@
 // 음식물 쓰레기 장면 — 그림(2D)
-// 배출 순서: 서대문구청 안내(물기 빼기 → 뼈·조개/달걀 껍데기·복숭아 씨는 일반쓰레기로 골라내기 → 음식물 전용 수거함에 넣기)
-// 그림: img/scene/food/*.webp (food_assets.py가 물빠짐 바구니·수거함을 조각으로 나눔), 물·일반쓰레기 봉투는 canvas 도형
+// 배출 순서: 서대문구청 안내(물기 빼기 → 뼈·조개/달걀 껍데기·복숭아 씨는 일반쓰레기로 골라내기
+//            → 노란 음식물 전용 봉투에 담아 음식물 수거용기에 넣기)
+// 그림: img/scene/food/*.webp (food_assets.py가 물빠짐 바구니·수거함을 조각으로 나눔), 물은 canvas 도형
+//       종량제 봉투(일반용·음식물용)는 구청 자료의 서대문구 봉투 사진 (scene-general2d.js drawBag)
 // 단계 값은 3D 장면(scene-food.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261108r";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
 import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText } from "./eco2d-util.js?v=20261108r";
-import { drawBag } from "./scene-general2d.js?v=20261108r";
+import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261108r";
 
 const D = "img/scene/food/";
 // 그림 조각의 원래 크기와 그 안의 위치 (food_assets.py가 잰 값, meta.json)
@@ -25,11 +27,12 @@ const JUNK = [
 const GY = 700;                 // 바닥선
 const KB = 460 / BASKET.w;      // 바구니 크기 배율 (너비 460)
 const B0 = 405, B1 = 470;       // 바구니 자리 (처음, 일반쓰레기 봉투가 나온 뒤)
-const HOLD = [478, 222, 0.66];  // 수거함 위에서 쏟을 때 바구니 가운데·크기
-const REST = [362, 0.62];       // 다 쏟고 내려놓는 자리·크기
+const HOLD = [392, 250, 0.6];   // 음식물 봉투 위에서 쏟을 때 바구니 가운데·크기
+const REST = [380, 0.62];       // 다 쏟고 내려놓는 자리·크기
 const KN = 400 / BIN.h;         // 수거함 크기 배율 (높이 400)
 const BIN_X = 655;
 const BAG = [122, 210, 300];    // 일반쓰레기 봉투 자리·너비·높이
+const FBAG = [392, 300];        // 노란 음식물 봉투 자리·높이
 
 export default {
   kind: "2d",
@@ -44,7 +47,7 @@ export default {
   images: {
     back: D + "basket-back.webp", front: D + "basket-front.webp", slots: D + "basket-slots.webp", wet: D + "basket-water.webp",
     mound: D + "mound.webp", bone: D + "bone.webp", egg: D + "egg.webp", shell: D + "shell.webp", pit: D + "pit.webp",
-    body: D + "bin-body.webp", lid: D + "bin-lid.webp"
+    body: D + "bin-body.webp", lid: D + "bin-lid.webp", bagG: BAG_IMG.general, bagF: BAG_IMG.food
   },
   draw: draw
 };
@@ -67,18 +70,18 @@ function draw(ctx, v, s) {
     bx += Math.sin(q * 52) * 12 * env;
     rot = Math.sin(q * 52 + 1.2) * 0.06 * env + wobble(clamp01((q - 0.9) / 0.1), 2) * 0.03;
   }
-  // 3단계: 들썩(준비) → 들어 올려 수거함 왼쪽 위로 → 오른쪽으로 기울여 쏟음 → 옆으로 옮겨 통통 내려놓음
+  // 3단계: 들썩(준비) → 들어 올려 음식물 봉투 위로 → 기울여 쏟음 → 봉투를 묶어 수거함에 넣은 뒤 그 자리에 통통 내려놓음
   let hx = 0, hy = 0;
   if (bp > 0) {
-    const up = easeInOut(clamp01((bp - 0.04) / 0.22));
-    const away = easeInOut(clamp01((bp - 0.7) / 0.2));
-    const drop = bp >= 0.7 ? bounceDrop(clamp01((bp - 0.7) / 0.24)) : 1;
+    const up = easeInOut(clamp01((bp - 0.02) / 0.2));
+    const away = easeInOut(clamp01((bp - 0.82) / 0.14));
+    const drop = bp >= 0.82 ? bounceDrop(clamp01((bp - 0.82) / 0.16)) : 1;
     if (bp < 0.06) sq = 1 - Math.sin(Math.PI * bp / 0.06) * 0.05;
     k = lerp(lerp(1, HOLD[2], up), REST[1], away);
     hx = lerp(lerp(B1, HOLD[0], up), REST[0], away);
     const restY = GY - BASKET.h * KB * k / 2;
     hy = lerp(lerp(GY - BASKET.h * KB / 2, HOLD[1], up), restY - (restY - HOLD[1]) * drop, away);
-    const pp = clamp01((bp - 0.3) / 0.4);
+    const pp = clamp01((bp - 0.26) / 0.32);
     rot = (pp > 0 && pp < 1 ? tiltCurve(pp) : 0) * 1.75 + wobble(clamp01((bp - 0.84) / 0.14), 2) * 0.05;
   }
   const bw = BASKET.w * KB * k, bh = BASKET.h * KB * k;
@@ -93,7 +96,7 @@ function draw(ctx, v, s) {
     jig += wobble(clamp01((pk - 0.4 - i * 0.15) / 0.12), 1);
   });
   const bagK = 1 - jig * 0.05;
-  const bag = { full: landed / JUNK.length, sx: 1 / Math.sqrt(bagK), sy: bagK, label: "cat.general" };
+  const bag = { img: img.bagG, full: landed / JUNK.length, tie: easeInOut(clamp01((pk - 0.86) / 0.14)), sx: 1 / Math.sqrt(bagK), sy: bagK };
   if (pk > 0) {
     shadow(ctx, BAG[0], BAG[1] * 1.1, 1 - smooth(0, 300, bagDrop));
     drawBag(ctx, BAG[0], GY - bagDrop, BAG[1], BAG[2], Object.assign({ part: "back" }, bag));
@@ -103,9 +106,9 @@ function draw(ctx, v, s) {
   const binX = lerp(1150, BIN_X, 1 - Math.pow(1 - clamp01((bp - 0.04) / 0.18), 3));
   const nw = BIN.w * KN, nh = BIN.h * KN;
   const left = binX - nw / 2, top = GY - nh;
-  const lidT = bp < 0.6 ? 1.85 * easeInOut(clamp01((bp - 0.18) / 0.12)) : 1.85 * bounceDrop(clamp01((bp - 0.86) / 0.12));
+  const lidT = bp < 0.75 ? 1.85 * easeInOut(clamp01((bp - 0.56) / 0.1)) : 1.85 * bounceDrop(clamp01((bp - 0.84) / 0.09));
   const lidExt = Math.cos(lidT) - 3 * Math.sin(lidT); // 뚜껑 앞쪽이 보이는 높이 비율 (음수면 경첩 위로 세워짐)
-  const binWob = wobble(clamp01((bp - 0.93) / 0.07), 2) * 0.025;
+  const binWob = wobble(clamp01((bp - 0.89) / 0.1), 2) * 0.025;
   if (bp > 0) {
     shadow(ctx, binX, nw * 1.1, 1);
     ctx.save();
@@ -127,9 +130,25 @@ function draw(ctx, v, s) {
     ctx.restore();
   }
 
+  // ── 노란 음식물 봉투: 위에서 떨어져 통통 → 음식이 담기면 출렁 → 묶음 → 포물선으로 수거함 안으로 ──
+  const fDrop = bounceDrop(clamp01((bp - 0.06) / 0.2)) * 520;
+  const fu = clamp01((bp - 0.68) / 0.14);              // 수거함으로 날아가는 정도
+  const fe = easeInOut(fu);
+  const fK = 1 - wobble(clamp01((bp - 0.45) / 0.12), 1) * 0.06;
+  const fbag = { img: img.bagF, kind: "food", full: smooth(0.4, 0.5, bp), tie: easeInOut(clamp01((bp - 0.56) / 0.12)),
+    sx: 1 / Math.sqrt(fK) * lerp(1, 0.72, fe), sy: fK * lerp(1, 0.72, fe), rot: fe * 0.5 };
+  const fx = lerp(FBAG[0], binX, fe);
+  const fy = lerp(GY - fDrop, top + 82 * KN + FBAG[1] * 0.8, fe) - Math.sin(Math.PI * Math.min(fe / 0.8, 1)) * 230;
+  const showF = bp > 0.06 && fu < 1;
+  if (showF) {
+    shadow(ctx, FBAG[0], 230, (1 - smooth(0, 300, fDrop)) * (1 - smooth(0, 0.3, fu)));
+    // 떨어지는 동안은 바구니 뒤로 지나가도록 통째로 먼저, 내려앉은 뒤에는 뒤판만 먼저(음식이 앞판 뒤로 들어가게)
+    if (fu <= 0) drawBag(ctx, fx, fy, 0, FBAG[1], Object.assign({ part: fDrop > 1 ? "all" : "back" }, fbag));
+  }
+
   // ── 바구니 그림자 + 바구니 ──
   shadow(ctx, cx, bw * 1.05, 1 - smooth(0, 160, GY - (cy + bh / 2)));
-  const pourOut = smooth(0.43, 0.5, bp);   // 음식이 바구니에서 빠져나간 정도
+  const pourOut = smooth(0.36, 0.43, bp);   // 음식이 바구니에서 빠져나간 정도
   drawBasket(ctx, img, v, cx, cy, KB * k, rot, sq, pourOut);
 
   // 2단계: 일반쓰레기가 하나씩 들썩 → 포물선 → 봉투 속으로
@@ -138,7 +157,7 @@ function draw(ctx, v, s) {
     if (u <= 0 || u >= 1) return;
     const w0 = j.w * j.k * KB, h0 = j.h * j.k * KB;
     const sx = bx + (j.x - BASKET.w / 2) * KB, sy = GY - bh / 2 + (j.y - BASKET.h / 2) * KB;
-    const tx = BAG[0], ty = GY - bagDrop - BAG[2] * 0.82;
+    const tx = BAG[0], ty = GY - bagDrop - bagMouth(BAG[2]);
     const f = clamp01((u - 0.1) / 0.9), e = easeInOut(f);
     let x = lerp(sx, tx, e), y = lerp(sy, ty + h0 * 0.8, e) - Math.sin(Math.PI * Math.min(e / 0.85, 1)) * 170;
     if (u < 0.1) y -= Math.sin(Math.PI * u / 0.1) * 12;
@@ -154,13 +173,13 @@ function draw(ctx, v, s) {
   if (pk > 0) drawBag(ctx, BAG[0], GY - bagDrop, BAG[1], BAG[2], Object.assign({ part: "front" }, bag));
 
   // 3단계: 음식 더미가 기운 바구니에서 미끄러져 수거함 입구로 떨어짐 (입구 앞 테두리 아래는 가림)
-  const fq = clamp01((bp - 0.43) / 0.1);
+  const fq = clamp01((bp - 0.36) / 0.1);
   if (fq > 0 && fq < 1) {
     const kk = KB * k;
     const lx = (MOUND.x + MOUND.w / 2 - BASKET.w / 2) * kk, ly = (MOUND.y + MOUND.h / 2 - BASKET.h / 2) * kk;
     const sx = cx + lx * Math.cos(rot) - ly * Math.sin(rot), sy = cy + lx * Math.sin(rot) + ly * Math.cos(rot);
-    const mx = binX + 8, my = top + 70 * KN;
-    const frontY = top + 82 * KN;
+    const mx = FBAG[0], my = GY - fDrop - bagMouth(FBAG[1]) - 10;
+    const frontY = my + 14;
     ctx.save();
     ctx.beginPath();
     ctx.rect(-500, -500, 2000, frontY + 500);
@@ -172,6 +191,17 @@ function draw(ctx, v, s) {
       const x = lerp(sx, mx, g) + (i - 1) * 18, y = lerp(sy, my + 40, g * g);
       put(ctx, img.mound, x, y, MOUND.w * kk * 0.9, MOUND.h * kk * 0.9, { py: 0.5, rot: rot * (1 - g) + i * 0.4 * g, alpha: i ? 0.85 : 1 });
     }
+    ctx.restore();
+  }
+
+  if (showF && (fDrop <= 1 || fu > 0)) {
+    ctx.save();
+    if (fu > 0.5) {
+      ctx.beginPath();
+      ctx.rect(-500, -500, 2000, top + 82 * KN + 500);
+      ctx.clip();
+    }
+    drawBag(ctx, fx, fy, 0, FBAG[1], Object.assign({ part: fu > 0 ? "all" : "front" }, fbag));
     ctx.restore();
   }
 
@@ -282,8 +312,13 @@ function sounds(v) {
   if (hit(v, "water", 0.15)) sfx.play("water", 1.69); // 흔드는 동안 물 빠지는 소리
   if (hit(v, "water", 0.92)) sfx.play("tap");         // 바구니를 내려놓을 때 톡
   if (hit(v, "pick", 0.4) || hit(v, "pick", 0.55) || hit(v, "pick", 0.7) || hit(v, "pick", 0.85)) sfx.play("slide"); // 일반쓰레기가 봉투에 하나씩 쏙
-  if (hit(v, "bin", 0.53)) sfx.play("thud");          // 음식물이 수거함에 툭
-  if (hit(v, "bin", 0.844)) sfx.play("tap");          // 바구니를 내려놓을 때 톡
-  if (hit(v, "bin", 0.928)) sfx.play("lid");          // 뚜껑이 탁 닫힘
+  if (hit(v, "pick", 0.87)) sfx.play("tie");         // 일반쓰레기 봉투 묶기
+  if (hit(v, "bin", 0.12)) sfx.play("rustle", 0.25);  // 노란 봉투가 떨어질 때 바스락
+  if (hit(v, "bin", 0.45)) sfx.play("thud");          // 음식물이 봉투에 툭
+  if (hit(v, "bin", 0.57)) sfx.play("tie");           // 노란 봉투 묶기
+  if (hit(v, "bin", 0.69)) sfx.play("whoosh");        // 봉투가 수거함으로 휙
+  if (hit(v, "bin", 0.82)) sfx.play("thud");          // 수거함 안에 툭
+  if (hit(v, "bin", 0.885)) sfx.play("lid");          // 뚜껑이 탁 닫힘
+  if (hit(v, "bin", 0.915)) sfx.play("tap");          // 바구니를 내려놓을 때 톡
   if (hit(v, "bin", 0.97)) sfx.play("chime");         // 끝 띵동
 }
