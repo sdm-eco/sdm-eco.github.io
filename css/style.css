@@ -118,10 +118,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .btn-icon-line{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 /* 배너 그림: 배너 오른쪽을 위아래·오른쪽 끝까지 채우는 배경. 글 쪽(왼쪽)과 아래만 흐려 배너 바탕과 이어짐
    그림 왼쪽 30%는 비워 둔 여백이라 흐려져도 독립문·학생은 그대로 보임. 넝쿨 선·물결·원호는 그림 위에 그려짐
-   인물이 잘 보이도록 그림 칸(.hero-scene)을 그림 영역보다 10% 크게 함(인물 쪽 가로 60%·세로 65% 중심, 가장자리는 넘쳐서 안 보임)
-   → 흐림 위치(마스크 %)는 그림 영역 기준 값을 그림 칸 기준으로 바꾼 값: 가로 (x+6)/110, 세로 (y+6.5)/110 */
+   인물이 잘 보이도록 그림 칸(.hero-scene)을 그림 영역보다 10% 크게 함(가로 80%·세로 65% 중심, 가장자리는 넘쳐서 안 보임)
+   가로 중심을 오른쪽(80%)에 둬 오른쪽 폭포가 흐린 끝에 덜 걸리게 함(오른쪽 흐림도 4%로 좁힘)
+   → 흐림 위치(마스크 %)는 그림 영역 기준 값을 그림 칸 기준으로 바꾼 값: 가로 (x+8)/110, 세로 (y+6.5)/110 */
 .hero-art{position:absolute;top:0;right:0;bottom:0;width:58%;margin:0;pointer-events:none}
-.hero-scene{--scene-filter:hue-rotate(10deg) saturate(1.05) contrast(1.07) brightness(1.03);position:absolute;left:-6%;top:-6.5%;width:110%;height:110%;-webkit-mask-image:linear-gradient(to right,transparent 5.45%,#000 29.09%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 5.45%,#000 29.09%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);mask-composite:intersect}
+.hero-scene{--scene-filter:hue-rotate(10deg) saturate(1.05) contrast(1.07) brightness(1.03);position:absolute;left:-8%;top:-6.5%;width:110%;height:110%;-webkit-mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);mask-composite:intersect}
 /* 나타나는 효과가 끝나면 효과를 남기지 않음(backwards): 끝난 뒤에도 그림이 별도 층으로 남으면 Edge에서 폭을 바꾼 뒤 흐림 마스크가 예전 크기로 남아 그림이 잘려 보였음 */
 /* 그림의 누런 기를 빼고(풀색을 푸르게) 조금 맑게 */
 .hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:58% 45%;filter:var(--scene-filter);animation:scene-in 1.4s ease-out backwards}
@@ -133,7 +134,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* 배경 장식(큰 원·넝쿨 선·풀밭 물결)도 화면 끝이 아니라 내용 폭 기준으로: 바깥은 배너 바탕색만 남김 */
   .hero:after{right:calc((100% - 1280px) / 2 - 220px)}
   .garden-bg{left:calc((100% - 1280px) / 2 - 40px);width:calc(1280px + 80px);-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent)}
-  .hero-scene{-webkit-mask-image:linear-gradient(to right,transparent 5.45%,#000 29.09%),linear-gradient(to left,transparent 3.64%,#000 10%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);-webkit-mask-composite:source-in,source-in;mask-image:linear-gradient(to right,transparent 5.45%,#000 29.09%),linear-gradient(to left,transparent 3.64%,#000 10%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);mask-composite:intersect,intersect}
+  .hero-scene{-webkit-mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to left,transparent 1.82%,#000 5.45%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);-webkit-mask-composite:source-in,source-in;mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to left,transparent 1.82%,#000 5.45%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);mask-composite:intersect,intersect}
 }
 /* 그림 속 수거함의 ♻가 은은하게 밝아졌다 흐려졌다 반복(main.js setupBinMarks): 같은 그림을 겹쳐 흰 화살표만 남겨(검정은 screen으로 안 보임) 빛나게 */
 /* 배너 인물 움직임(main.js setupFigures: 머리카락·손짓): 그림과 같은 색 보정을 걸어 겹친 조각이 티 나지 않게
@@ -433,7 +434,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-grid{grid-template-columns:1fr;gap:40px;padding:60px 0 90px}
   .hero{display:flex;flex-direction:column}
   .hero-art{position:relative;order:2;width:100%;aspect-ratio:1344/756;margin-top:-70px}
-  .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 5.45%,#000 5.46%,#000 96.36%,transparent 96.37%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 5.45%,#000 5.46%,#000 96.36%,transparent 96.37%);mask-composite:intersect}
+  .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);mask-composite:intersect}
   .learn-inner{grid-template-columns:1fr;gap:12px}
   .game-placeholder{grid-template-columns:minmax(0,1fr);grid-template-areas:"demo" "copy" "cta";justify-items:center;row-gap:18px;padding:40px 24px;text-align:center}
   .game-copy,.game-cta{align-self:auto}
@@ -501,7 +502,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero{order:-2}
   #guide{order:-1;padding:16px 0 30px}
   .hero-art{order:-1;aspect-ratio:2.2/1;margin:0 0 -30px}
-  .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.9%,#000 5.91%,#000 71.36%,transparent 96.82%),linear-gradient(to right,transparent 5.45%,#000 5.46%,#000 96.36%,transparent 96.37%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.9%,#000 5.91%,#000 71.36%,transparent 96.82%),linear-gradient(to right,transparent 5.45%,#000 5.46%,#000 96.36%,transparent 96.37%);mask-composite:intersect}
+  .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.9%,#000 5.91%,#000 71.36%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.9%,#000 5.91%,#000 71.36%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);mask-composite:intersect}
   .hero-scene img{object-position:64% 62%}
   .hero-grid{gap:0;padding:0 0 24px}
   .hero-desc-long{display:none}
