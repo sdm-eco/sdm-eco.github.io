@@ -50,7 +50,27 @@
     });
 
     renderVideos();
+    checkTagRows();
     if (progress) progress.render();
+  }
+
+  // 영상 칸 주제 태그(한 줄): 칸보다 길면 is-over(오른쪽 끝 흐림), 끝까지 밀었으면 is-end(흐림 없앰)
+  // 언어를 바꾸면 글 길이가 달라지므로 언어를 바꿀 때마다 다시 잼
+  var tagRowsWatched = false;
+  function checkTagRows() {
+    var rows = document.querySelectorAll(".video-tags");
+    function check(row) {
+      row.classList.toggle("is-over", row.scrollWidth > row.clientWidth + 1);
+      row.classList.toggle("is-end", row.scrollLeft + row.clientWidth >= row.scrollWidth - 2);
+    }
+    rows.forEach(check);
+    if (tagRowsWatched || !window.ResizeObserver) return;
+    tagRowsWatched = true;
+    var ro = new ResizeObserver(function (entries) { entries.forEach(function (e) { check(e.target); }); });
+    rows.forEach(function (row) {
+      ro.observe(row);
+      row.addEventListener("scroll", function () { check(row); }, { passive: true });
+    });
   }
 
   // 학습 띠: 이 브라우저에서 끝낸 단계를 ✓로, 다음에 할 단계를 강조해서 보여줌

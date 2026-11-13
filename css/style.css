@@ -306,7 +306,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-close{position:absolute;right:14px;top:14px;z-index:2;width:44px;height:44px;border:0;border-radius:50%;background:var(--white);color:var(--ink);font-size:26px;line-height:1;box-shadow:0 4px 14px color-mix(in srgb,var(--forest) 20%,transparent)}
 
 .video-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
-.video-card{position:relative;padding:14px 14px 18px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
+.video-card{position:relative;min-width:0;padding:14px 14px 18px;border:2px solid var(--card-line);border-radius:var(--radius);background:var(--white)}
 /* 편마다 색 바탕 + 오른쪽 아래 캐릭터(img/video-ep*.webp), 왼쪽 위 편 배지·준비 중 배지, 왼쪽 아래 재생 버튼 */
 .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--forest)}
 .ep-1 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
@@ -329,8 +329,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .play-circle svg{width:24px;height:24px;fill:var(--ink);margin-left:4px}
 .video-card h3{margin:18px 8px 6px;font-size:24px;letter-spacing:-.6px}
 .video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
-.video-tags{display:flex;flex-wrap:wrap;gap:8px;margin:14px 8px 0;padding:0;list-style:none}
-.video-tags li{padding:5px 13px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-2);font-size:14px;font-weight:700}
+/* 주제 태그는 한 줄로: 칸보다 길면(좁은 화면·긴 언어) 옆으로 밀어서 봄, 넘칠 때만 오른쪽 끝을 흐려 더 있음을 알림(main.js setupTagRows) */
+.video-tags{display:flex;flex-wrap:nowrap;gap:5px;margin:14px 4px 0;padding:0 0 2px;list-style:none;overflow-x:auto;scrollbar-width:none}
+.video-tags::-webkit-scrollbar{display:none}
+.video-tags.is-over:not(.is-end){-webkit-mask-image:linear-gradient(to left,transparent,#000 40px);mask-image:linear-gradient(to left,transparent,#000 40px)}
+.video-tags li{flex:none;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-2);font-size:12.5px;font-weight:700;white-space:nowrap}
 
 /* 바탕은 초록·크림으로 두고 색은 통 4개가 맡음 (노랑 = 음식물이라 넓은 노란 면은 피함) */
 .game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 60%,transparent),transparent 55%),linear-gradient(90deg,var(--mint),var(--sun));overflow:hidden}
