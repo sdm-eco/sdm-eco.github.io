@@ -64,9 +64,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .nav-links a.nav-feature:hover{background:var(--mint-hi)}
 .nav-play{width:10px;height:10px;fill:var(--link);margin-right:8px}
 /* 언어 전환: 처음 온 유학생이 바로 찾도록 메뉴와 다른 모양의 독립 영역으로, 언제나 위쪽 오른편(휴대폰은 맨 위)에 둠 */
-.lang-switch{order:3;display:flex;align-items:center;gap:2px;padding:4px 4px 4px 12px;border:2px solid var(--fresh-strong);border-radius:999px;background:var(--white);box-shadow:0 2px 10px color-mix(in srgb,var(--fresh-strong) 14%,transparent)}
+.lang-switch{order:3;display:flex;align-items:center;gap:2px;padding:3px 3px 3px 12px;border:2px solid var(--fresh-strong);border-radius:999px;background:var(--white);box-shadow:0 2px 10px color-mix(in srgb,var(--fresh-strong) 14%,transparent)}
 .lang-globe{width:22px;height:22px;flex:none;margin-right:6px;fill:none;stroke:var(--fresh-strong);stroke-width:1.6;stroke-linecap:round}
-.lang-switch button{min-height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--white);color:var(--ink);font-size:15px;font-weight:700;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s}
+.lang-switch button{min-height:32px;padding:0 14px;border:0;border-radius:999px;background:var(--white);color:var(--ink);font-size:15px;font-weight:700;white-space:nowrap;transition:background-color .2s,border-color .2s,color .2s}
 .lang-switch button:hover{background:var(--lime-soft)}
 .lang-switch button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
 
