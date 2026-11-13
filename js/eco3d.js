@@ -18,18 +18,18 @@ import paper from "./scene-paper.js?v=20261108r";
 import appliance from "./scene-appliance.js?v=20261108r";
 import confuse from "./scene-confuse.js?v=20261108r";
 import pet2d from "./scene-pet2d.js?v=20261108r";
-import food2d from "./scene-food2d.js?v=20261108r";
-import general2d from "./scene-general2d.js?v=20261108r";
+import food2d from "./scene-food2d.js?v=20261114a";
+import general2d from "./scene-general2d.js?v=20261114a";
 import bulky2d from "./scene-bulky2d.js?v=20261108r";
 import can2d from "./scene-can2d.js?v=20261108r";
 import vinyl2d from "./scene-vinyl2d.js?v=20261108r";
 import carton2d from "./scene-carton2d.js?v=20261108r";
 import medicine2d from "./scene-medicine2d.js?v=20261108r";
-import battery2d from "./scene-battery2d.js?v=20261108r";
+import battery2d from "./scene-battery2d.js?v=20261114a";
 import glass2d from "./scene-glass2d.js?v=20261108r";
 import paper2d from "./scene-paper2d.js?v=20261108r";
 import appliance2d from "./scene-appliance2d.js?v=20261108r";
-import confuse2d from "./scene-confuse2d.js?v=20261108r";
+import confuse2d from "./scene-confuse2d.js?v=20261114a";
 import { create2DView } from "./eco2d.js?v=20261108r";
 
 import { GROUND } from "./eco3d-util.js?v=20261108r";
@@ -219,7 +219,8 @@ function setupItems() {
 
 // data-eco-widget 안의 [data-eco-mark="n"] 요소에 지금 단계를 is-on으로 표시
 function initLoop(stage) {
-  const def = SCENES[stage.dataset.ecoLoop];
+  // 카드 미리보기도 체험 창과 같은 그림(2D) 장면을 씀 (2D가 없으면 3D)
+  const def = LAB2D[stage.dataset.ecoLoop] || SCENES[stage.dataset.ecoLoop];
   const root = stage.closest("[data-eco-widget]") || stage;
   const marks = Array.from(root.querySelectorAll("[data-eco-mark]"));
   const canvas = stage.querySelector("canvas") || stage.appendChild(document.createElement("canvas"));
@@ -228,7 +229,9 @@ function initLoop(stage) {
     marks.forEach(function (m) { m.classList.toggle("is-on", Number(m.dataset.ecoMark) === n); });
   }
 
-  mount(stage, canvas, def, { interactive: false, zoom: Number(stage.dataset.ecoZoom) || 1 }, async function (view) {
+  // data-eco-zoom은 3D 카메라용, 그림(2D)은 data-eco-zoom2d(없으면 1)
+  const zoom = def.kind === "2d" ? Number(stage.dataset.ecoZoom2d) || 1 : Number(stage.dataset.ecoZoom) || 1;
+  mount(stage, canvas, def, { interactive: false, zoom: zoom }, async function (view) {
     view.goTo(0, true);
     if (reduced) return;
     await wait(1200);

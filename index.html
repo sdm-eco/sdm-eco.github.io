@@ -94,7 +94,7 @@
           <a class="btn" href="#videos"><svg class="btn-icon" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1l7 4-7 4z"/></svg><span data-i18n="hero.cta2">분리배출 영상 보기</span></a>
           <a class="btn btn-ghost" href="#guide"><svg class="btn-icon btn-icon-line" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C9.5 4.6 6 4.4 3 5.4v13c3-1 6.5-.8 9 1.1 2.5-1.9 6-2.1 9-1.1v-13c-3-1-6.5-.8-9 1.1zM12 6.5v13"/></svg><span data-i18n="hero.cta1">배출방법 보기</span></a>
                 </div>
-        <!-- 분리배출 바로 가기 (구청 의견 1): 글을 읽지 않고 아이콘으로 바로 그 품목의 3D 체험 창을 엶 -->
+        <!-- 분리배출 바로 가기 (구청 의견 1): 글을 읽지 않고 아이콘으로 바로 그 품목의 체험 창을 엶 -->
         <ul class="quick-cats" aria-label="분리배출 바로 가기" data-i18n-attr="aria-label:quick.label">
           <li><button type="button" class="quick-cat cat-general" data-eco-open="general-dialog"><img src="img/cat-general.webp" alt="" width="192" height="192"><span data-i18n="quick.general">일반</span></button></li>
           <li><button type="button" class="quick-cat cat-food" data-eco-open="food-dialog"><img src="img/cat-food.webp" alt="" width="192" height="192"><span data-i18n="quick.food">음식물</span></button></li>
@@ -164,7 +164,7 @@
         <div>
           <h2 data-i18n="guide.title">무엇을 버리나요?</h2>
         </div>
-        <p class="section-lead" data-i18n="guide.lead">버릴 물건을 고르면 3D로 버리는 순서를 보여 줘요.</p>
+        <p class="section-lead" data-i18n="guide.lead">버릴 물건을 고르면 그림으로 버리는 순서를 보여 줘요.</p>
       </div>
       <div class="guide-grid">
         <article class="guide-card cat-general">
@@ -172,28 +172,28 @@
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="general" data-eco-zoom="1.75"></div></div>
           <h3 data-i18n="cat.general">일반 쓰레기</h3>
           <p data-i18n="cat.general.sub">종량제 봉투</p>
-          <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
+          <button type="button" class="eco-open" data-eco-open="general-dialog"><span data-i18n="lab.try">그림으로 배우기</span></button>
         </article>
         <article class="guide-card cat-food">
           <span class="cat-pic" aria-hidden="true"><img src="img/cat-food.webp" alt="" width="192" height="192"></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="food" data-eco-zoom="1.45"></div></div>
           <h3 data-i18n="cat.food">음식물 쓰레기</h3>
           <p data-i18n="cat.food.sub">전용 수거함·봉투</p>
-          <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
+          <button type="button" class="eco-open" data-eco-open="food-dialog"><span data-i18n="lab.try">그림으로 배우기</span></button>
         </article>
         <article class="guide-card cat-recycle">
           <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="pet" data-eco-zoom="1.25"></div></div>
           <h3 data-i18n="cat.recycle">재활용품</h3>
           <p data-i18n="cat.recycle.sub">페트병·캔·유리·종이</p>
-          <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
+          <button type="button" class="eco-open" data-eco-open="pet-dialog"><span data-i18n="lab.try">그림으로 배우기</span></button>
         </article>
         <article class="guide-card cat-bulky">
           <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
           <div class="card-3d" aria-hidden="true"><div class="eco-mini" data-eco-loop="bulky" data-eco-zoom="1.3"></div></div>
           <h3 data-i18n="cat.bulky">대형·특수폐기물</h3>
           <p data-i18n="cat.bulky.sub">가구·의약품·건전지</p>
-          <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">3D로 배우기</span></button>
+          <button type="button" class="eco-open" data-eco-open="bulky-dialog"><span data-i18n="lab.try">그림으로 배우기</span></button>
         </article>
       </div>
     </div>
@@ -244,7 +244,7 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
@@ -272,12 +272,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
       <h3 id="can-dialog-title" data-i18n="can.title">캔, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="can.s1.title">내용물 비우기</strong><small data-i18n="can.s1.desc">남은 음료를 모두 비워요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="can.s2.title">물로 헹구기</strong><small data-i18n="can.s2.desc">안쪽을 물로 헹궈 이물질을 없애요.</small></span></button></li>
@@ -299,12 +299,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
       <h3 id="vinyl-dialog-title" data-i18n="vinyl.title">비닐, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="vinyl.s1.title">내용물 비우기</strong><small data-i18n="vinyl.s1.desc">과자 부스러기 같은 내용물을 털어 내요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="vinyl.s2.title">음식물이 묻었다면 헹구기</strong><small data-i18n="vinyl.s2.desc">물로 헹궈요. 씻어도 지워지지 않으면 종량제 봉투에 버려요.</small></span></button></li>
@@ -325,12 +325,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
       <h3 id="carton-dialog-title" data-i18n="carton.title">종이팩, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="carton.s1.title">내용물 비우기</strong><small data-i18n="carton.s1.desc">남은 우유·주스를 모두 비워요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="carton.s2.title">물로 헹구기</strong><small data-i18n="carton.s2.desc">안쪽을 물로 헹궈요.</small></span></button></li>
@@ -352,12 +352,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
       <h3 id="glass-dialog-title" data-i18n="glass.title">유리병, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="glass.s1.title">뚜껑 떼기</strong><small data-i18n="glass.s1.desc">병뚜껑은 떼어서 따로 버려요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="glass.s2.title">내용물 비우기</strong><small data-i18n="glass.s2.desc">남은 내용물을 비우고, 담배꽁초 같은 이물질을 넣지 않아요.</small></span></button></li>
@@ -379,12 +379,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-recycle.webp" alt="" width="192" height="192"></span>
       <h3 id="paper-dialog-title" data-i18n="paper.title">종이류, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="paper.s1.title">테이프·스티커 떼기</strong><small data-i18n="paper.s1.desc">상자에 붙은 테이프와 택배 운송장 스티커를 떼어 내요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="paper.s2.title">상자는 펴서 납작하게</strong><small data-i18n="paper.s2.desc">상자를 펴서 납작하게 만들어요.</small></span></button></li>
@@ -408,12 +408,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-food.webp" alt="" width="192" height="192"></span>
       <h3 id="food-dialog-title" data-i18n="food.title">음식물 쓰레기, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="food.s1.title">물기 빼기</strong><small data-i18n="food.s1.desc">물기를 꼭 짜서 최대한 빼요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="food.s2.title">일반쓰레기 골라내기</strong><small data-i18n="food.s2.desc">뼈, 조개·달걀 껍데기, 복숭아 씨는 일반쓰레기예요.</small></span></button></li>
@@ -438,12 +438,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-general.webp" alt="" width="192" height="192"></span>
       <h3 id="general-dialog-title" data-i18n="general.title">일반 쓰레기, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="general.s1.title">재활용품 골라내기</strong><small data-i18n="general.s1.desc">캔·병·종이·플라스틱은 종량제 봉투에 넣지 말고 품목별로 따로 내놓아요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="general.s2.title">종량제 봉투에 담아 묶기</strong><small data-i18n="general.s2.desc">휴지·스펀지·낙엽 같은 타는 쓰레기는 종량제 봉투에 담아 입구를 묶어요.</small></span></button></li>
@@ -464,12 +464,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-general.webp" alt="" width="192" height="192"></span>
       <h3 id="confuse-dialog-title" data-i18n="confuse.title">헷갈리는 쓰레기, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="confuse.s1.title">재활용품처럼 보여도 쓰레기</strong><small data-i18n="confuse.s1.desc">칫솔·영수증·나무젓가락·고무장갑·테이프는 재활용되지 않아요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="confuse.s2.title">종량제 봉투에 담기</strong><small data-i18n="confuse.s2.desc">이런 것들은 종량제 봉투에 담아 버려요.</small></span></button></li>
@@ -494,12 +494,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
       <h3 id="bulky-dialog-title" data-i18n="bulky.title">대형·특수폐기물, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="bulky.s1.title">배출 신고하고 수수료 내기</strong><small data-i18n="bulky.s1.desc">동 주민센터를 방문하거나 구청 홈페이지 ‘대형폐기물 신고’에서 신고하고 수수료를 내요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="bulky.s2.title">신고필증 붙이기</strong><small data-i18n="bulky.s2.desc">신고필증을 출력해 버릴 물건에 잘 보이게 붙여요.</small></span></button></li>
@@ -520,12 +520,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
       <h3 id="medicine-dialog-title" data-i18n="medicine.title">폐의약품, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="medicine.s1.title">알약은 포장된 그대로</strong><small data-i18n="medicine.s1.desc">알약·가루약은 뜯지 말고 포장된 그대로 모아요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="medicine.s2.title">물약·연고는 용기째</strong><small data-i18n="medicine.s2.desc">물약·시럽·연고는 마개를 닫아 용기째 모아요.</small></span></button></li>
@@ -546,12 +546,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
       <h3 id="battery-dialog-title" data-i18n="battery.title">폐건전지·폐형광등, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="battery.s1.title">다 쓴 건전지 빼서 모으기</strong><small data-i18n="battery.s1.desc">기기에서 건전지를 빼서 따로 모아요.</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="battery.s2.title">형광등은 깨지지 않게</strong><small data-i18n="battery.s2.desc">다 쓴 형광등은 깨지지 않게 그대로 모아요.</small></span></button></li>
@@ -572,12 +572,12 @@
       <span class="eco-badge" aria-hidden="true">3D</span>
       <button type="button" class="eco-sound" data-eco-sound aria-pressed="false" data-i18n-attr="aria-label:lab.sound" aria-label="효과음"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="spk" d="M4 9h4l5-4v14l-5-4H4z"/><path class="on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="off" d="M16 9l6 6M22 9l-6 6"/></svg></button>
       <p class="eco-hint" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg><span data-i18n="lab.hint">드래그해서 돌려 보세요</span></p>
-      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 3D를 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
+      <p class="eco-fallback" data-i18n="lab.fallback">이 기기에서는 그림을 표시할 수 없어요. 단계 설명을 참고해 주세요.</p>
     </div>
     <div class="eco-panel">
       <span class="cat-pic" aria-hidden="true"><img src="img/cat-bulky.webp" alt="" width="192" height="192"></span>
       <h3 id="appliance-dialog-title" data-i18n="appliance.title">폐가전, 이렇게 버려요</h3>
-      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 3D로 직접 보여 줘요.</p>
+      <p class="eco-lead" data-i18n="lab.lead">단계를 누르면 그림으로 순서를 보여 줘요.</p>
       <ol class="eco-steps">
         <li><button type="button" data-step="1"><span class="eco-num">1</span><span><strong data-i18n="appliance.s1.title">큰 가전은 무료 방문수거 예약</strong><small data-i18n="appliance.s1.desc">냉장고·세탁기·에어컨·TV 같은 큰 가전이나 작은 가전 5개 이상은 폐가전 무상방문수거를 예약해요(☎1599-0903).</small></span></button></li>
         <li><button type="button" data-step="2"><span class="eco-num">2</span><span><strong data-i18n="appliance.s2.title">약속한 날 무료로 수거</strong><small data-i18n="appliance.s2.desc">예약한 날 집으로 와서 무료로 가져가요.</small></span></button></li>
@@ -607,9 +607,9 @@
 </footer>
 
 <script src="js/config.js?v=20261108t"></script>
-<script src="js/i18n.js?v=20261113b"></script>
+<script src="js/i18n.js?v=20261114a"></script>
 <script src="js/main.js?v=20261108v"></script>
 <script type="importmap">{"imports":{"three":"./vendor/three/build/three.module.min.js","three/addons/":"./vendor/three/examples/jsm/"}}</script>
-<script type="module" src="js/eco3d.js?v=20261113b"></script>
+<script type="module" src="js/eco3d.js?v=20261114a"></script>
 </body>
 </html>

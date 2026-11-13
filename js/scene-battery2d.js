@@ -48,7 +48,7 @@ export default {
     { cells: 1, tube: 1, box: 1 }
   ],
   moves: [null, [["cells", 2.2]], [["tube", 2.2]], [["box", 3.6]]],
-  images: { remote: D + "remote.webp", cell: D + "cell.webp", cellL: D + "cell-l.webp", cellR: D + "cell-r.webp", bin: D + "bin.webp" },
+  images: { remote: D + "remote.webp", cell: D + "cell.webp", cellL: D + "cell-l.webp", cellR: D + "cell-r.webp", bin: D + "bin.webp?v=20261114a" },
   draw: draw
 };
 
