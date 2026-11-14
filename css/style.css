@@ -359,51 +359,30 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .video-tags.is-over:not(.is-end){-webkit-mask-image:linear-gradient(to left,transparent,#000 40px);mask-image:linear-gradient(to left,transparent,#000 40px)}
 .video-tags li{flex:none;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-2);font-size:12.5px;font-weight:700;white-space:nowrap}
 
-/* 바탕은 초록·크림으로 두고 색은 통 4개가 맡음 (노랑 = 음식물이라 넓은 노란 면은 피함) */
-.game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;background:radial-gradient(ellipse at 88% 50%,color-mix(in srgb,var(--white) 60%,transparent),transparent 55%),linear-gradient(90deg,var(--mint),var(--sun));overflow:hidden}
-.game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
+/* 게임: 밝은 초록 띠 + 왼쪽 문구 · 가운데 캐릭터(바닥에 붙음) · 오른쪽 큰 동그라미 시작 버튼 (팀원 사이트 구성 참고) */
+.section.game-band{padding:0;overflow:hidden;background:radial-gradient(ellipse 70% 90% at 70% 120%,#bfe5cc,transparent 60%),linear-gradient(180deg,#f2faf5,#e1f3e7)}
+.game-stage{position:relative}
+.game-stage.is-playing{aspect-ratio:16/9;margin:48px 0;border-radius:28px;overflow:hidden;background:var(--night)}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-/* 왼쪽 = 시범 장면(점수판+통), 오른쪽 = 문구와 그 바로 아래 버튼 한 덩어리 */
-.game-placeholder{display:grid;grid-template-columns:280px minmax(0,auto);grid-template-areas:"demo copy" "demo cta";justify-content:center;align-items:center;column-gap:48px;row-gap:18px;padding:34px 44px;text-align:left}
-/* 게임 예고 장면: 위에 점수판, 아래에 표정 있는 통 4개, 물건은 main.js가 띄워 날려 보냄 */
-.game-demo{grid-area:demo;position:relative;width:280px;height:196px}
-.game-hud{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--ink-2)}
-.hud-score b{display:inline-block;min-width:3ch;margin-left:4px;font-size:16px;font-variant-numeric:tabular-nums;color:var(--game-ink)}
-.hud-level{padding:2px 9px;border-radius:999px;background:var(--white);border:1px solid var(--card-line)}
-.hud-hearts{display:flex;gap:3px}
-.hud-hearts svg{width:15px;height:13px;fill:#e5484d}
-.bins{position:absolute;left:50%;bottom:4px;display:flex;gap:14px;transform:translateX(-50%)}
-.bin{position:relative;width:52px;height:64px;border-radius:8px 8px 12px 12px;animation:bin-bob 3.2s ease-in-out infinite}
-/* 통의 얼굴: 흰 눈에 검은 눈동자(가끔 깜빡임), 물건을 받으면 입을 벌리며 통통 뜀 */
-.bin-face{position:absolute;left:0;right:0;top:17px;height:26px}
-.bin-face i{position:absolute;top:0;left:12px;width:11px;height:11px;border-radius:50%;background:radial-gradient(circle at 55% 55%,#1b2b22 0 2.6px,#fff 3.2px);transform-origin:center;animation:bin-blink 4.6s infinite}
-.bin-face i+i{left:auto;right:12px}
-.bin-b .bin-face i{animation-delay:1.2s}.bin-c .bin-face i{animation-delay:2.3s}.bin-d .bin-face i{animation-delay:3.4s}
-.bin-face b{position:absolute;left:50%;top:15px;width:14px;height:6px;margin-left:-7px;border:2px solid color-mix(in srgb,#000 55%,transparent);border-top:0;border-radius:0 0 10px 10px;transition:height .2s}
-.bin.is-happy{animation:bin-hop .55s cubic-bezier(.3,1.6,.5,1);animation-delay:0s}
-.bin.is-happy .bin-face b{height:10px;background:color-mix(in srgb,#000 45%,transparent)}
-@keyframes bin-blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
-@keyframes bin-hop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-12px) scale(1.06,.95)}70%{transform:translateY(0) scale(.97,1.04)}100%{transform:translateY(0) scale(1)}}
-/* 날아오는 물건과 +10 */
-.demo-item{position:absolute;left:0;top:0;z-index:2;width:34px;height:34px;pointer-events:none}
-.demo-item svg{display:block;width:100%;height:100%}
-.demo-pop{position:absolute;z-index:3;font-size:15px;font-weight:900;color:var(--fresh-strong);pointer-events:none}
-.bin:before{content:"";position:absolute;left:-5px;right:-5px;top:-9px;height:9px;border-radius:6px 6px 2px 2px;background:inherit;filter:brightness(.85)}
-/* 게임 수거함도 배출방법 카드와 같은 카테고리 색 (일반·음식물·재활용·대형) */
-.bin-a{background:var(--general)}.bin-b{background:var(--food);animation-delay:.3s}.bin-c{background:var(--recycle);animation-delay:.6s}.bin-d{background:var(--bulky);animation-delay:.9s}
-@keyframes bin-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.game-placeholder h3{margin:0;font-size:30px;letter-spacing:-.8px;text-wrap:balance}
-.game-placeholder p{margin-top:6px;color:var(--muted);font-size:17px;text-wrap:balance}
+.game-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) auto;align-items:end;gap:24px;min-height:420px}
+.game-copy{align-self:center;padding:56px 0}
+.game-desc{margin:18px 0 0;max-width:460px;color:var(--ink-2);font-size:17px;line-height:1.7;text-wrap:balance}
+/* 캐릭터 크기는 칸 폭에 맞춰 줄어듦(cqw): 여학생 오른쪽 끝이 칸 안에 들어오도록 높이 ≤ 칸 폭의 72~74% */
+.game-chars{position:relative;height:400px;container-type:inline-size}
+.game-chars img{position:absolute;bottom:0;height:min(380px,72cqw);width:auto}
+.game-chars .boy{left:0}
+.game-chars .girl{left:42%;height:min(390px,74cqw)}
+.game-cta{align-self:center;display:grid;justify-items:center;gap:12px}
+.game-start{display:grid;place-items:center;align-content:center;gap:6px;width:190px;height:190px;padding:0;border:0;border-radius:50%;background:var(--fresh-strong);color:var(--white);font:inherit;font-size:21px;font-weight:800;box-shadow:0 0 0 14px color-mix(in srgb,var(--fresh-strong) 14%,transparent);cursor:pointer;transition:transform .2s,background-color .2s}
+.game-start:hover{background:var(--fresh-hover);transform:scale(1.04)}
+.game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:18px}
+.game-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.game-soon{padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 10%,transparent);color:var(--fresh-strong);font-size:14px;font-weight:800}
+/* 게임이 실제로 올라오면(main.js setupGame → .is-ready) '곧 게임이 열려요' 표시를 숨김 */
+.game-stage.is-ready .game-soon{display:none}
+.game-status{margin:0;font-size:15px;font-weight:700;color:var(--soon-ink)}
 .action-link{display:inline-flex;align-items:center;gap:10px;margin-top:24px;min-height:48px;padding:6px 24px;border:1.5px solid var(--link);border-radius:999px;background:var(--link);color:var(--on-dark);font-size:17px;font-weight:700;transition:background-color .2s,border-color .2s}
 .action-link:hover{background:var(--link-dark);border-color:var(--link-dark)}
-.game-status{margin-top:12px;font-size:15px;font-weight:700;color:var(--soon-ink)}
-.game-copy{grid-area:copy;align-self:end}
-/* 게임이 실제로 올라오면(main.js setupGame → .is-ready) '곧 열려요' 대신 '해 보세요' 문구 */
-.game-live,.game-stage.is-ready .game-soon{display:none}
-.game-stage.is-ready .game-live{display:block}
-.game-cta{grid-area:cta;align-self:start;display:flex;flex-direction:column;align-items:flex-start}
-.game-cta .action-link{margin-top:0;border-color:var(--fresh-strong);background:var(--fresh-strong)}
-.game-cta .action-link:hover{border-color:var(--fresh-hover);background:var(--fresh-hover)}
 
 .footer{padding:28px 0;border-top:1px solid var(--line)}
 .footer-inner{display:flex;justify-content:space-between;align-items:flex-start;gap:24px}
@@ -436,9 +415,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-art{position:relative;order:2;width:100%;aspect-ratio:1344/756;margin-top:-70px}
   .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);mask-composite:intersect}
   .learn-inner{grid-template-columns:1fr;gap:12px}
-  .game-placeholder{grid-template-columns:minmax(0,1fr);grid-template-areas:"demo" "copy" "cta";justify-items:center;row-gap:18px;padding:40px 24px;text-align:center}
-  .game-copy,.game-cta{align-self:auto}
-  .game-cta{align-items:center}
+  /* 좁은 화면: 문구 → 시작 버튼(길쭉하게) → 캐릭터 순서로 쌓음 */
+  .game-hero{grid-template-columns:minmax(0,1fr);gap:0;min-height:0}
+  .game-copy{padding:44px 0 8px}
+  .game-cta{order:2;justify-items:start;grid-auto-flow:column;align-items:center;justify-content:start;gap:14px;padding:16px 0 8px}
+  .game-start{grid-auto-flow:column;width:auto;height:auto;min-height:52px;padding:0 28px;border-radius:999px;box-shadow:none;font-size:18px}
+  .game-start:hover{transform:none}
+  .game-start:focus-visible{outline-offset:4px}
+  .game-start svg{width:18px;height:18px}
+  .game-chars{order:3;height:min(310px,76vw);max-width:520px;width:100%;justify-self:center}
+  .game-chars img{height:min(296px,72cqw)}
+  .game-chars .girl{height:min(304px,74cqw)}
 }
 @media(max-width:700px){
   .wrap{width:calc(100% - 32px)}

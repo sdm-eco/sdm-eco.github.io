@@ -344,79 +344,6 @@
     window.addEventListener("load", function () { toTop(); setTimeout(toTop, 0); });
   }
 
-  // 게임 예고 장면: 물건이 하나씩 날아와 알맞은 통에 들어가고, 통이 기뻐하며 점수가 오름
-  // (보는 사람이 조작하지 않는 시범. 화면에 보일 때만 돌고, 움직임 줄이기 설정이면 멈춘 장면만 보임)
-  // 물건과 통의 짝은 사이트 3D 체험과 같은 기준: 페트병=재활용, 휴지=일반, 사과 심=음식물, 의자=대형
-  function setupGameDemo() {
-    var demo = document.querySelector("[data-game-demo]");
-    if (!demo || matchMedia("(prefers-reduced-motion: reduce)").matches || !demo.animate) return;
-    var scoreEl = demo.querySelector("[data-demo-score]");
-    var items = [
-      { bin: "recycle", svg: '<svg viewBox="0 0 34 34"><path d="M14 3h6v4l2 3v19a2 2 0 0 1-2 2h-6a2 2 0 0 1-2-2V10l2-3z" fill="#dff1fb" stroke="#5a9bd6" stroke-width="1.6"/><rect x="13.5" y="1.5" width="7" height="3.5" rx="1" fill="#2f7fd6"/><path d="M12 16h10v6H12z" fill="#2f8f5b" opacity=".75"/></svg>' },
-      { bin: "general", svg: '<svg viewBox="0 0 34 34"><path d="M8 20c-3-1-4-5-1-7 0-4 4-6 7-4 2-3 7-3 8 1 4 0 6 4 4 7 2 3 0 7-4 7-2 3-7 3-9 0-3 1-6-1-5-4z" fill="#fbfaf6" stroke="#9aa59e" stroke-width="1.5"/><path d="M13 15c2 1 4 0 5 2m-3 4c2-1 4 0 5 1" fill="none" stroke="#c5ccc7" stroke-width="1.3" stroke-linecap="round"/></svg>' },
-      { bin: "food", svg: '<svg viewBox="0 0 34 34"><path d="M12 7c2 2 8 2 10 0 2 3 1 6-1 8 2 3 3 8 1 11-2 2-8 2-10 0-2-3-1-8 1-11-2-2-3-5-1-8z" fill="#f7e3b0" stroke="#d64545" stroke-width="2"/><path d="M17 7V3m0 0c2-1 4 0 5 1" fill="none" stroke="#7a5236" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.5" cy="18" r="1" fill="#5c3d28"/><circle cx="18.5" cy="20" r="1" fill="#5c3d28"/></svg>' },
-      { bin: "bulky", svg: '<svg viewBox="0 0 34 34"><path d="M8 4h18v14H8z" fill="#6b9e8c"/><path d="M5 17h24v6H5z" fill="#4f8573"/><path d="M7 23v8m20-8v8M5 17v-5h3m21 5v-5h-3" fill="none" stroke="#3d6658" stroke-width="2.2" stroke-linecap="round"/></svg>' }
-    ];
-    var bins = {};
-    demo.querySelectorAll("[data-bin]").forEach(function (b) { bins[b.dataset.bin] = b; });
-    var score = 0, order = [], visible = false, timer = null;
-
-    function shuffle() {
-      order = items.slice();
-      for (var i = order.length - 1; i > 0; i--) {
-        var j = Math.floor(Math.random() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t;
-      }
-    }
-
-    function drop() {
-      if (!visible) { timer = null; return; }
-      if (!order.length) shuffle();
-      var item = order.pop(), bin = bins[item.bin];
-      var box = demo.getBoundingClientRect(), b = bin.getBoundingClientRect();
-      var endX = b.left - box.left + b.width / 2 - 17, endY = b.top - box.top - 14;
-      var startX = 20 + Math.random() * (box.width - 74), startY = 26;
-      var el = document.createElement("span");
-      el.className = "demo-item";
-      el.innerHTML = item.svg;
-      demo.appendChild(el);
-      var spin = (Math.random() < 0.5 ? -1 : 1) * 200;
-      el.animate([
-        { transform: "translate(" + startX + "px," + startY + "px) scale(.6) rotate(0deg)", opacity: 0 },
-        { transform: "translate(" + startX + "px," + (startY - 6) + "px) scale(1) rotate(" + spin * 0.15 + "deg)", opacity: 1, offset: 0.18 },
-        { transform: "translate(" + (startX + endX) / 2 + "px," + (startY - 16) + "px) scale(1) rotate(" + spin * 0.5 + "deg)", offset: 0.5 },
-        { transform: "translate(" + endX + "px," + endY + "px) scale(.85) rotate(" + spin + "deg)", opacity: 1, offset: 0.88 },
-        { transform: "translate(" + endX + "px," + (endY + 16) + "px) scale(.4) rotate(" + spin + "deg)", opacity: 0 }
-      ], { duration: 1300, easing: "cubic-bezier(.45,0,.55,1)" }).onfinish = function () {
-        el.remove();
-        bin.classList.remove("is-happy");
-        void bin.offsetWidth; // 같은 통이 연달아 받아도 다시 뛰도록
-        bin.classList.add("is-happy");
-        setTimeout(function () { bin.classList.remove("is-happy"); }, 600);
-        score = score >= 990 ? 10 : score + 10;
-        scoreEl.textContent = score;
-        var pop = document.createElement("span");
-        pop.className = "demo-pop";
-        pop.textContent = "+10";
-        pop.style.left = b.left - box.left + b.width / 2 - 14 + "px";
-        pop.style.top = b.top - box.top - 26 + "px";
-        demo.appendChild(pop);
-        pop.animate([{ transform: "translateY(0)", opacity: 1 }, { transform: "translateY(-22px)", opacity: 0 }], { duration: 900, easing: "ease-out" }).onfinish = function () { pop.remove(); };
-      };
-      timer = setTimeout(drop, 1900);
-    }
-
-    new IntersectionObserver(function (entries) {
-      visible = entries[entries.length - 1].isIntersecting && !reduceMotion.matches;
-      if (visible && !timer) timer = setTimeout(drop, 400);
-    }).observe(demo);
-    // 페이지를 연 뒤 움직임 줄이기를 켜면 다음 물건부터 멈춤, 끄면 화면에 보일 때 다시 시작
-    reduceMotion.addEventListener("change", function () {
-      var r = demo.getBoundingClientRect();
-      visible = !reduceMotion.matches && r.bottom > 0 && r.top < innerHeight;
-      if (visible && !timer) timer = setTimeout(drop, 400);
-    });
-  }
-
   // 배너 그림(object-fit:cover, 원본 1344×756)의 좌표를 지금 화면 좌표로 바꾸는 함수. s = 그림 배율
   function sceneMap(scene, img) {
     var IW = 1344, IH = 756;
@@ -908,7 +835,6 @@
   startAtTopOnReload();
   setupGame();
   setupToTop();
-  setupGameDemo();
   setupHeroScene();
   setupBinMarks();
   setupFigures();
