@@ -13,7 +13,7 @@
   --lime:#d4f29a;--lime-3:#b8de78;--lime-hover:#c8ec85;--lime-soft:#e2f3e6;--leaf:#9fcf7a;
   --lime-ink:#173404;--leaf-ink:#2c5a1e;--card-line:#cfe5d7;
   --on-dark:#f5fbef;
-  --wash:#f4faf6;--mist:#ebf3ee;--strip-ink:#4b5d50;--soon-ink:#5d7350;--soon-line:#b7cfa8;
+  --wash:#f4faf6;--mist:#ebf3ee;--soon-ink:#5d7350;--soon-line:#b7cfa8;
   --glow:#f2b632;--focus:#1f6b44;--danger:#b42318;
   /* 카테고리 타일·게임 배너: 구청 시안 색 그대로(실제 봉투 색 확인 전 임시값) */
   --general:#7b5bd6;--general-bg:#f6f2fe;--general-hi:#e2d6fb;--food:#f2b705;--food-bg:#fef9e2;--food-hi:#fae9a5;--food-ink:#3d2f00;--recycle:#2f7fd6;--recycle-bg:#edf5fd;--recycle-hi:#cde1f9;--bulky:#e0558f;--bulky-bg:#fef0f5;--bulky-hi:#fad0e1;--banner:#fdf4c8;--video:#ef7d4f;--video-ink:#b4491f;--video-bg:#fdeee6;--video-hi:#fadccd;--video-line:#f6d6c6;--game-ink:#8a5a00;--banner-2:#fbecb2;
@@ -42,9 +42,6 @@ p{margin:0;text-wrap:pretty}
 .skip-link{position:absolute;left:16px;top:-60px;z-index:50;background:var(--forest);color:var(--on-dark);padding:10px 16px;border-radius:10px;font-weight:700}
 .skip-link:focus{top:12px}
 
-.review-strip{background:var(--mist);color:var(--strip-ink);font-size:15px}
-.review-strip .wrap{padding:10px 0}
-.draft-pill{font-weight:800;color:var(--forest-2);margin-right:14px}
 
 .header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--white) 96%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .header-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;min-height:88px}
@@ -484,9 +481,6 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* ── 휴대폰 전용 배치 (서대문구 모바일 요청)
      첫 화면: 로고 → 다국어 → 배너 그림 → 제목·버튼, 그 바로 아래 분리배출 카드 2×2.
      학습 띠·영상·게임은 그 아래로 (화면 순서만 바꾸고 PC 순서는 그대로) ── */
-  .review-strip{font-size:13px}
-  .review-strip .wrap{padding:6px 0}
-  .review-strip p{margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .brand-sub{display:none}
   .brand{min-height:44px}
   /* 메뉴 대신 첫 화면의 큰 버튼과 카드로 이동 */
@@ -620,4 +614,32 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* 휴대폰은 hover가 눌림 뒤에 남으므로 PC의 진한 초록 hover를 덮고, 눌림은 타일처럼 연초록 */
   .hero-actions .btn:hover{background:color-mix(in srgb,var(--white) 78%,transparent);border-color:color-mix(in srgb,var(--fresh) 22%,transparent)}
   .hero-actions .btn:active{transform:scale(.985);background:var(--mint);border-color:color-mix(in srgb,var(--fresh) 45%,transparent)}
+}
+
+/* ===== 꼬리말: 위 .footer 규칙을 덮어씀 (추천안 B) ===== */
+/* B안 · 짙은 숲색 꼬리말: 페이지를 어두운 띠로 단단히 마무리, 초안 표시는 라임 알약 배지 */
+.footer{margin-top:16px;padding:44px 0 48px;border-top:0;background:var(--forest);color:var(--on-dark)}
+.footer-inner{align-items:center;gap:32px}
+
+/* 왼쪽: 흰 원판 위 구 로고 + 부서명 + 설명 (원판이 있어야 초록 로고가 어두운 바탕에 묻히지 않음) */
+.footer-inner>div:first-child{position:relative;min-height:56px;padding-left:76px;display:flex;flex-direction:column;justify-content:center}
+.footer-inner>div:first-child::before{content:"";position:absolute;left:0;top:50%;width:56px;height:56px;margin-top:-28px;border-radius:50%;background:var(--white) url("../img/seodaemun-logo.png") center/38px auto no-repeat}
+.footer strong{font-size:18px;color:var(--on-dark);line-height:1.4}
+.footer p{margin-top:4px;color:#bcd0c3}
+
+/* 오른쪽: 초안 배지 + 안내문 */
+.footer-meta{display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:50%;text-align:right}
+.footer-meta p:first-child{display:inline-flex;align-items:center;gap:8px;padding:4px 14px 4px 12px;border:1px solid var(--lime);border-radius:999px;background:rgba(212,242,154,.1);color:var(--lime);font-size:14px;font-weight:700;line-height:1.5}
+.footer-meta p:first-child::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lime)}
+.draft-note{color:#dce8df!important;font-weight:600}
+
+/* 휴대폰: 세로로 쌓고 왼쪽 정렬, 위아래 사이를 가는 선으로 나눔 */
+@media(max-width:700px){
+  .footer{padding:32px 0 36px}
+  .footer-inner{align-items:stretch;gap:20px}
+  .footer-inner>div:first-child{padding-left:64px;min-height:48px}
+  .footer-inner>div:first-child::before{width:48px;height:48px;margin-top:-24px;background-size:31px auto}
+  .footer strong{font-size:17px}
+  .footer p{font-size:15px}
+  .footer-meta{align-items:flex-start;max-width:none;text-align:left;padding-top:20px;border-top:1px solid rgba(245,251,239,.14)}
 }
