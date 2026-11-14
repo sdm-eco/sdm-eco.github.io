@@ -6,7 +6,7 @@
 // 단계 값은 3D 장면(scene-battery.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261114f";
+import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261114g";
 
 const D = "img/scene/battery/";
 // 그림 조각 크기와 그 안의 위치 (battery_assets.py가 잰 값)
@@ -28,7 +28,7 @@ const SLOT_B = [SLOT_A[0] - SIDE[0] * 40, SLOT_A[1] - SIDE[1] * 40]; // 뚜껑 �
 const STACK_X = 362;                                               // 뺀 건전지를 눕혀 쌓는 자리
 const PILE_X = [345, 388];                                         // 미리 모아 둔 건전지(세워 둠)
 const TUBE = { L: 380, D: 38 };
-const TUBE_X = 610, TUBE_Y = GY - TUBE.D / 2;                      // 형광등을 내려놓는 자리(가운데)
+const TUBE_X = 610, TUBE_Y = GY - TUBE.D / 2;                      // 형광등이 놓인 자리(가운데). 더 오른쪽은 좁은 화면에서 끝이 잘림
 const KN = 330 / BIN.h;                                            // 수거함 크기 배율 (높이 330)
 const BIN_X = 605;
 const BL = BIN_X - BIN.w * KN / 2, BT = GY - BIN.h * KN;            // 수거함 그림 왼쪽 위
@@ -168,17 +168,17 @@ function drawCell(ctx, img, c) {
   ctx.restore();
 }
 
-// 형광등: 2단계에 위에서 점점 느려지며 내려와 살며시 놓이고(작게 흔들림) 은은하게 빛남
+// 형광등: 처음부터 바닥에 놓여 있음(리모컨·건전지와 함께 이 품목의 물건이 다 보이게)
+// 2단계에 조심히 살짝 들어 올렸다가 천천히 내려놓고(작게 흔들림) 은은하게 빛남 = '깨지지 않게 조심히'
 // 3단계에 살짝 가라앉았다(준비) 눕힌 채 떠올라(조금 작아짐 = 안으로 들어감) 수거함 윗칸 앞으로 → 파란 받침 속으로 쏙
 function drawTubeStep(ctx, v) {
   const tp = v.tube, bp = v.box;
-  if (tp <= 0) return;
   const dq = clamp01(tp / 0.75);
-  const down = 1 - Math.pow(1 - dq, 3);
-  let x = TUBE_X, y = lerp(150, TUBE_Y, down), rot = wobble(clamp01((tp - 0.72) / 0.28), 2) * 0.04, s = 1;
+  const lift = Math.sin(Math.PI * dq) * 46 * (1 - dq * 0.3);          // 들었다 놓는 높이
+  let x = TUBE_X, y = TUBE_Y - lift, rot = wobble(clamp01((tp - 0.72) / 0.28), 2) * 0.04, s = 1;
   const glow = Math.sin(Math.PI * clamp01((tp - 0.6) / 0.4)) * 0.9;
   const q = clamp01((bp - 0.6) / 0.4);
-  let inside = false, shA = smooth(0, 0.75, tp);
+  let inside = false, shA = 1 - Math.sin(Math.PI * dq) * 0.5;
   if (q > 0) {
     const prep = q < 0.12 ? Math.sin(Math.PI * q / 0.12) : 0;
     const rise = easeInOut(clamp01((q - 0.1) / 0.45));

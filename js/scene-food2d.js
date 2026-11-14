@@ -6,8 +6,8 @@
 // 단계 값은 3D 장면(scene-food.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText } from "./eco2d-util.js?v=20261114f";
-import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114f";
+import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText } from "./eco2d-util.js?v=20261114g";
+import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114g";
 
 const D = "img/scene/food/";
 // 그림 조각의 원래 크기와 그 안의 위치 (food_assets.py가 잰 값, meta.json)
