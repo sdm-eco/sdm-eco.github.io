@@ -660,20 +660,27 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 그림 후보 4: 영상 2편 남학생 얼굴 + 재활용 파랑 바탕 (영상 버튼 썸네일과 같은 짜임, 색만 파랑) */
 @media(min-width:701px){
   .hero-actions .btn-ghost::before{background:url("../img/video-ep2.webp?v=20261114c") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
+  /* 강조색은 썸네일 색을 따름: 영상 카드는 초록, 배출방법 카드는 진한 파랑(#1d63b5, 흰 바탕 대비 약 5.9:1).
+     마우스를 올리면 각자 색으로 테두리·바탕이 옅게 물듦 (아래 타일이 카테고리 색으로 물드는 것과 같은 방식) */
+  .hero-actions .btn:not(.btn-ghost):hover{border-color:color-mix(in srgb,var(--fresh) 50%,transparent);background:color-mix(in srgb,var(--fresh) 7%,var(--white))}
+  .hero-actions .btn-ghost{color:#1d63b5}
+  .hero-actions .btn-ghost .btn-icon-line{stroke:#1d63b5}
+  .hero-actions .btn-ghost:hover{border-color:color-mix(in srgb,var(--recycle) 50%,transparent);background:color-mix(in srgb,var(--recycle) 7%,var(--white));color:#1d63b5;box-shadow:0 14px 26px -18px color-mix(in srgb,#1f5fae 70%,transparent)}
 }
 
 /* ===== 바로가기 타일: 마우스를 올리면 품목마다 다른 동작 (마우스가 있는 기기만, 움직임 줄이기 설정이면 멈춤) =====
-   일반 봉투는 매듭을 잡고 대롱대롱, 음식물 통은 콩콩 두 번 뜀, 재활용 통은 한 바퀴 돌고(=재활용), 대형 의자는 흔들의자처럼 까딱 */
+   일반 봉투는 매듭을 잡고 대롱대롱, 음식물 통은 콩콩 두 번 뜀, 재활용 통은 꾹 눌렸다 쏙(무언가를 받아먹듯), 대형 의자는 흔들의자처럼 까딱
+   (그림이 평면이라 좌우로 뒤집는 회전(rotateY)은 옆모습에서 종이처럼 얇아져 쓰지 않음 — 기울이기·늘이기·위아래만) */
 @media(hover:hover){
   .quick-cat:hover img{animation-duration:.8s;animation-fill-mode:both;animation-timing-function:ease-in-out}
   .quick-cat.cat-general:hover img{transform-origin:50% 8%;animation-name:qc-swing}
   .quick-cat.cat-food:hover img{animation-name:qc-hop}
-  .quick-cat.cat-recycle:hover img{animation-name:qc-spin;animation-duration:.7s}
+  .quick-cat.cat-recycle:hover img{transform-origin:50% 100%;animation-name:qc-squash;animation-duration:.75s}
   .quick-cat.cat-bulky:hover img{transform-origin:30% 100%;animation-name:qc-rock}
 }
 @keyframes qc-swing{0%{transform:rotate(0)}25%{transform:rotate(14deg) scale(1.08)}50%{transform:rotate(-10deg) scale(1.1)}75%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(0) scale(1.1)}}
 @keyframes qc-hop{0%{transform:none}20%{transform:translateY(-10px) scale(1.1,1.12)}40%{transform:translateY(0) scale(1.14,1.04)}60%{transform:translateY(-6px) scale(1.1)}80%{transform:translateY(0) scale(1.12,1.07)}100%{transform:translateY(0) scale(1.1)}}
-@keyframes qc-spin{0%{transform:rotateY(0)}100%{transform:rotateY(360deg) scale(1.12)}}
+@keyframes qc-squash{0%{transform:none}22%{transform:scale(1.16,.82)}48%{transform:translateY(-8px) scale(.94,1.16)}70%{transform:translateY(0) scale(1.13,1.03)}85%{transform:scale(1.08,1.12)}100%{transform:scale(1.1)}}
 @keyframes qc-rock{0%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.08)}60%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(-3deg) scale(1.1)}}
 @media(hover:hover) and (prefers-reduced-motion:reduce){
   .quick-cat:hover img{animation:none}
