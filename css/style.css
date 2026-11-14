@@ -82,7 +82,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 흐르는 빛: 선명한 초록 + 은은한 초록 빛무리 — 흰 바탕에선 초록으로, 풀밭에선 크림색 선 위라서 보임 */
 .garden-pulses{fill:none;stroke:#34b86a;stroke-width:3;stroke-linecap:round;opacity:.95;filter:drop-shadow(0 0 2.5px rgba(52,184,106,.75))}
 /* 굵은 선은 넝쿨 길이의 55% 지점(바로 가기 4칸의 오른쪽 끝을 지난 곳, 1201~1920px에서 47~55%)에서 출발: 카드 뒤에서는 가려져 보이지 않았음 */
-.vine-pulse{stroke-dasharray:.047 .953;stroke-dashoffset:.45;opacity:0;animation:vine-pulse 8s linear 5s infinite}
+/* 흐르는 초록 선 길이: 넝쿨 길이의 3.1% (처음 7% → 4.7% → 3.1%, 두 번 3분의 2로 줄임) */
+.vine-pulse{stroke-dasharray:.031 .969;stroke-dashoffset:.45;opacity:0;animation:vine-pulse 8s linear 5s infinite}
 @keyframes vine-grow{to{stroke-dashoffset:0}}
 @keyframes vine-pulse{0%{stroke-dashoffset:.45;opacity:0}8%,85%{opacity:1}100%{stroke-dashoffset:0;opacity:0}}
 @keyframes node-glow{0%,100%{opacity:.25;transform:scale(1)}50%{opacity:.9;transform:scale(1.7)}}
