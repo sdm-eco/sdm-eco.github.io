@@ -377,10 +377,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .game-start:hover{background:var(--fresh-hover);transform:scale(1.04)}
 .game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:18px}
 .game-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.game-soon{padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 10%,transparent);color:var(--fresh-strong);font-size:14px;font-weight:800}
+/* 글자색은 한 단계 진한 초록: 연한 초록 바탕 위에서도 대비 4.5:1 이상 (진한 초록 #1d7a43는 4.2:1) */
+.game-soon{padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 10%,transparent);color:var(--fresh-hover);font-size:14px;font-weight:800}
 /* 게임이 실제로 올라오면(main.js setupGame → .is-ready) '곧 게임이 열려요' 표시를 숨김 */
 .game-stage.is-ready .game-soon{display:none}
-.game-status{margin:0;font-size:15px;font-weight:700;color:var(--soon-ink)}
+.game-status{margin:0;font-size:15px;font-weight:700;color:var(--fresh-hover)}
 .action-link{display:inline-flex;align-items:center;gap:10px;margin-top:24px;min-height:48px;padding:6px 24px;border:1.5px solid var(--link);border-radius:999px;background:var(--link);color:var(--on-dark);font-size:17px;font-weight:700;transition:background-color .2s,border-color .2s}
 .action-link:hover{background:var(--link-dark);border-color:var(--link-dark)}
 
