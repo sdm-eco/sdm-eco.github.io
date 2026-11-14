@@ -59,10 +59,18 @@ function initLab(lab) {
     if (n === last) document.dispatchEvent(new CustomEvent("eco:lab-done", { detail: lab.dataset.ecoLab }));
   }
 
-  // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 움직임이 끝난 뒤 DWELL만큼 읽을 시간을 줌.
+  // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 움직임이 끝난 뒤 그 단계 설명을 읽을 시간만큼 기다림.
   // 단계 버튼·다음 단계를 누르면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
   // 움직임 줄이기 설정이면 자동 진행 없이 지금처럼 직접 누르는 방식만 씀.
-  const DWELL = 3500;
+  // 읽을 시간 = 1.5초 + 설명 글자 수 × 언어별 글자당 시간, 2~4.5초 사이 (예전엔 모든 단계 3.5초 고정)
+  //   같은 내용이라도 영어·베트남어는 글자가 2배쯤 많아 글자당 시간을 절반으로 둠 → 네 언어 평균 약 2.6초
+  const PER_CHAR = { ko: 30, zh: 40, en: 15, vi: 15 };
+  function dwell(n) {
+    const btn = lab.querySelector('[data-step="' + n + '"]');
+    const lang = (document.documentElement.lang || "ko").slice(0, 2);
+    const len = btn ? btn.textContent.replace(/\s+/g, " ").trim().length : 0;
+    return Math.min(4500, Math.max(2000, 1500 + len * (PER_CHAR[lang] || 30)));
+  }
   const auto = lab.querySelector("[data-eco-auto]");
   const dialog = lab.closest("dialog");
   let run = 0; // 진행 회차. 멈추거나 새로 시작하면 올라가서 이전 회차의 대기를 무효로 만듦
@@ -79,7 +87,7 @@ function initLab(lab) {
     while (id === run && !view && !stage.classList.contains("is-fallback")) await wait(100);
     while (id === run && step < last) {
       while (id === run && view && view.busy()) await wait(100);
-      const need = step === 0 ? 1200 : DWELL;
+      const need = step === 0 ? 1200 : dwell(step);
       for (let t = 0; id === run && t < need; t += 100) await wait(100);
       if (id !== run) return;
       setStep(step + 1);
