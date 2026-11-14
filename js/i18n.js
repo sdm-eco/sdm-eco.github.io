@@ -3,7 +3,7 @@ window.I18N = {
   ko: {
     "meta.title": "서대문구 분리배출 교육 | 서대문에서 생활하는 외국인 대상",
     "skip": "본문 바로가기",
-    "strip.pill": "초안 v0.4",
+    "strip.pill": "초안 v0.5",
     "brand.title": "서대문구 분리배출 교육",
     "brand.sub": "서대문구 기후환경과",
     "nav.guide": "배출방법 안내",
@@ -208,7 +208,7 @@ window.I18N = {
   zh: {
     "meta.title": "西大门区垃圾分类教育 | 面向在西大门生活的外国人",
     "skip": "跳到正文",
-    "strip.pill": "草案 v0.4",
+    "strip.pill": "草案 v0.5",
     "brand.title": "西大门区垃圾分类教育",
     "brand.sub": "西大门区 气候环境科",
     "nav.guide": "投放方法",
@@ -413,7 +413,7 @@ window.I18N = {
   en: {
     "meta.title": "Seodaemun Recycling Guide | For Foreign Residents",
     "skip": "Skip to content",
-    "strip.pill": "Draft v0.4",
+    "strip.pill": "Draft v0.5",
     "brand.title": "Seodaemun Recycling Guide",
     "brand.sub": "Seodaemun-gu Climate & Environment Division",
     "nav.guide": "How to sort",
@@ -618,7 +618,7 @@ window.I18N = {
   vi: {
     "meta.title": "Hướng dẫn phân loại rác Seodaemun | Dành cho người nước ngoài",
     "skip": "Chuyển đến nội dung",
-    "strip.pill": "Bản nháp v0.4",
+    "strip.pill": "Bản nháp v0.5",
     "brand.title": "Hướng dẫn phân loại rác Seodaemun",
     "brand.sub": "Phòng Khí hậu và Môi trường quận Seodaemun",
     "nav.guide": "Cách phân loại",
