@@ -6,7 +6,7 @@
 // 단계 값은 3D 장면(scene-battery.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261108r";
+import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261114d";
 
 const D = "img/scene/battery/";
 // 그림 조각 크기와 그 안의 위치 (battery_assets.py가 잰 값)
@@ -48,7 +48,7 @@ export default {
     { cells: 1, tube: 1, box: 1 }
   ],
   moves: [null, [["cells", 2.2]], [["tube", 2.2]], [["box", 3.6]]],
-  images: { remote: D + "remote.webp", cell: D + "cell.webp", cellL: D + "cell-l.webp", cellR: D + "cell-r.webp", bin: D + "bin.webp?v=20261114a" },
+  images: { remote: D + "remote.webp", cell: D + "cell.webp?v=20261114d", cellL: D + "cell-l.webp?v=20261114d", cellR: D + "cell-r.webp?v=20261114d", bin: D + "bin.webp?v=20261114a" },
   draw: draw
 };
 

@@ -7,8 +7,8 @@
 // 단계 값은 3D 장면(scene-confuse.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText, binLabel } from "./eco2d-util.js?v=20261108r";
-import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114a";
+import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText, binLabel } from "./eco2d-util.js?v=20261114d";
+import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261114d";
 
 const D = "img/scene/confuse/";
 // 그림 조각의 원래 크기와 그 안의 위치 (confuse_assets.py가 잰 값)
@@ -52,7 +52,7 @@ export default {
   images: {
     toothbrush: D + "toothbrush.webp", receipt: D + "receipt.webp", chopsticks: D + "chopsticks.webp",
     glove: D + "glove.webp", tape: D + "tape.webp",
-    dirty: D + "cup-dirty.webp", clean: D + "cup-clean.webp", bin: D + "bin.webp",
+    dirty: D + "cup-dirty.webp", clean: D + "cup-clean.webp", bin: D + "bin.webp?v=20261114d",
     faucet: "img/scene/common/faucet.webp", bag: BAG_IMG.general
   },
   draw: draw

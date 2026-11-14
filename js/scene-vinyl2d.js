@@ -5,7 +5,7 @@
 // 단계 값은 3D 장면(scene-vinyl.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, wobble, seeded } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw } from "./eco2d-util.js?v=20261108r";
+import { put, shadow as shade, dropsEmit, dropsDraw } from "./eco2d-util.js?v=20261114d";
 
 const D = "img/scene/vinyl/";
 // 그림 조각의 원래 크기와 그 안의 위치 (vinyl_assets.py가 잰 값)

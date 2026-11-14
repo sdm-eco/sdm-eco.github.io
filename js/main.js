@@ -96,6 +96,64 @@
     });
   }
 
+  // 동별 배출요일 (일반 쓰레기 창의 세 번째 탭): 동을 고르면 그 동의 요일을 주간 표에 켜고 요약 문장을 보여 줌.
+  //   묶음(data-days)은 mwf = 월·수·금, tts = 화·목·일. 충현동·신촌동은 옛 동(구역)마다 달라 구역 버튼을 한 번 더 보여 줌.
+  //   글자는 data-i18n 키를 바꿔 달아 두므로 언어를 바꾸면 applyLang이 함께 번역함
+  function setupDays() {
+    var lab = document.querySelector('[data-eco-lab="days"]');
+    if (!lab) return;
+    var GROUP = { mwf: ["mon", "wed", "fri"], tts: ["tue", "thu", "sun"] };
+    var nameEl = lab.querySelector("[data-days-name]");
+    var sumEl = lab.querySelector("[data-days-sum]");
+    var link = lab.querySelector("[data-days-link]");
+    var dongBtns = lab.querySelectorAll("[data-dong]");
+    var zoneBoxes = lab.querySelectorAll("[data-zones-of]");
+
+    function setText(el, key) {
+      if (key) { el.setAttribute("data-i18n", key); el.textContent = t(key); }
+      else { el.removeAttribute("data-i18n"); el.textContent = ""; }
+    }
+    function showGroup(group) {
+      lab.querySelectorAll("[data-day]").forEach(function (li) {
+        li.classList.toggle("is-on", !!group && GROUP[group].indexOf(li.dataset.day) > -1);
+      });
+      setText(sumEl, group ? "days.sum." + group : "");
+    }
+    function press(list, btn) {
+      list.forEach(function (b) { b.setAttribute("aria-pressed", String(b === btn)); });
+    }
+    // 좁은 화면은 결과 판이 동 버튼 위에 있어 고른 뒤 결과가 화면 밖에 남음 → 결과 판이 보이게 올려 줌
+    var board = lab.querySelector(".days-board");
+    var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function reveal() {
+      var r = board.getBoundingClientRect();
+      if (r.top < 0) board.scrollIntoView({ block: "start", behavior: calm ? "auto" : "smooth" });
+    }
+    dongBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var code = btn.dataset.dong, group = btn.dataset.days;
+        press(dongBtns, btn);
+        setText(nameEl, "dong." + code);
+        link.href = "https://www.sdm.go.kr/dong/" + code + "/useful/com/waste.do";
+        link.hidden = false;
+        zoneBoxes.forEach(function (box) {
+          box.hidden = box.dataset.zonesOf !== code;
+          box.querySelectorAll("[data-zone]").forEach(function (z) { z.setAttribute("aria-pressed", "false"); });
+        });
+        showGroup(group === "zone" ? null : group);
+        if (group === "zone") setText(sumEl, "days.zonepick");
+        else reveal();
+      });
+    });
+    lab.querySelectorAll("[data-zone]").forEach(function (z) {
+      z.addEventListener("click", function () {
+        press(z.parentNode.querySelectorAll("[data-zone]"), z);
+        showGroup(z.dataset.days);
+        reveal();
+      });
+    });
+  }
+
   // 학습 띠: 이 브라우저에서 끝낸 단계를 ✓로, 다음에 할 단계를 강조해서 보여줌
   // (기록은 브라우저마다 따로 남고, 다른 기기와 공유되지 않음)
   function setupProgress() {
@@ -840,6 +898,7 @@
   setupFigures();
   setupWaterfall();
   setupBirds();
+  setupDays();
   progress = setupProgress();
   applyLang(detectLang());
 })();

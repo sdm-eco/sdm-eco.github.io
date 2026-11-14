@@ -6,7 +6,7 @@
 // 휴대폰·필증·손가락 그리기는 폐가전 장면(scene-appliance2d.js)도 가져다 씀(export)
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { shadow as shade, t, fitText } from "./eco2d-util.js?v=20261108r";
+import { shadow as shade, t, fitText } from "./eco2d-util.js?v=20261114d";
 
 const D = "img/scene/bulky/";
 const TAU = Math.PI * 2;

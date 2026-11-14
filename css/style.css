@@ -659,7 +659,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 }
 /* 배출방법 카드 썸네일: 남학생 밝은 미소(img/cta-boy.webp) + 재활용 파랑 바탕 (영상 카드 썸네일과 같은 짜임, 색만 파랑) */
 @media(min-width:701px){
-  .hero-actions .btn-ghost::before{background:url("../img/cta-boy.webp?v=20261114a") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
+  .hero-actions .btn-ghost::before{background:url("../img/cta-boy.webp?v=20261114e") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
   /* 강조색은 썸네일 색을 따름: 영상 카드는 초록, 배출방법 카드는 진한 파랑(#1d63b5, 흰 바탕 대비 약 5.9:1).
      마우스를 올리면 각자 색으로 테두리·바탕이 옅게 물듦 (아래 타일이 카테고리 색으로 물드는 것과 같은 방식) */
   .hero-actions .btn:not(.btn-ghost):hover{border-color:color-mix(in srgb,var(--fresh) 50%,transparent);background:color-mix(in srgb,var(--fresh) 7%,var(--white))}
@@ -684,4 +684,37 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @keyframes qc-rock{0%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.08)}60%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(-3deg) scale(1.1)}}
 @media(hover:hover) and (prefers-reduced-motion:reduce){
   .quick-cat:hover img{animation:none}
+}
+
+/* ===== 동별 배출요일 (일반 쓰레기 창 세 번째 탭, main.js setupDays) =====
+   왼쪽(좁은 화면은 위) 판: 고른 동 이름 + 월~일 주간 표(배출하는 요일만 진한 초록) + 요약 + 시간
+   오른쪽: 동 버튼 14개(충현동·신촌동은 구역 버튼이 한 번 더), 알아 둘 점, 출처 */
+.days-board{display:flex;flex-direction:column;justify-content:center;gap:18px;min-height:540px;padding:32px 28px;background:radial-gradient(ellipse at 50% 38%,var(--white),transparent 62%),radial-gradient(ellipse at 50% 100%,var(--cat-hi),transparent 55%),var(--cat-bg);text-align:center}
+.days-dong{margin:0;font-size:28px;font-weight:850;letter-spacing:-.6px;color:var(--ink);text-wrap:balance}
+.days-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;max-width:460px;width:100%;margin:0 auto;padding:0;list-style:none}
+.days-week li{display:grid;place-items:center;aspect-ratio:1;border:1.5px solid var(--line);border-radius:50%;background:var(--white);color:var(--muted);font-size:16px;font-weight:800;transition:background-color .25s,color .25s,border-color .25s,transform .25s}
+.days-week li.is-on{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white);transform:translateY(-3px)}
+/* 토요일은 어느 동도 배출하지 않음: 점선 테두리로 구분(글자 대비는 다른 요일과 같게) */
+.days-week li[data-day="sat"]{border-style:dashed}
+.days-sum{min-height:1.5em;margin:0;font-size:19px;font-weight:800;color:var(--fresh-hover);text-wrap:balance}
+.days-time{display:inline-flex;align-items:center;justify-content:center;gap:8px;align-self:center;margin:0;padding:8px 16px;border-radius:999px;background:var(--white);color:var(--ink-2);font-size:15px;font-weight:700;box-shadow:0 4px 14px -8px color-mix(in srgb,var(--ink) 40%,transparent)}
+.days-time svg{width:18px;height:18px;flex:none;fill:var(--glow)}
+.days-dongs,.days-zones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:18px}
+.days-zones{grid-template-columns:1fr;margin-top:10px;padding:10px;border-radius:16px;background:var(--wash)}
+.days-zones[hidden]{display:none}
+.days-dongs button,.days-zones button{min-height:44px;padding:6px 10px;border:1.5px solid var(--line);border-radius:12px;background:var(--white);color:var(--ink-2);font-size:15px;font-weight:700;line-height:1.3;text-wrap:balance;transition:background-color .2s,border-color .2s,color .2s}
+.days-dongs button:hover,.days-zones button:hover{border-color:var(--leaf);background:var(--wash)}
+.days-dongs button[aria-pressed="true"],.days-zones button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
+.days-notes{margin:18px 0 0;padding:0 0 0 18px;display:grid;gap:6px;color:var(--ink-2);font-size:15px;line-height:1.5}
+.days-link{margin-left:4px;color:var(--link);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:1200px){
+  .days-board{min-height:0;padding:26px 20px}
+}
+@media(max-width:700px){
+  .days-board{gap:12px;padding:20px 14px}
+  .days-dong{font-size:22px}
+  .days-week{gap:5px}
+  .days-week li{font-size:14px}
+  .days-sum{font-size:16px}
+  .days-dongs{grid-template-columns:repeat(2,minmax(0,1fr))}
 }

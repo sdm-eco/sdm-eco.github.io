@@ -6,8 +6,8 @@
 // 휴대폰·접수증·손가락 그리기는 대형 폐기물 장면(scene-bulky2d.js)의 것을 같이 씀
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, fitText } from "./eco2d-util.js?v=20261108r";
-import { rr, PHONE, drawPhone, screenTop, doneScreen, tapFinger, drawPermit } from "./scene-bulky2d.js?v=20261108r";
+import { put, shadow as shade, fitText } from "./eco2d-util.js?v=20261114d";
+import { rr, PHONE, drawPhone, screenTop, doneScreen, tapFinger, drawPermit } from "./scene-bulky2d.js?v=20261114d";
 
 const D = "img/scene/appliance/";
 const TAU = Math.PI * 2;

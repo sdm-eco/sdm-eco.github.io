@@ -4,19 +4,19 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 장면 (카드 장식용)
 //    data-eco-zoom="1.2"   작은 칸에서 물건이 잘 보이도록 확대 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet2d.js?v=20261108r";
-import food from "./scene-food2d.js?v=20261114a";
-import general from "./scene-general2d.js?v=20261114a";
-import bulky from "./scene-bulky2d.js?v=20261108r";
-import can from "./scene-can2d.js?v=20261108r";
-import vinyl from "./scene-vinyl2d.js?v=20261108r";
-import carton from "./scene-carton2d.js?v=20261108r";
-import medicine from "./scene-medicine2d.js?v=20261108r";
-import battery from "./scene-battery2d.js?v=20261114a";
-import glass from "./scene-glass2d.js?v=20261108r";
-import paper from "./scene-paper2d.js?v=20261108r";
-import appliance from "./scene-appliance2d.js?v=20261108r";
-import confuse from "./scene-confuse2d.js?v=20261114a";
+import pet from "./scene-pet2d.js?v=20261114d";
+import food from "./scene-food2d.js?v=20261114d";
+import general from "./scene-general2d.js?v=20261114d";
+import bulky from "./scene-bulky2d.js?v=20261114d";
+import can from "./scene-can2d.js?v=20261114d";
+import vinyl from "./scene-vinyl2d.js?v=20261114d";
+import carton from "./scene-carton2d.js?v=20261114d";
+import medicine from "./scene-medicine2d.js?v=20261114d";
+import battery from "./scene-battery2d.js?v=20261114d";
+import glass from "./scene-glass2d.js?v=20261114d";
+import paper from "./scene-paper2d.js?v=20261114d";
+import appliance from "./scene-appliance2d.js?v=20261114d";
+import confuse from "./scene-confuse2d.js?v=20261114d";
 import { create2DView } from "./eco2d.js?v=20261108r";
 import { sfx } from "./eco3d-sound.js?v=20261108r";
 
@@ -35,6 +35,7 @@ setupSound();
 
 function initLab(lab) {
   const def = SCENES[lab.dataset.ecoLab];
+  if (!def) return; // 장면 그림 없는 칸(예: 동별 배출요일, main.js setupDays)은 품목 탭 전환만 함께 씀
   const stage = lab.querySelector(".eco-stage");
   const canvas = lab.querySelector(".eco-canvas");
   const buttons = Array.from(lab.querySelectorAll("[data-step]"));

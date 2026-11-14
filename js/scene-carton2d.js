@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-carton.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261108r";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114d";
 
 const D = "img/scene/carton/";
 // 그림 조각의 원래 크기와 그 안의 위치
@@ -35,7 +35,7 @@ export default {
     { empty: 1, rinse: 1, flat: 1, bin: 1 }
   ],
   moves: [null, [["empty", 2.2]], [["rinse", 3.6]], [["flat", 1.8]], [["bin", 1.8]]],
-  images: { carton: D + "carton.webp", flat: D + "flat.webp", bin: D + "bin.webp", faucet: "img/scene/common/faucet.webp" },
+  images: { carton: D + "carton.webp", flat: D + "flat.webp", bin: D + "bin.webp?v=20261114d", faucet: "img/scene/common/faucet.webp" },
   draw: draw
 };
 
