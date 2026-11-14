@@ -533,3 +533,91 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .vine{stroke-dashoffset:0}
   .hero-leaf{opacity:.7}
 }
+
+/* ===== 배출방법 칸: 위 기본 카드 규칙을 덮어씀 (추천안 C) ===== */
+/* C안 "하나로 묶은 판": 머리 메뉴의 '연한 초록 트랙 + 흰 칩' 문법을 배출 방법 칸에 이어 씀
+   네 카드를 연한 초록 판 하나에 묶고, 카드는 판 위의 흰 칸. 카테고리 색은 그림 접시·아이콘 테두리에만 */
+
+/* 판: 섹션 바탕(--paper)보다 한 단계 짙은 초록 트랙 + 가는 테두리, 안쪽 여백·칸 사이 6px */
+.guide-grid{gap:6px;padding:6px;border-radius:var(--radius);background:color-mix(in srgb,var(--fresh-strong) 9%,var(--paper));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--fresh-strong) 10%,transparent)}
+
+/* 칸: 흰 칩. 판 둥글기(24px)에서 여백(6px)을 뺀 18px로 모서리를 맞춤, 글은 왼쪽 정렬 */
+.guide-grid .guide-card,.section-split .guide-grid .guide-card{align-items:stretch;padding:8px;border-radius:18px;text-align:left;box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 6%,transparent)}
+.guide-grid .guide-card[class*="cat-"]{background:var(--white)}
+
+/* 그림 접시: 카테고리 색은 여기(아주 옅은 바탕)에만. 그림은 접시 안쪽 기준으로 그대로 */
+.guide-grid .card-3d{margin-top:0;border-radius:12px;background:radial-gradient(ellipse 60% 55% at 50% 58%,color-mix(in srgb,var(--white) 70%,transparent),transparent),var(--cat-bg);transition:background-color .3s}
+
+/* 아이콘: 접시 왼쪽 위에 얹은 작은 흰 원 + 카테고리 색 가는 테두리 (그림을 가리지 않게 작게) */
+.guide-grid .cat-pic{position:absolute;left:16px;top:16px;z-index:1;width:40px;height:40px;margin:0;box-shadow:0 0 0 1.5px var(--cat);transition:box-shadow .3s}
+.guide-grid .cat-pic img{width:30px;height:30px}
+
+/* 제목·부제: 접시 아래 왼쪽 정렬, 칸 안쪽 여백 10px */
+.guide-grid .guide-card h3,.guide-grid .guide-card .card-3d+h3{margin:12px 10px 2px;font-size:21px;letter-spacing:-.5px}
+.guide-grid .guide-card p{margin:0 10px 14px;font-size:15px}
+
+/* 버튼: 칸 아래 전체 폭의 얇은 줄 (위쪽 가는 구분선 + 글자 + 오른쪽 화살표). 칸 아래 모서리에 맞춰 둥글게 */
+.guide-grid .eco-open{align-self:stretch;display:flex;justify-content:space-between;gap:8px;width:auto;min-height:44px;margin:auto -8px -8px;padding:0 18px;border:0;border-top:1px solid var(--line);border-radius:0 0 18px 18px;background:transparent;color:var(--fresh-strong);font-size:15px;font-weight:800;text-align:left;transition:background-color .2s,color .2s}
+/* 화살표: 글자와 무관한 장식(4개 언어 공통), 선 그림을 currentColor로 칠함 */
+.guide-grid .eco-open::after{content:"";flex:none;width:16px;height:16px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 8h11M9 3.5 13.5 8 9 12.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.5 8h11M9 3.5 13.5 8 9 12.5'/%3E%3C/svg%3E") center/contain no-repeat;transition:transform .25s}
+.guide-grid .eco-open:hover{background:color-mix(in srgb,var(--fresh-strong) 6%,var(--white));color:var(--fresh-strong)}
+/* 키보드 초점 테두리는 칸 밖으로 튀어나가지 않게 안쪽에 */
+.guide-grid .eco-open:focus-visible{outline-offset:-3px}
+
+/* 넓은 화면(제목 기둥): 제목 기둥 첫 글자(꼬리표) 윗선을 판의 윗선에 맞춤 */
+@media(min-width:1201px){
+  .section-split .section-head{padding-top:0}
+  #guide .eyebrow{line-height:1;margin-bottom:12px}
+}
+
+/* 마우스를 올린 칸만 '선택 칩'처럼: 살짝 떠오르며 그림자, 접시 색·아이콘 테두리가 진해짐, 화살표가 앞으로 */
+@media(hover:hover){
+  .guide-grid .guide-card{transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s}
+  .guide-grid .guide-card .card-3d{transition:background-color .3s}
+  .guide-grid .guide-card .eco-mini{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .guide-grid .guide-card:hover{transform:translateY(-3px);box-shadow:0 0 0 1px color-mix(in srgb,var(--cat) 28%,transparent),0 14px 26px -14px color-mix(in srgb,var(--ink) 40%,transparent)}
+  .guide-grid .guide-card:hover .card-3d{transform:none;background-color:color-mix(in srgb,var(--cat-hi) 45%,var(--cat-bg))}
+  .guide-grid .guide-card:hover .eco-mini{transform:scale(1.04)}
+  .guide-grid .guide-card:hover .cat-pic{box-shadow:0 0 0 2px var(--cat),0 0 0 5px var(--cat-hi)}
+  .guide-grid .guide-card:hover .eco-open{background:color-mix(in srgb,var(--fresh-strong) 6%,var(--white));color:var(--fresh-strong)}
+  .guide-grid .guide-card:hover .eco-open::after{transform:translateX(3px)}
+}
+/* 움직임 줄이기: 떠오름·확대·화살표 이동은 빼고 색 변화만 */
+@media(hover:hover) and (prefers-reduced-motion:reduce){
+  .guide-grid .guide-card:hover,.guide-grid .guide-card:hover .eco-mini,.guide-grid .guide-card:hover .eco-open::after{transform:none}
+}
+
+/* 중간 폭(901~1200, 4열): 칸 여백만 맞춤 */
+@media(min-width:901px) and (max-width:1200px){
+  .guide-grid .guide-card{padding:8px}
+}
+
+/* 휴대폰(700 이하): 그림 접시가 없어 아이콘을 칸 안 왼쪽 위에 그대로 두고, 그 둘레를 옅은 카테고리 색으로 */
+@media(max-width:700px){
+  .guide-grid{gap:6px;padding:6px}
+  .guide-grid .guide-card,.section-split .guide-grid .guide-card{padding:12px 8px 8px}
+  .guide-grid .cat-pic{position:static;width:48px;height:48px;margin:0 0 0 6px;box-shadow:0 0 0 1.5px var(--cat),0 0 0 5px var(--cat-bg)}
+  .guide-grid .guide-card .cat-pic{width:48px;height:48px}
+  .guide-grid .cat-pic img{width:36px;height:36px}
+  .guide-grid .guide-card h3,.guide-grid .guide-card .card-3d+h3{margin:12px 6px 2px;font-size:18px;letter-spacing:-.4px}
+  .guide-grid .guide-card p{margin:0 6px 12px;font-size:14px}
+  /* 터치 높이 48px, 글자가 길면(베트남어) 두 줄까지 허용 */
+  .guide-grid .eco-open{min-height:48px;padding:6px 14px;justify-content:space-between;line-height:1.3}
+}
+
+/* ===== 휴대폰 첫 화면 영상 버튼: 위 .btn 규칙을 덮어씀 (추천안 B) ===== */
+/* B안 "영상 미리 보기 카드": 휴대폰 첫 화면 맨 아래 영상 버튼을 바로가기 타일과 같은 재질의 가로 카드로 */
+@media (max-width:700px){
+  .hero-actions{margin-top:10px}
+  /* 카드 몸통: 타일과 같은 반투명 흰 바탕 + 1.5px 연초록 테두리 + 반경 18px */
+  .hero-actions .btn{position:relative;justify-content:flex-start;gap:0;min-height:72px;padding:8px 46px 8px 88px;border:1.5px solid color-mix(in srgb,var(--fresh) 22%,transparent);border-radius:18px;background:color-mix(in srgb,var(--white) 78%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 8px 18px -16px color-mix(in srgb,var(--ink) 60%,transparent);color:var(--fresh-strong);font-size:17px;line-height:1.3;text-align:left;transition:transform .15s,background-color .2s,border-color .2s}
+  /* 왼쪽 썸네일: 영상 1편 카드와 같은 초록 바탕 + 캐릭터 얼굴 부분만 */
+  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
+  /* 재생 표시: 기존 삼각형 svg를 썸네일 왼쪽 아래 흰 반투명 원 위에 (영상 카드의 재생 버튼 자리와 같게) */
+  .hero-actions .btn .btn-icon{position:absolute;left:13px;bottom:13px;z-index:1;width:26px;height:26px;padding:8px 7px 8px 9px;border-radius:50%;background:color-mix(in srgb,var(--white) 88%,transparent);fill:var(--fresh-strong);box-shadow:0 2px 6px -2px color-mix(in srgb,var(--ink) 50%,transparent)}
+  /* 맨 오른쪽 이동 화살표 (언어 무관 기호) */
+  .hero-actions .btn::after{content:"→";position:absolute;right:17px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:800;line-height:1;color:var(--fresh-strong)}
+  /* 휴대폰은 hover가 눌림 뒤에 남으므로 PC의 진한 초록 hover를 덮고, 눌림은 타일처럼 연초록 */
+  .hero-actions .btn:hover{background:color-mix(in srgb,var(--white) 78%,transparent);border-color:color-mix(in srgb,var(--fresh) 22%,transparent)}
+  .hero-actions .btn:active{transform:scale(.985);background:var(--mint);border-color:color-mix(in srgb,var(--fresh) 45%,transparent)}
+}
