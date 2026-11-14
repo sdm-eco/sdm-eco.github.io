@@ -90,63 +90,82 @@ export function fitText(ctx, text, cx, cy, maxW, size, weight, color) {
   ctx.fillText(text, cx, cy);
   ctx.restore();
 }
-// 분리배출 표시 (구청 2차 의견 2-8 '재활용 마크를 정확하게'): 제품에 찍힌 표시처럼 두 화살표가 둥근 고리를 이루고
-// 가운데에 재질 이름. 재질 이름은 실제 표시 그대로 한국어(외국인도 제품에서 이 글자를 찾게 됨), 아래 품목 이름은 사이트 언어
-const MARK = { "item.pet": "투명페트", "item.can": "캔류", "item.glass": "유리", "item.carton": "종이팩" };
-function markLoop(ctx, cx, cy, w, h, text, color) {
-  const lw = Math.max(1.5, h * 0.11), rx = w / 2 - lw, ry = h / 2 - lw, r = ry;
-  const x0 = cx - rx + r, x1 = cx + rx - r;   // 둥근 양 끝 원의 중심
-  const ah = lw * 1.9;                        // 화살촉 크기
+// 분리배출 표시 (구청 2차 의견 2-8 '재활용 마크를 정확하게'): 환경부고시 제2021-140호 「분리배출 표시에 관한 지침」 별표 도안
+//  - 화살표 3개가 시계 방향으로 돌며 정삼각형을 이루고(화살표 뒷부분은 120°로 꺾임), 가운데에 도안 내부 표시 문자
+//  - 세부 재질(캔류의 철·알루미늄)은 삼각형 아래. 표시 문자는 제품에 찍힌 그대로 한국어(외국인도 제품에서 이 글자를 찾게 됨)
+//  - 색은 고시 표의 권장 색(무색페트 노랑·캔류 회색·유리 주황·일반팩 녹색). 흰 이름표 위에서 읽히게 조금 진하게
+//  - 우유팩 같은 살균팩은 '일반팩'(멸균팩과 구분), 페트는 '무색페트'
+const MARK = {
+  "item.pet": { text: "무색페트", color: "#c99400" },
+  // 고시 도안은 캔류 아래에 세부 재질(철·알루미늄)을 쓰지만, 수거함 이름표 크기에서는 읽히지 않아 '캔류'만 씀
+  "item.can": { text: "캔류", color: "#6f757c" },
+  "item.glass": { text: "유리", color: "#d9631c" },
+  "item.carton": { text: "일반팩", color: "#2e8b3a" }
+};
+// 정삼각형 분리배출 표시: (cx, cy) = 삼각형 무게중심, s = 한 변 길이. text가 없으면 화살표만(공용 재활용 표시)
+function markTri(ctx, cx, cy, s, color, text) {
+  const lw = s * 0.11, R = s / Math.sqrt(3);          // 선 굵기, 꼭짓점까지 거리
+  const P = [0, 1, 2].map(function (i) { const a = -Math.PI / 2 + i * Math.PI * 2 / 3; return [cx + Math.cos(a) * R, cy + Math.sin(a) * R]; });
+  const lerp2 = function (a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; };
   ctx.save();
-  ctx.strokeStyle = ctx.fillStyle = color;
-  ctx.lineWidth = lw; ctx.lineCap = "round";
-  // 위쪽 화살표: 왼쪽 끝 원 아래에서 시작해 위를 지나 오른쪽 위에서 멈춤(시계 방향), 아래쪽도 같은 모양을 180도 돌려 그림
-  [0, Math.PI].forEach(function (rot) {
-    ctx.save();
-    ctx.translate(cx, cy); ctx.rotate(rot); ctx.translate(-cx, -cy);
-    ctx.beginPath();
-    ctx.arc(x0, cy, r, Math.PI * 0.62, Math.PI * 1.5);
-    ctx.lineTo(x1 - r * 0.15, cy - r);
-    ctx.stroke();
-    ctx.beginPath();                          // 화살촉(오른쪽을 향함)
-    ctx.moveTo(x1 - r * 0.15 + ah, cy - r);
-    ctx.lineTo(x1 - r * 0.15 - ah * 0.4, cy - r - ah * 0.75);
-    ctx.lineTo(x1 - r * 0.15 - ah * 0.4, cy - r + ah * 0.75);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  });
-  ctx.restore();
-  fitText(ctx, text, cx, cy + h * 0.02, (x1 - x0) + r * 1.2, h * 0.42, 800, color);
-}
-// 재질 표시가 없는 공용 재활용 수거함·폐건전지: 세 화살표가 도는 삼각형 재활용 마크를 선으로 그림(글꼴 ♻에 기대지 않음)
-function markTriangle(ctx, cx, cy, s, color) {
-  const lw = Math.max(1.5, s * 0.12), R = s * 0.5, ah = lw * 1.7;
-  const P = [0, 1, 2].map(function (i) { const a = -Math.PI / 2 + i * Math.PI * 2 / 3; return [cx + Math.cos(a) * R, cy + Math.sin(a) * R * 0.95]; });
-  ctx.save();
-  ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = lw; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = lw; ctx.lineCap = "butt"; ctx.lineJoin = "miter";
   for (let i = 0; i < 3; i++) {
-    const a = P[i], b = P[(i + 1) % 3];
-    const ax = a[0] + (b[0] - a[0]) * 0.16, ay = a[1] + (b[1] - a[1]) * 0.16;
-    const bx = a[0] + (b[0] - a[0]) * 0.74, by = a[1] + (b[1] - a[1]) * 0.74;
-    ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
-    const d = Math.atan2(b[1] - a[1], b[0] - a[0]);
+    const a = P[i], b = P[(i + 1) % 3], prev = P[(i + 2) % 3];
+    // 꼬리: 앞 변 끝부분(꼭짓점 a 앞)에서 시작해 꼭짓점 a에서 120°로 꺾여 이번 변을 따라감
+    const tail = lerp2(a, prev, 0.13), end = lerp2(a, b, 0.58);
+    ctx.beginPath(); ctx.moveTo(tail[0], tail[1]); ctx.lineTo(a[0], a[1]); ctx.lineTo(end[0], end[1]); ctx.stroke();
+    // 화살촉: 이번 변 방향(다음 꼭짓점 쪽)으로
+    const d = Math.atan2(b[1] - a[1], b[0] - a[0]), ah = lw * 2.1, tip = lerp2(a, b, 0.58 + 0.17);
+    const bx = tip[0] - Math.cos(d) * ah, by = tip[1] - Math.sin(d) * ah;
     ctx.beginPath();
-    ctx.moveTo(bx + Math.cos(d) * ah, by + Math.sin(d) * ah);
-    ctx.lineTo(bx + Math.cos(d + 2.4) * ah, by + Math.sin(d + 2.4) * ah);
-    ctx.lineTo(bx + Math.cos(d - 2.4) * ah, by + Math.sin(d - 2.4) * ah);
+    ctx.moveTo(tip[0], tip[1]);
+    ctx.lineTo(bx + Math.cos(d + Math.PI / 2) * ah * 0.95, by + Math.sin(d + Math.PI / 2) * ah * 0.95);
+    ctx.lineTo(bx - Math.cos(d + Math.PI / 2) * ah * 0.95, by - Math.sin(d + Math.PI / 2) * ah * 0.95);
     ctx.closePath(); ctx.fill();
   }
   ctx.restore();
+  if (!text) return;
+  // 가운데 표시 문자: 화살표 띠와 겹쳐도 읽히게 흰 테두리를 두른 뒤 채움
+  let size = Math.round(s * (text.length > 3 ? 0.25 : text.length > 2 ? 0.29 : 0.33));
+  ctx.save();
+  ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = `900 ${size}px ${FONT}`;
+  while (ctx.measureText(text).width > s * 0.9 && size > 7) { size--; ctx.font = `900 ${size}px ${FONT}`; }
+  ctx.lineJoin = "round"; ctx.lineWidth = size * 0.32; ctx.strokeStyle = "#ffffff";
+  ctx.strokeText(text, cx, cy + s * 0.05);
+  ctx.fillStyle = color; ctx.fillText(text, cx, cy + s * 0.05);
+  ctx.restore();
 }
-// 수거함 앞 이름표: 위에 분리배출 표시, 아래에 품목 이름(key = i18n 키, 예 "item.pet"). 그림에는 글자를 넣지 않고 여기서 씀
-// 폐의약품은 재활용품이 아니라 표시 없이 이름만
-// 글자색은 통 색을 따름: 초록 통(페트·유리·공용)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
+// 두 줄까지 허용하는 글자: 너무 길면 띄어쓰기(없으면 가운데 글자)에서 나눠 두 줄로
+function fitText2(ctx, text, cx, cy, maxW, size, weight, color) {
+  ctx.save(); ctx.font = `${weight} ${Math.round(size)}px ${FONT}`;
+  const one = ctx.measureText(text).width <= maxW; ctx.restore();
+  if (one || text.length < 4) { fitText(ctx, text, cx, cy, maxW, size, weight, color); return; }
+  const sp = text.split(" ");
+  let a, b;
+  if (sp.length > 1) {
+    let best = 1, diff = 1e9;
+    for (let k = 1; k < sp.length; k++) { const d = Math.abs(sp.slice(0, k).join(" ").length - sp.slice(k).join(" ").length); if (d < diff) { diff = d; best = k; } }
+    a = sp.slice(0, best).join(" "); b = sp.slice(best).join(" ");
+  } else { const m = Math.ceil(text.length / 2); a = text.slice(0, m); b = text.slice(m); }
+  fitText(ctx, a, cx, cy - size * 0.58, maxW, size * 0.92, weight, color);
+  fitText(ctx, b, cx, cy + size * 0.58, maxW, size * 0.92, weight, color);
+}
+// 수거함 앞 이름표: 왼쪽에 분리배출 표시(정삼각형), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
+// 공용 재활용 수거함·폐건전지는 글자 없는 표시, 폐의약품은 재활용품이 아니라 표시 없이 이름만
+// 품목 이름 색은 통 색을 따름: 초록 통(페트·유리·공용)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
 const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "cat.recycle": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
 export function binLabel(ctx, key, left, top, w, h, color) {
   color = color || INK[key] || "#1f5a9e";
-  const cx = left + w / 2;
-  if (key === "item.medicine") { fitText(ctx, t(key), cx, top + h / 2, w * 0.9, h * 0.34, 800, color); return; }
-  if (MARK[key]) markLoop(ctx, cx, top + h * 0.33, w * 0.78, h * 0.44, MARK[key], color);
-  else markTriangle(ctx, cx, top + h * 0.33, h * 0.4, color);
-  fitText(ctx, t(key), cx, top + h * 0.76, w * 0.9, h * 0.27, 800, color);
+  if (key === "item.medicine") { fitText(ctx, t(key), left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color); return; }
+  const m = MARK[key];
+  const col = Math.min(h * 0.98, w * 0.46);             // 왼쪽 표시 칸 폭
+  const s = col * (m && m.sub ? 0.78 : 0.9);              // 삼각형 한 변
+  const mx = left + w * 0.04 + col / 2;
+  const triH = s * Math.sqrt(3) / 2;
+  const my = top + h * 0.5 - (m && m.sub ? h * 0.08 : 0) + triH / 6;   // 무게중심(위로 1/3)
+  markTri(ctx, mx, my, s, m ? m.color : color, m ? m.text : "");
+  if (m && m.sub) fitText(ctx, m.sub, mx, my + triH / 3 + h * 0.13, col, h * 0.15, 800, m.color);
+  const nx = left + w * 0.04 + col + (w * 0.96 - col) / 2;
+  fitText2(ctx, t(key), nx, top + h / 2, (w * 0.92 - col), h * 0.24, 800, color);
 }

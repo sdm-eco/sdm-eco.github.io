@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-pet.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114d";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114f";
 
 const D = "img/scene/pet/";
 // 그림 조각의 원래 크기와 그 안의 위치 (pet_assets.py가 잰 값)

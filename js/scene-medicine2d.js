@@ -5,7 +5,7 @@
 // 단계 값은 3D 장면(scene-medicine.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261114d";
+import { put, shadow as shade, binLabel } from "./eco2d-util.js?v=20261114f";
 
 const D = "img/scene/medicine/";
 // 그림 조각 크기(장면에 그대로 1:1로 씀)와 그 안의 위치
