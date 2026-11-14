@@ -661,3 +661,20 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @media(min-width:701px){
   .hero-actions .btn-ghost::before{background:url("../img/video-ep2.webp?v=20261114c") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
 }
+
+/* ===== 바로가기 타일: 마우스를 올리면 품목마다 다른 동작 (마우스가 있는 기기만, 움직임 줄이기 설정이면 멈춤) =====
+   일반 봉투는 매듭을 잡고 대롱대롱, 음식물 통은 콩콩 두 번 뜀, 재활용 통은 한 바퀴 돌고(=재활용), 대형 의자는 흔들의자처럼 까딱 */
+@media(hover:hover){
+  .quick-cat:hover img{animation-duration:.8s;animation-fill-mode:both;animation-timing-function:ease-in-out}
+  .quick-cat.cat-general:hover img{transform-origin:50% 8%;animation-name:qc-swing}
+  .quick-cat.cat-food:hover img{animation-name:qc-hop}
+  .quick-cat.cat-recycle:hover img{animation-name:qc-spin;animation-duration:.7s}
+  .quick-cat.cat-bulky:hover img{transform-origin:30% 100%;animation-name:qc-rock}
+}
+@keyframes qc-swing{0%{transform:rotate(0)}25%{transform:rotate(14deg) scale(1.08)}50%{transform:rotate(-10deg) scale(1.1)}75%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(0) scale(1.1)}}
+@keyframes qc-hop{0%{transform:none}20%{transform:translateY(-10px) scale(1.1,1.12)}40%{transform:translateY(0) scale(1.14,1.04)}60%{transform:translateY(-6px) scale(1.1)}80%{transform:translateY(0) scale(1.12,1.07)}100%{transform:translateY(0) scale(1.1)}}
+@keyframes qc-spin{0%{transform:rotateY(0)}100%{transform:rotateY(360deg) scale(1.12)}}
+@keyframes qc-rock{0%{transform:rotate(0)}30%{transform:rotate(-12deg) scale(1.08)}60%{transform:rotate(5deg) scale(1.1)}100%{transform:rotate(-3deg) scale(1.1)}}
+@media(hover:hover) and (prefers-reduced-motion:reduce){
+  .quick-cat:hover img{animation:none}
+}
