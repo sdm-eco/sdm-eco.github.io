@@ -334,7 +334,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 편마다 색 바탕 + 오른쪽 아래 캐릭터(img/video-ep*.webp), 왼쪽 위 편 배지·준비 중 배지, 왼쪽 아래 재생 버튼 */
 .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--forest)}
 .ep-1 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
-.ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#183a73,#2a5ea8 60%,#4a82c9)}
+/* 2편 파랑은 재활용 카드의 파랑(--recycle #2f7fd6) 계열: 1편 초록과 같은 무게로 */
+.ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
 .video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto}
 .video-ep,.video-soon{display:inline-block;padding:4px 13px;border-radius:999px;color:var(--white);font-size:14px;font-weight:800;line-height:1.5}
 .video-ep{position:absolute;left:20px;top:20px;z-index:1;border:1.5px solid color-mix(in srgb,var(--white) 80%,transparent)}
@@ -360,20 +361,21 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .video-tags li{flex:none;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--white);color:var(--ink-2);font-size:12.5px;font-weight:700;white-space:nowrap}
 
 /* 게임: 밝은 초록 띠 + 왼쪽 문구 · 가운데 캐릭터(바닥에 붙음) · 오른쪽 큰 동그라미 시작 버튼 (팀원 사이트 구성 참고) */
-.section.game-band{padding:0;overflow:hidden;background:radial-gradient(ellipse 70% 90% at 70% 120%,#bfe5cc,transparent 60%),linear-gradient(180deg,#f2faf5,#e1f3e7)}
-.game-stage{position:relative}
-.game-stage.is-playing{aspect-ratio:16/9;margin:48px 0;border-radius:28px;overflow:hidden;background:var(--night)}
+/* 위 배출방법 칸(민트 바탕)과 구분되도록 바탕은 흰색, 연한 초록은 둥근 카드 안에만 */
+.game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;overflow:hidden;background:radial-gradient(ellipse 70% 90% at 70% 120%,#bfe5cc,transparent 60%),linear-gradient(180deg,#f2faf5,#e1f3e7)}
+.game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.game-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) auto;align-items:end;gap:24px;min-height:420px}
-.game-copy{align-self:center;padding:56px 0}
+.game-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) auto;align-items:end;gap:20px;min-height:330px;padding:0 44px}
+.game-copy{align-self:center;padding:44px 0}
 .game-desc{margin:18px 0 0;max-width:460px;color:var(--ink-2);font-size:17px;line-height:1.7;text-wrap:balance}
-/* 캐릭터 크기는 칸 폭에 맞춰 줄어듦(cqw): 여학생 오른쪽 끝이 칸 안에 들어오도록 높이 ≤ 칸 폭의 72~74% */
-.game-chars{position:relative;height:400px;container-type:inline-size}
-.game-chars img{position:absolute;bottom:0;height:min(380px,72cqw);width:auto}
+/* 캐릭터 크기는 칸 폭에 맞춰 줄어듦(cqw): 여학생 오른쪽 끝이 칸 안에 들어오도록 높이 ≤ 칸 폭의 64~66%
+   원본(사용자 캐릭터 시트)이 작아 크게 늘리면 흐려서 높이 280px 정도로 씀. 큰 원본이 생기면 그림만 바꾸면 됨 */
+.game-chars{position:relative;height:300px;container-type:inline-size}
+.game-chars img{position:absolute;bottom:0;height:min(280px,64cqw);width:auto}
 .game-chars .boy{left:0}
-.game-chars .girl{left:42%;height:min(390px,74cqw)}
+.game-chars .girl{left:40%;height:min(288px,66cqw)}
 .game-cta{align-self:center;display:grid;justify-items:center;gap:12px}
-.game-start{display:grid;place-items:center;align-content:center;gap:6px;width:190px;height:190px;padding:0;border:0;border-radius:50%;background:var(--fresh-strong);color:var(--white);font:inherit;font-size:21px;font-weight:800;box-shadow:0 0 0 14px color-mix(in srgb,var(--fresh-strong) 14%,transparent);cursor:pointer;transition:transform .2s,background-color .2s}
+.game-start{display:grid;place-items:center;align-content:center;gap:6px;width:160px;height:160px;padding:0;border:0;border-radius:50%;background:var(--fresh-strong);color:var(--white);font:inherit;font-size:19px;font-weight:800;box-shadow:0 0 0 14px color-mix(in srgb,var(--fresh-strong) 14%,transparent);cursor:pointer;transition:transform .2s,background-color .2s}
 .game-start:hover{background:var(--fresh-hover);transform:scale(1.04)}
 .game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:18px}
 .game-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
@@ -417,16 +419,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .hero-scene{-webkit-mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 5.91%,#000 25.91%,#000 76.82%,transparent 96.82%),linear-gradient(to right,transparent 7.27%,#000 7.28%,#000 98.18%,transparent 98.19%);mask-composite:intersect}
   .learn-inner{grid-template-columns:1fr;gap:12px}
   /* 좁은 화면: 문구 → 시작 버튼(길쭉하게) → 캐릭터 순서로 쌓음 */
-  .game-hero{grid-template-columns:minmax(0,1fr);gap:0;min-height:0}
-  .game-copy{padding:44px 0 8px}
-  .game-cta{order:2;justify-items:start;grid-auto-flow:column;align-items:center;justify-content:start;gap:14px;padding:16px 0 8px}
+  .game-hero{grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding:0 24px}
+  .game-copy{padding:32px 0 6px}
+  .game-cta{order:2;justify-items:start;grid-auto-flow:column;align-items:center;justify-content:start;gap:14px;padding:14px 0 10px}
   .game-start{grid-auto-flow:column;width:auto;height:auto;min-height:52px;padding:0 28px;border-radius:999px;box-shadow:none;font-size:18px}
   .game-start:hover{transform:none}
   .game-start:focus-visible{outline-offset:4px}
   .game-start svg{width:18px;height:18px}
-  .game-chars{order:3;height:min(310px,76vw);max-width:520px;width:100%;justify-self:center}
-  .game-chars img{height:min(296px,72cqw)}
-  .game-chars .girl{height:min(304px,74cqw)}
+  /* 캐릭터 칸 높이 = 그림 높이(칸 폭의 60~62%, 칸 폭 ≈ 화면 폭 - 83px): 버튼과 캐릭터 사이가 비지 않게 */
+  .game-chars{order:3;height:min(242px,calc((100vw - 83px) * .62));max-width:520px;width:100%;justify-self:center}
+  .game-chars img{height:min(236px,60cqw)}
+  .game-chars .girl{height:min(242px,62cqw)}
 }
 @media(max-width:700px){
   .wrap{width:calc(100% - 32px)}
