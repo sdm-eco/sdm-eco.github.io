@@ -643,3 +643,21 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .footer p{font-size:15px}
   .footer-meta{align-items:flex-start;max-width:none;text-align:left;padding-top:20px;border-top:1px solid rgba(245,251,239,.14)}
 }
+
+/* ===== PC 첫 화면 두 버튼: 위 .btn 규칙을 덮어씀 (휴대폰 영상 카드와 같은 짜임) ===== */
+/* 2안 기반: 두 버튼 모두 썸네일 카드(왼쪽 72px 그림 + 왼쪽 아래 흰 원 아이콘 + 글자 + 오른쪽 화살표) */
+@media(min-width:701px){
+  .hero-actions{align-items:stretch}
+  .hero-actions .btn,.hero-actions .btn-ghost{position:relative;gap:0;min-height:72px;padding:8px 52px 8px 92px;border:1.5px solid color-mix(in srgb,var(--fresh) 22%,transparent);border-radius:18px;background:color-mix(in srgb,var(--white) 82%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 10px 22px -18px color-mix(in srgb,var(--ink) 60%,transparent);color:var(--fresh-strong);transition:transform .2s,background-color .2s,border-color .2s,box-shadow .2s}
+  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
+  .hero-actions .btn .btn-icon{position:absolute;left:13px;bottom:13px;z-index:1;width:26px;height:26px;padding:8px 7px 8px 9px;border-radius:50%;background:color-mix(in srgb,var(--white) 88%,transparent);fill:var(--fresh-strong);stroke:none;box-shadow:0 2px 6px -2px color-mix(in srgb,var(--ink) 50%,transparent)}
+  /* 책 아이콘(선 그림)은 같은 흰 원 위에, 선 굵기만 유지 */
+  .hero-actions .btn-ghost .btn-icon-line{padding:5px;fill:none;stroke:var(--fresh-strong)}
+  .hero-actions .btn::after{content:"→";position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:20px;font-weight:800;line-height:1;transition:transform .2s}
+  .hero-actions .btn:hover{background:var(--white);border-color:color-mix(in srgb,var(--fresh) 45%,transparent);color:var(--fresh-strong);box-shadow:0 14px 26px -18px color-mix(in srgb,var(--ink) 70%,transparent)}
+  .hero-actions .btn:hover::after{transform:translate(3px,-50%)}
+}
+/* 그림 후보 4: 영상 2편 남학생 얼굴 + 재활용 파랑 바탕 (영상 버튼 썸네일과 같은 짜임, 색만 파랑) */
+@media(min-width:701px){
+  .hero-actions .btn-ghost::before{background:url("../img/video-ep2.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
+}
