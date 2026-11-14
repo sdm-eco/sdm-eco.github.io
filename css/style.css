@@ -631,6 +631,13 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .footer-meta p:first-child::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--lime)}
 .draft-note{color:#dce8df!important;font-weight:600}
 
+/* 가운데(오른쪽 배지 앞): 휴대폰으로 열기 QR — 흰 둥근 칸 위 QR + 제목·설명. 부서명 칸이 남는 폭을 차지해 QR이 배지 옆으로 붙음 */
+.footer-inner>div:first-child{margin-right:auto}
+.footer-qr{display:flex;align-items:center;gap:16px;padding-right:32px;border-right:1px solid rgba(245,251,239,.14)}
+.footer-qr img{flex:none;width:88px;height:88px;padding:8px;border-radius:12px;background:var(--white)}
+.footer-qr strong{display:block;font-size:16px}
+.footer-qr p{max-width:15em;margin-top:2px;font-size:14px;line-height:1.5}
+
 /* 휴대폰: 세로로 쌓고 왼쪽 정렬, 위아래 사이를 가는 선으로 나눔 */
 @media(max-width:700px){
   .footer{padding:32px 0 36px}
@@ -640,6 +647,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .footer strong{font-size:17px}
   .footer p{font-size:15px}
   .footer-meta{align-items:flex-start;max-width:none;text-align:left;padding-top:20px;border-top:1px solid rgba(245,251,239,.14)}
+  .footer-qr{display:none}
 }
 
 /* ===== PC 첫 화면 두 버튼: 위 .btn 규칙을 덮어씀 (휴대폰 영상 카드와 같은 짜임) ===== */

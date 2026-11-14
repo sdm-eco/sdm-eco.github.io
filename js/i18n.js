@@ -242,7 +242,10 @@ window.I18N = {
     "confuse.s3.desc": "컵라면 용기·색깔 있는 스티로폼은 깨끗이 씻으면 재활용, 씻기 어려우면 종량제 봉투에 버려요.",
     "confuse.note": "알약 포장재·기저귀·기름종이·택배 운송장 스티커·코팅된 종이도 종량제 봉투에 버려요. 아이스팩은 전용 수거함이 있으면 거기에, 없으면 종량제 봉투에 버려요.",
     "footer.desc": "서대문구에서 생활하는 외국인 대상 분리배출 교육",
-    "footer.note": "구성안 · 실제 운영 사이트 아님"
+    "footer.note": "구성안 · 실제 운영 사이트 아님",
+    "footer.qr.title": "휴대폰으로 열기",
+    "footer.qr.desc": "QR 코드를 스캔하면 앱 설치 없이 바로 열려요.",
+    "footer.qr.alt": "이 사이트(sdm-eco.github.io)로 가는 QR 코드"
   },
   zh: {
     "meta.title": "西大门区垃圾分类教育 | 面向在西大门生活的外国人",
@@ -486,7 +489,10 @@ window.I18N = {
     "confuse.s3.desc": "泡面碗·彩色泡沫塑料洗干净后可回收，难以洗净的请装进计量制垃圾袋。",
     "confuse.note": "药片包装·尿布·油纸·快递面单贴纸·覆膜纸也请装进计量制垃圾袋。冰袋有专用回收箱就投进去，没有就装进计量制垃圾袋。",
     "footer.desc": "面向在西大门区生活的外国人的垃圾分类教育",
-    "footer.note": "框架草案 · 非正式运营网站"
+    "footer.note": "框架草案 · 非正式运营网站",
+    "footer.qr.title": "用手机打开",
+    "footer.qr.desc": "扫描二维码即可直接打开，无需安装应用。",
+    "footer.qr.alt": "打开本网站（sdm-eco.github.io）的二维码"
   },
   en: {
     "meta.title": "Seodaemun Recycling Guide | For Foreign Residents",
@@ -730,7 +736,10 @@ window.I18N = {
     "confuse.s3.desc": "Cup noodle cups and colored styrofoam can be recycled if washed clean. If not, use a pay-as-you-throw bag.",
     "confuse.note": "Pill packs, diapers, oil paper, delivery label stickers and coated paper also go in a pay-as-you-throw bag. Ice packs go in a special bin if there is one, otherwise in a pay-as-you-throw bag.",
     "footer.desc": "Recycling education for foreign residents of Seodaemun-gu",
-    "footer.note": "Layout draft · Not the live website"
+    "footer.note": "Layout draft · Not the live website",
+    "footer.qr.title": "Open on your phone",
+    "footer.qr.desc": "Scan the QR code to open it right away. No app needed.",
+    "footer.qr.alt": "QR code for this website (sdm-eco.github.io)"
   },
   vi: {
     "meta.title": "Hướng dẫn phân loại rác Seodaemun | Dành cho người nước ngoài",
@@ -974,6 +983,9 @@ window.I18N = {
     "confuse.s3.desc": "Cốc mì ăn liền và xốp màu rửa sạch thì tái chế được, khó rửa thì bỏ vào túi rác có phí.",
     "confuse.note": "Vỉ thuốc, tã, giấy thấm dầu, nhãn vận đơn, giấy tráng phủ cũng bỏ vào túi rác có phí. Túi đá giữ lạnh: có thùng riêng thì bỏ vào đó, không có thì bỏ vào túi rác có phí.",
     "footer.desc": "Giáo dục phân loại rác cho người nước ngoài sống tại quận Seodaemun",
-    "footer.note": "Bản nháp bố cục · Không phải trang web chính thức"
+    "footer.note": "Bản nháp bố cục · Không phải trang web chính thức",
+    "footer.qr.title": "Mở trên điện thoại",
+    "footer.qr.desc": "Quét mã QR để mở ngay, không cần cài ứng dụng.",
+    "footer.qr.alt": "Mã QR mở trang web này (sdm-eco.github.io)"
   }
 };
