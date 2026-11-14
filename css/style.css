@@ -606,7 +606,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* 카드 몸통: 타일과 같은 반투명 흰 바탕 + 1.5px 연초록 테두리 + 반경 18px */
   .hero-actions .btn{position:relative;justify-content:flex-start;gap:0;min-height:72px;padding:8px 46px 8px 88px;border:1.5px solid color-mix(in srgb,var(--fresh) 22%,transparent);border-radius:18px;background:color-mix(in srgb,var(--white) 78%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 8px 18px -16px color-mix(in srgb,var(--ink) 60%,transparent);color:var(--fresh-strong);font-size:17px;line-height:1.3;text-align:left;transition:transform .15s,background-color .2s,border-color .2s}
   /* 왼쪽 썸네일: 영상 1편 카드와 같은 초록 바탕 + 캐릭터 얼굴 부분만 */
-  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
+  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114c") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
   /* 재생 표시: 기존 삼각형 svg를 썸네일 왼쪽 아래 흰 반투명 원 위에 (영상 카드의 재생 버튼 자리와 같게) */
   .hero-actions .btn .btn-icon{position:absolute;left:13px;bottom:13px;z-index:1;width:26px;height:26px;padding:8px 7px 8px 9px;border-radius:50%;background:color-mix(in srgb,var(--white) 88%,transparent);fill:var(--fresh-strong);box-shadow:0 2px 6px -2px color-mix(in srgb,var(--ink) 50%,transparent)}
   /* 맨 오른쪽 이동 화살표 (언어 무관 기호) */
@@ -649,7 +649,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @media(min-width:701px){
   .hero-actions{align-items:stretch}
   .hero-actions .btn,.hero-actions .btn-ghost{position:relative;gap:0;min-height:72px;padding:8px 52px 8px 92px;border:1.5px solid color-mix(in srgb,var(--fresh) 22%,transparent);border-radius:18px;background:color-mix(in srgb,var(--white) 82%,transparent);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);box-shadow:0 10px 22px -18px color-mix(in srgb,var(--ink) 60%,transparent);color:var(--fresh-strong);transition:transform .2s,background-color .2s,border-color .2s,box-shadow .2s}
-  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
+  .hero-actions .btn::before{content:"";position:absolute;left:7px;top:7px;bottom:7px;width:72px;border-radius:12px;background:url("../img/video-ep1.webp?v=20261114c") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
   .hero-actions .btn .btn-icon{position:absolute;left:13px;bottom:13px;z-index:1;width:26px;height:26px;padding:8px 7px 8px 9px;border-radius:50%;background:color-mix(in srgb,var(--white) 88%,transparent);fill:var(--fresh-strong);stroke:none;box-shadow:0 2px 6px -2px color-mix(in srgb,var(--ink) 50%,transparent)}
   /* 책 아이콘(선 그림)은 같은 흰 원 위에, 선 굵기만 유지 */
   .hero-actions .btn-ghost .btn-icon-line{padding:5px;fill:none;stroke:var(--fresh-strong)}
@@ -659,5 +659,5 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 }
 /* 그림 후보 4: 영상 2편 남학생 얼굴 + 재활용 파랑 바탕 (영상 버튼 썸네일과 같은 짜임, 색만 파랑) */
 @media(min-width:701px){
-  .hero-actions .btn-ghost::before{background:url("../img/video-ep2.webp?v=20261114b") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
+  .hero-actions .btn-ghost::before{background:url("../img/video-ep2.webp?v=20261114c") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
 }
