@@ -96,6 +96,48 @@
     });
   }
 
+  // 영상 카드 캐릭터 눈 깜빡임: data-blink="반쯤 감은 그림 감은 그림"
+  //   뜬 눈 → 반쯤(50ms) → 감음(70ms) → 반쯤(50ms) → 뜬 눈, 캐릭터마다 4~8초 사이 무작위, 다섯 번 중 한 번은 두 번 연속
+  //   그림을 미리 받아 둔 뒤에만 시작(바꿔 끼울 때 깜빡 비는 일 없게), 화면 밖·탭 숨김이면 멈춤, 움직임 줄이기 설정이면 안 함
+  function setupBlink() {
+    var imgs = document.querySelectorAll("img[data-blink]");
+    if (!imgs.length || !("IntersectionObserver" in window)) return;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    imgs.forEach(function (img) {
+      var open = img.getAttribute("src");
+      var frames = img.dataset.blink.split(" ");
+      var ready = false, visible = false, timer = 0;
+      function preload() {
+        if (ready) return;
+        Promise.all(frames.map(function (src) { var i = new Image(); i.src = src; return i.decode ? i.decode() : Promise.resolve(); }))
+          .then(function () { ready = true; schedule(); }, function () {});
+      }
+      function set(src) { img.src = src; }
+      function blinkOnce(done) {
+        set(frames[0]);
+        setTimeout(function () { set(frames[1]); }, 50);
+        setTimeout(function () { set(frames[0]); }, 120);
+        setTimeout(function () { set(open); if (done) done(); }, 170);
+      }
+      function schedule() {
+        clearTimeout(timer);
+        if (!ready || !visible || document.hidden) return;
+        timer = setTimeout(function () {
+          if (!visible || document.hidden) return;
+          blinkOnce(function () {
+            if (Math.random() < 0.2) setTimeout(function () { blinkOnce(schedule); }, 140);
+            else schedule();
+          });
+        }, 4000 + Math.random() * 4000);
+      }
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+        if (visible) { preload(); schedule(); } else { clearTimeout(timer); set(open); }
+      }, { rootMargin: "200px" }).observe(img);
+      document.addEventListener("visibilitychange", schedule);
+    });
+  }
+
   // 동별 배출요일 (일반 쓰레기 창의 세 번째 탭): 동을 고르면 그 동의 요일을 주간 표에 켜고 요약 문장을 보여 줌.
   //   묶음(data-days)은 mwf = 월·수·금, tts = 화·목·일. 충현동·신촌동은 옛 동(구역)마다 달라 구역 버튼을 한 번 더 보여 줌.
   //   글자는 data-i18n 키를 바꿔 달아 두므로 언어를 바꾸면 applyLang이 함께 번역함
@@ -899,6 +941,7 @@
   setupWaterfall();
   setupBirds();
   setupDays();
+  setupBlink();
   progress = setupProgress();
   applyLang(detectLang());
 })();
