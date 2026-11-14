@@ -40,7 +40,8 @@ a:focus-visible,button:focus-visible{outline:3px solid var(--focus);outline-offs
 p{margin:0;text-wrap:pretty}
 .wrap{width:min(1280px,calc(100% - 80px));margin:auto}
 .skip-link{position:absolute;left:16px;top:-60px;z-index:50;background:var(--forest);color:var(--on-dark);padding:10px 16px;border-radius:10px;font-weight:700}
-.skip-link:focus{top:12px}
+/* 키보드로 초점이 왔을 때만 보임: 맨 위로 버튼을 마우스로 누르면 초점이 여기로 오지만(main.js setupToTop) 상자는 띄우지 않음 */
+.skip-link:focus-visible{top:12px}
 
 
 .header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--white) 96%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}

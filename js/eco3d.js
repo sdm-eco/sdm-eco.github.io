@@ -17,7 +17,7 @@ import glass from "./scene-glass2d.js?v=20261114g";
 import paper from "./scene-paper2d.js?v=20261114g";
 import appliance from "./scene-appliance2d.js?v=20261114g";
 import confuse from "./scene-confuse2d.js?v=20261114g";
-import { create2DView } from "./eco2d.js?v=20261108r";
+import { create2DView } from "./eco2d.js?v=20261114h";
 import { sfx } from "./eco3d-sound.js?v=20261108r";
 
 // 품목별 장면 (scene-*2d.js, eco2d.js 형식)
@@ -267,18 +267,22 @@ function setupDialogs() {
 }
 
 // 화면 근처에 오면 장면 그림을 불러와 그림(eco2d.js). 실패하면 is-fallback(글 단계만)
-// 돌려주는 함수를 부르면 아직 만들기 전인 대기를 취소함
+// 돌려주는 함수를 부르면 아직 만들기 전인 대기를 취소함. 취소된 요청은 늦게 성공·실패해도 표시를 건드리지 않음
+//   (취소 뒤 새 요청이 성공했는데 옛 요청의 실패가 is-fallback을 다시 붙이는 경합 방지)
 function mount(stage, canvas, def, opts, onReady) {
   let cancelled = false;
+  stage.classList.remove("is-fallback");
   const loader = new IntersectionObserver(async function (entries) {
     if (!entries.some(function (e) { return e.isIntersecting; })) return;
     loader.disconnect();
     try {
       const view = await create2DView(stage, canvas, def, opts);
       if (cancelled) { view.destroy(); return; }
+      stage.classList.remove("is-fallback");
       stage.classList.add("is-ready");
       onReady(view);
     } catch (err) {
+      if (cancelled) return;
       console.error(err);
       stage.classList.add("is-fallback");
     }

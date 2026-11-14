@@ -83,16 +83,27 @@ export async function create2DView(stage, canvas, def, opts) {
     draw(dt);
   }
 
-  // 화면에 보일 때만 그림
-  let visible = false, running = false, prev = 0, dead = false;
+  // 화면에 보이고 움직일 것이 있을 때만 그림: 단계 움직임과 남은 물방울 등이 끝나고 잠깐(SETTLE초) 지나면 멈추고,
+  //   단계를 바꾸거나 다시 보이면 다시 시작. 크기·언어가 바뀌면 멈춘 채로 한 번 다시 그림
+  //   (장면은 단계 움직임 동안에만 s.t로 흔들리므로 멈춘 장면은 늘 같은 그림)
+  const SETTLE = 0.5;
+  let visible = false, running = false, prev = 0, dead = false, idle = 0;
+  function moving() {
+    if (active || queue.length) return true;
+    for (const k in mem) if (Array.isArray(mem[k]) && mem[k].length) return true; // 떨어지는 물방울·우유 방울
+    return false;
+  }
   function frame(now) {
     if (dead || !visible || document.hidden) { running = false; return; }
     const dt = Math.min((now - prev) / 1000, 0.05);
     prev = now;
     update(dt);
+    idle = moving() ? 0 : idle + dt;
+    if (idle > SETTLE) { running = false; return; }
     requestAnimationFrame(frame);
   }
   function start() {
+    idle = 0;
     if (dead || running || !visible || document.hidden) return;
     running = true;
     prev = performance.now();
@@ -103,14 +114,18 @@ export async function create2DView(stage, canvas, def, opts) {
   const watcher = new IntersectionObserver(function (e) { visible = e[e.length - 1].isIntersecting; start(); });
   watcher.observe(stage);
   document.addEventListener("visibilitychange", start);
+  // 언어를 바꾸면(i18n.js가 <html lang>을 바꿈) 장면 속 글자도 새 언어로
+  const langWatch = new MutationObserver(function () { if (!running) draw(0); });
+  langWatch.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   resize();
 
   return {
-    goTo: function (n, instant) { goTo(n, instant); if (!running) draw(0); },
+    goTo: function (n, instant) { goTo(n, instant); if (!running) draw(0); start(); },
     destroy: function () {
       dead = true;
       sizer.disconnect();
       watcher.disconnect();
+      langWatch.disconnect();
       document.removeEventListener("visibilitychange", start);
     },
     busy: function () {
