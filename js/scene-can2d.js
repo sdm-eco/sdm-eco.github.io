@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-can.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114g";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
 
 const D = "img/scene/can/";
 // 그림 조각의 원래 크기와 그 안의 위치 (can_assets.py가 잰 값)
@@ -212,16 +212,13 @@ function drawCrush(ctx, img, v, s, binX, nh, binSy) {
   ctx.save();
   if (u > 0) {
     // 끝 모습: 찌그러진 캔 윗부분이 수거함 위로 살짝 보이게 (넣었다는 것이 한눈에 보이게)
-    const rim = GY - nh * binSy + BIN.rim * KN;
     x = lerp(BX, binX, easeInOut(u));
     y = lerp(GY, GY - nh + BIN.rim * KN + 150, u) - 4 * u * (1 - u) * 250;   // 가장 높을 때도 화면 위로 잘리지 않게
     rot = u * Math.PI * 2 + wobble(land, 2) * 0.06;
     k = lerp(1, 0.75, u);
     if (u > 0.5) {
-      // 입구 테두리 아래로 내려간 부분은 가려서 '들어가는' 모습
-      ctx.beginPath();
-      ctx.rect(-500, -500, 2000, rim + 500);
-      ctx.clip();
+      // 앞 테두리 윗선 아래로 내려간 부분은 가려서 '들어가는' 모습
+      clipBelowRim(ctx, binX - BIN.w * KN / 2, GY - nh * binSy, KN, KN * binSy);
     }
   }
   shadow(ctx, BX, CRUSHED.w * lerp(0.95, 1.05, crushedA), 1 - smooth(0.28, 0.4, b));

@@ -5,7 +5,7 @@
 // 단계 값은 3D 장면(scene-glass.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114g";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
 
 const D = "img/scene/glass/";
 const TAU = Math.PI * 2;
@@ -13,7 +13,7 @@ const TAU = Math.PI * 2;
 const BOTTLE = { w: 163, h: 460, cx: 80, neck: { y: 62, w: 70 }, label: { y: 222, h: 120, w: 160 } };   // neck: 나사산(뚜껑 자리) 아랫선
 const LIQUID = { y0: 150, y1: 418 };
 const CAP = { w: 85, h: 64 };      // 떼어 내 바닥에 놓인 뚜껑(안쪽이 보임)
-const BIN = { w: 361, h: 440, rim: 35, label: { x: 140, y: 140, w: 159, h: 86 } };
+const BIN = { w: 361, h: 440, label: { x: 140, y: 140, w: 159, h: 86 } };
 
 // 장면 배치 (설계 크기 820×760 기준, eco2d.js)
 const GY = 700;             // 바닥선
@@ -35,7 +35,7 @@ export default {
     { cap: 1, empty: 1, label: 1, bin: 1 }
   ],
   moves: [null, [["cap", 1.2]], [["empty", 2.2]], [["label", 1.4]], [["bin", 1.8]]],
-  images: { bottle: D + "bottle.webp", liquid: D + "liquid.webp", cap: D + "cap.webp", bin: D + "bin.webp" },
+  images: { bottle: D + "bottle.webp?v=20261115a", liquid: D + "liquid.webp", cap: D + "cap.webp", bin: D + "bin.webp" },
   draw: draw
 };
 
@@ -327,11 +327,9 @@ function drawToBin(ctx, img, v, binX, nh, binSy, land) {
   shadow(ctx, BX, BOTTLE.w * 1.25, 1 - smooth(0.28, 0.4, b));
   ctx.save();
   if (u > 0.6) {
-    // 입구 테두리 아래로 내려간 부분은 가려서 '들어가는' 모습
-    const rim = GY - nh * binSy + BIN.rim * KN;
-    ctx.beginPath();
-    ctx.rect(-500, -500, 2000, rim + 500);
-    ctx.clip();
+    // 앞 테두리 윗선 아래로 내려간 부분은 가려서 '들어가는' 모습. 선은 그림의 앞 테두리를 따라 비스듬함(원근: 오른쪽이 조금 높음)
+    //   (예전처럼 입구 안쪽 중간 높이에서 자르면 병이 입구 안에서 수평으로 잘려 떠 보임)
+    clipBelowRim(ctx, binX - BIN.w * KN / 2, GY - nh * binSy, KN, KN * binSy);
   }
   // 움츠림: 바닥을 축으로 납작해짐
   const sy = 1 - crouch * 0.1;

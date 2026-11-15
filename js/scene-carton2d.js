@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-carton.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114g";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
 
 const D = "img/scene/carton/";
 // 그림 조각의 원래 크기와 그 안의 위치
@@ -158,11 +158,8 @@ function drawFlat(ctx, img, v, b, binX, nh, binSy, cw, ch, fw, fh) {
   }
   shadow(ctx, CX, lerp(cw * 1.25, fw * 1.05, morph), 1 - smooth(0.3, 0.42, b));
   ctx.save();
-  if (clipY !== null) {
-    ctx.beginPath();
-    ctx.rect(-500, -500, 2000, clipY + 500);
-    ctx.clip();
-  }
+  // 앞 테두리 윗선 아래로 내려간 부분은 가려서 '들어가는' 모습 (선은 비스듬한 앞 테두리를 따름)
+  if (clipY !== null) clipBelowRim(ctx, binX - BIN.w * KN / 2, GY - nh * binSy, KN, KN * binSy);
   ctx.translate(x, y);
   ctx.rotate(rot);
   ctx.scale(sc, sc);

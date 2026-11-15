@@ -4,13 +4,13 @@
 // 단계 값은 3D 장면(scene-pet.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label } from "./eco2d-util.js?v=20261114g";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
 
 const D = "img/scene/pet/";
 // 그림 조각의 원래 크기와 그 안의 위치 (pet_assets.py가 잰 값)
 const BOTTLE = { w: 155, h: 420, cap: { x: 38, y: 2, w: 75, h: 63 }, label: { y: 152, h: 101 } };
 const CRUSHED = { w: 287, h: 300, cap: { x: 129, y: 2, w: 84, h: 67 } };
-const BIN = { w: 362, h: 440, rim: 36, label: { x: 140, y: 139, w: 162, h: 87 } };
+const BIN = { w: 362, h: 440, label: { x: 140, y: 139, w: 162, h: 87 } };
 const CURL = { w: 205, h: 150 };
 
 // 장면 배치 (설계 크기 820×760 기준, eco2d.js)
@@ -84,11 +84,8 @@ function draw(ctx, v, s) {
     rot = u * Math.PI * 1.2;
     scale = lerp(1, 0.8, u);
     if (u > 0.5) {
-      // 입구 테두리 아래로 내려간 부분은 가려서 '들어가는' 모습
-      const rim = GY - nh * binBounce + BIN.rim * KN;
-      ctx.beginPath();
-      ctx.rect(-500, -500, 2000, rim + 500);
-      ctx.clip();
+      // 앞 테두리 윗선 아래로 내려간 부분은 가려서 '들어가는' 모습
+      clipBelowRim(ctx, binX - BIN.w * KN / 2, GY - nh * binBounce, KN, KN * binBounce);
     }
     if (u >= 1) { ctx.restore(); return; }
   }
