@@ -37,6 +37,7 @@
 
     document.querySelectorAll("[data-i18n]").forEach(function (el) {
       el.textContent = t(el.getAttribute("data-i18n"));
+      koName(el);
     });
     document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
       el.innerHTML = t(el.getAttribute("data-i18n-html"));
@@ -52,6 +53,14 @@
     renderVideos();
     checkTagRows();
     if (progress) progress.render();
+  }
+
+  // 동 이름의 한국어 원래 이름: 한국어가 아닌 화면이면 동 이름(dong.* 키) 아래에 작게 한국어 이름을 붙임
+  //   (신분증·임대차 계약서의 한국어 주소와 맞춰 볼 수 있게). 글자는 CSS가 data-ko를 ::after로 그려 textContent 바꾸기와 부딪치지 않음
+  function koName(el) {
+    var key = el.getAttribute("data-i18n");
+    if (current !== "ko" && key && key.indexOf("dong.") === 0) el.setAttribute("data-ko", window.I18N.ko[key]);
+    else el.removeAttribute("data-ko");
   }
 
   // 맨 위로 버튼: 첫 화면 높이만큼 내려가면 보이고, 누르면 맨 위로 (움직임 줄이기 설정이면 바로 이동)
@@ -154,6 +163,7 @@
     function setText(el, key) {
       if (key) { el.setAttribute("data-i18n", key); el.textContent = t(key); }
       else { el.removeAttribute("data-i18n"); el.textContent = ""; }
+      koName(el); // 고른 동 제목에도 한국어 이름
     }
     function showGroup(group) {
       lab.querySelectorAll("[data-day]").forEach(function (li) {

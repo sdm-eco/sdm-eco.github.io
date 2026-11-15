@@ -235,7 +235,13 @@ function setupDialogs() {
 
   document.querySelectorAll("[data-eco-open]").forEach(function (btn) {
     const dialog = document.getElementById(btn.dataset.ecoOpen);
-    btn.addEventListener("click", function () { open(dialog, true); });
+    btn.addEventListener("click", function () {
+      open(dialog, true);
+      // data-eco-tab="이름": 창을 연 뒤 그 품목 탭을 눌러 둠(초점도 그 탭으로, setupItems show). 예: 첫 화면 '버리는 날·시간' 띠 → 동별 배출요일
+      //   창을 닫으면 setupItems가 첫 품목으로 되돌리므로 다른 버튼으로 열면 지금처럼 첫 탭부터 보임
+      const tab = btn.dataset.ecoTab && dialog.querySelector('[data-eco-lab]:not([hidden]) [data-eco-item="' + btn.dataset.ecoTab + '"]');
+      if (tab) tab.click();
+    });
   });
   // 배출방법 카드는 카드 어디를 눌러도 그 카드의 체험 창이 열림 (휴대폰 터치 영역을 카드 전체로)
   document.querySelectorAll(".guide-card").forEach(function (card) {
