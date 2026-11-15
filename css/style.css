@@ -658,10 +658,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 }
 
 /* ===== 버리는 날·시간 띠 (index.html .put-band, 디자인 점검) =====
-   모든 품목에 같은 내놓는 시간·요일 규칙을 첫 화면 바로 아래 흰 카드로: 배너 아래 끝에 살짝 걸쳐 올림(음수 위 여백)
+   모든 품목에 같은 내놓는 시간·요일 규칙을 배너(.hero) 안 맨 아래 흰 카드로: 위의 버튼·바로 가기 4칸과 같은 흰 카드 줄로 이어짐
+   (예전엔 배너 아래 끝에 26px만 걸쳐 있었는데, 배너 바닥이 흐릿하게 흐려져 위치가 어긋난 것처럼 보여 배너 안으로 옮김 — B안)
    넓은 화면은 한 줄(이름표 · 시간 | 요일 · 오른쪽 버튼), 701~1000px은 두 줄(이름표·버튼 / 시간 | 요일), 700px 이하는 세로로 쌓고 버튼 전체 폭
-   휴대폰은 main이 flex 세로 줄이고 배너가 order:-2라 같은 order를 줘야 배너 바로 아래(배출방법 카드 위)에 옴 */
-.put-band{position:relative;z-index:3;margin-top:-26px}
+   1000px 이하는 배너가 flex 세로 줄(그림 order:2)이라 띠에 order를 줘서 그림 아래 맨 끝에 둠 */
+.put-band{position:relative;z-index:1;margin:-13px 0 32px}
 .put-band-card{display:flex;align-items:center;gap:24px;padding:14px 14px 14px 26px;border:1.5px solid var(--card-line);border-radius:var(--radius);background:var(--white);box-shadow:0 18px 34px -24px color-mix(in srgb,var(--ink) 55%,transparent)}
 .put-band-label{flex:none;margin:0;font-size:15px;font-weight:800;line-height:1.3;letter-spacing:-.2px;color:var(--fresh-strong)}
 .put-band-item{display:flex;align-items:center;gap:12px;min-width:0;margin:0}
@@ -676,13 +677,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .put-band-btn:hover svg{transform:translateX(3px)}
 @media(prefers-reduced-motion:reduce){.put-band-btn:hover svg{transform:none}}
 @media(min-width:701px) and (max-width:1000px){
+  .put-band{order:3;margin:-40px 0 32px}
+}
+/* 두 줄 배치는 1200px까지: 1001~1200px에서 한 줄이면 베트남어처럼 긴 글이 칸마다 4줄로 접힘 */
+@media(min-width:701px) and (max-width:1200px){
   .put-band-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 20px;padding:16px 16px 18px 22px}
   .put-band-label{align-self:center}
   .put-band-btn{grid-column:2;grid-row:1;justify-self:end;margin-left:0;min-height:44px;font-size:15px}
   .put-band-item+.put-band-item{padding-left:20px}
 }
 @media(max-width:700px){
-  .put-band{order:-2;margin-top:-14px}
+  .put-band{order:3;margin:-8px 0 24px}
   .put-band-card{flex-direction:column;align-items:stretch;gap:12px;padding:16px 16px 16px}
   .put-band-item+.put-band-item{padding:12px 0 0;border-left:0;border-top:1px solid var(--line)}
   .put-band-icon{width:40px;height:40px;padding:9px}

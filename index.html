@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261115a">
+<link rel="stylesheet" href="css/style.css?v=20261115b">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -98,17 +98,17 @@
       </div>
 
     </div>
-  </section>
 
-  <!-- 버리는 날·시간 띠 (디자인 점검): 모든 품목에 같은 내놓는 시간·요일 규칙을 첫 화면 바로 아래에 보여 줌 (휴대폰에서도 배너 바로 아래, css .put-band order)
-       내용은 일반 쓰레기 창 '동별 배출요일' 탭(days.time·days.sat·days.same)과 같음. 버튼은 그 창을 동별 배출요일 탭으로 엶(data-eco-tab, eco3d.js setupDialogs) -->
-  <section class="put-band" aria-labelledby="put-band-title">
+    <!-- 버리는 날·시간 띠 (디자인 점검): 모든 품목에 같은 내놓는 시간·요일 규칙을 배너 안 맨 아래(바로 가기 4칸 아래)에 흰 카드로 보여 줌
+         내용은 일반 쓰레기 창 '동별 배출요일' 탭(days.time·days.sat·days.same)과 같음. 버튼은 그 창을 동별 배출요일 탭으로 엶(data-eco-tab, eco3d.js setupDialogs) -->
+    <section class="put-band" aria-labelledby="put-band-title">
     <div class="wrap put-band-card">
       <h2 class="put-band-label" id="put-band-title" data-i18n="band.label">버리는 날·시간</h2>
       <p class="put-band-item put-band-time"><svg class="put-band-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M19.5 14.6A7.6 7.6 0 0 1 9.4 4.5a7.6 7.6 0 1 0 10.1 10.1z"/></svg><span><strong data-i18n="band.time">저녁 6시 ~ 밤 11시</strong><small data-i18n="band.place">내 집·내 점포 앞</small></span></p>
       <p class="put-band-item put-band-days"><svg class="put-band-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/></svg><span><strong data-i18n="band.days">월·수·금 또는 화·목·일</strong><small data-i18n="band.note">동마다 달라요 · 토요일에는 내놓지 않아요</small></span></p>
       <button type="button" class="put-band-btn" data-eco-open="general-dialog" data-eco-tab="days"><span data-i18n="band.cta">우리 동 요일 찾기</span><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 8h11M9 3.5 13.5 8 9 12.5"/></svg></button>
     </div>
+    </section>
   </section>
 
   <section class="learn" aria-labelledby="learn-title">
