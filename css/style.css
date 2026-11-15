@@ -577,6 +577,8 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
      닫기 버튼(z-index 2)이 그림(z-index 1) 위에 오도록 순서 유지 */
   .eco-dialog .eco-lab{overflow:visible}
   .eco-dialog .eco-stage{position:sticky;top:0;z-index:1;height:clamp(220px,42svh,360px);min-height:0;box-shadow:0 12px 18px -14px color-mix(in srgb,var(--forest) 45%,transparent)}
+  /* 키보드로 단계 버튼에 초점이 가면 고정된 그림 아래에 보이게 스크롤(그림 높이 + 12px): 없으면 Shift+Tab으로 올라갈 때 버튼이 그림 뒤에 숨음 */
+  .eco-dialog{scroll-padding-top:calc(clamp(220px,42svh,360px) + 12px)}
   /* 효과음 버튼은 왼쪽 위로: 오른쪽 위는 화면에 고정된 닫기 버튼 자리라 그림이 맨 위에 붙으면 겹쳐 가려짐 */
   .eco-dialog .eco-sound{right:auto;left:14px}
 }

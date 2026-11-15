@@ -91,7 +91,20 @@
       nav.classList.remove("is-open");
       var tb = nav.querySelector(".nav-toggle"); if (tb) tb.setAttribute("aria-expanded", "false");
     }
+    // 키보드 초점 지키기: 창 폭이 바뀌어 초점이 있던 메뉴 링크(또는 '메뉴' 버튼)가 숨겨지면, 지금 보이는 쪽으로 초점을 옮김
+    //   (메뉴가 접히면 → '메뉴' 버튼, 다시 펼쳐지면 → 첫 메뉴 링크). 숨은 요소에 초점이 남으면 다음 Tab이 페이지 처음부터 시작됨
+    function keepFocus(was) {
+      if (!nav || !was || !nav.contains(was) || was.getClientRects().length) return;
+      var tb = nav.querySelector(".nav-toggle"), first = nav.querySelector(".nav-links a");
+      var to = tb && tb.getClientRects().length ? tb : first && first.getClientRects().length ? first : null;
+      if (to) to.focus({ preventScroll: true });
+    }
     function fit() {
+      var was = document.activeElement;
+      layout();
+      keepFocus(was);
+    }
+    function layout() {
       root.classList.remove("hdr-stacked", "nav-collapsed");
       // 휴대폰: 버튼 글자는 늘 '메뉴'(setLabel), 폭 고정 없음 — 칸 이름을 넣으면 긴 언어에서 사이트 제목이 세 줄로 눌림
       if (window.innerWidth <= 700) { root.classList.add("nav-collapsed"); if (lab) lab.style.minWidth = ""; return; }
@@ -153,7 +166,9 @@
       label.textContent = named ? current.a.textContent.trim() : t("nav.menu");
       toggle.classList.toggle("has-current", !!named);
     }
-    fitters.push(setLabel);
+    // 맨 앞에 넣음: 언어를 바꾸면 버튼 글자부터 새 언어로 바꾼 뒤 머리 부분 폭을 재야 함
+    //   (뒤에 두면 이전 언어의 긴 칸 이름으로 재서, 한 줄에 들어가는데도 두 줄로 남음 — 예: 베트남어→한국어, 폭 860px)
+    fitters.unshift(setLabel);
     window.addEventListener("resize", setLabel);
     function mark(hit) {
       if (hit === current) return;
