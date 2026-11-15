@@ -56,11 +56,12 @@ p{margin:0;text-wrap:pretty}
 nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 머리 메뉴: 메뉴 3개와 언어 선택을 같은 모양으로 — 연한 초록 트랙 하나에 묶고, 선택된(강조) 항목만 흰 칩으로 살짝 띄움 */
 .nav-links,.lang-switch{display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 8%,var(--white))}
-.nav-links a,.lang-switch button{display:inline-flex;align-items:center;justify-content:center;min-height:38px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-weight:700;white-space:nowrap;transition:background-color .2s,color .2s,box-shadow .2s}
+.nav-links a,.lang-switch button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font-weight:700;white-space:nowrap;transition:background-color .2s,color .2s,box-shadow .2s}
 .nav-links a{padding:0 18px;font-size:16px;text-wrap:balance}
 .nav-links a:hover,.lang-switch button:hover{background:var(--white);color:var(--ink)}
-/* 강조 메뉴(영상)·고른 언어: 흰 칩 + 진한 초록 글자 + 아래로 떨어지는 부드러운 그림자 */
-.nav-links a.nav-feature,.lang-switch button[aria-pressed="true"]{background:var(--white);color:var(--fresh-strong);box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 12%,transparent),0 4px 12px -4px color-mix(in srgb,var(--fresh-strong) 30%,transparent)}
+/* 지금 보고 있는 칸의 메뉴(main.js setupNavSpy, aria-current)·고른 언어: 흰 칩 + 진한 초록 글자 + 아래로 떨어지는 부드러운 그림자
+   (예전엔 '영상' 메뉴에 늘 흰 칩이 있어 늘 선택된 것처럼 보였음 — 디자인 점검 6번) */
+.nav-links a[aria-current="location"],.lang-switch button[aria-pressed="true"]{background:var(--white);color:var(--fresh-strong);box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 12%,transparent),0 4px 12px -4px color-mix(in srgb,var(--fresh-strong) 30%,transparent)}
 .nav-play{width:10px;height:10px;fill:currentColor;margin-right:8px}
 /* 언어 전환: 지구 모양 아이콘을 앞에 둔 별도 트랙으로, 언제나 위쪽 오른편(휴대폰은 맨 위)에 둠 */
 .lang-switch{order:3;padding-left:12px}
@@ -108,6 +109,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 바탕은 네 칸 모두 같은 흰색 반투명(배너 톤 유지), 카테고리 색은 아이콘에만. 올리거나 누를 때만 그 색이 옅게 비침 */
 .quick-cat:hover,.quick-cat:active{transform:translateY(-2px);background:var(--cat-bg);border-color:color-mix(in srgb,var(--cat) 45%,transparent);box-shadow:0 12px 22px -16px var(--cat)}
 .quick-cat img{width:46px;height:46px;flex:none;object-fit:contain}
+/* 네 칸 높이를 같게(가장 긴 이름에 맞춤), 아이콘·이름은 위에서부터: 한 칸만 이름이 두 줄이어도(베트남어 등) 아이콘과 첫 줄이 나란히 (디자인 점검 13번) */
+.quick-cats li{display:grid}
+.quick-cat{justify-content:flex-start}
 .btn{display:inline-flex;align-items:center;gap:10px;min-height:56px;padding:14px 24px;border:1.5px solid var(--fresh-strong);border-radius:999px;background:var(--fresh-strong);color:var(--white);font-size:17px;font-weight:800;transition:background-color .2s,border-color .2s}
 .btn:hover{background:var(--fresh-hover);border-color:var(--fresh-hover)}
 .btn-ghost{background:var(--mint);color:var(--fresh-strong);border-color:color-mix(in srgb,var(--fresh-strong) 45%,transparent)}
@@ -212,10 +216,12 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .section h2{font-size:37px;line-height:1.4;letter-spacing:-1.4px;margin:0;font-weight:850;text-wrap:balance}
 /* 섹션 제목: 작은 영어 꼬리표 + 가는 첫 줄 / 굵은 둘째 줄 (팀원 사이트 sdm-eco.vercel.app 구성 참고) */
 .eyebrow{display:block;margin-bottom:6px;color:var(--fresh-strong);font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+/* 꼬리표는 사이트 언어로(디자인 점검 10번, 예전엔 모든 언어에서 영어). 한글·한자는 자간을 넓히면 글자가 흩어져 보여 좁힘 */
+:lang(ko) .eyebrow,:lang(zh) .eyebrow{letter-spacing:.06em}
 .section h2 .h2-light{display:block;font-weight:400;color:var(--ink-2)}
 .section h2 .h2-bold{display:block}
 /* 맨 위로(main.js setupToTop): 첫 화면을 지나 내려가면 나타남 */
-.to-top{position:fixed;right:22px;bottom:22px;z-index:50;display:grid;place-items:center;width:52px;height:52px;padding:0;border:1.5px solid color-mix(in srgb,var(--fresh-strong) 30%,transparent);border-radius:50%;background:var(--white);color:var(--fresh-strong);box-shadow:0 8px 22px -8px color-mix(in srgb,var(--ink) 45%,transparent);opacity:0;visibility:hidden;transform:translateY(10px);transition:opacity .25s,transform .25s,visibility .25s}
+.to-top{position:fixed;right:22px;bottom:22px;z-index:50;display:grid;place-items:center;width:52px;height:52px;padding:0;border:1.5px solid color-mix(in srgb,var(--fresh-strong) 30%,transparent);border-radius:50%;background:var(--white);color:var(--fresh-strong);box-shadow:0 8px 22px -8px color-mix(in srgb,var(--ink) 45%,transparent);opacity:0;visibility:hidden;transform:translateY(10px);margin-bottom:var(--lift,0px);transition:opacity .25s,transform .25s,visibility .25s}
 .to-top.is-on{opacity:1;visibility:visible;transform:none}
 .to-top:hover{background:var(--mint)}
 .to-top:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:3px}
@@ -304,6 +310,13 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .eco-auto[data-state="playing"] :is(.i-play,.l-play),.eco-auto[data-state="paused"] :is(.i-pause,.l-pause){display:none}
 .eco-reset{min-height:44px;padding:0 6px;border:0;background:none;color:var(--link);font-size:16px;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 .eco-note{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line);font-size:15px;color:var(--muted);text-wrap:balance}
+/* 꼭 확인하세요 상자 (디자인 점검 8번): 사람들이 가장 많이 틀리는 예외 규칙이라 단계 목록 바로 아래에 연한 노랑 상자로.
+   제목은 data-check(4개 언어, i18n note.check)를 ::before로 보여 줌, 앞에 ⚠ 아이콘 */
+.eco-note.eco-check{margin:16px 0 0;padding:12px 16px 13px;border:1px solid var(--food-hi);border-radius:14px;background:var(--food-bg);color:var(--ink-2);font-size:15px;font-weight:600;line-height:1.6}
+.eco-check::before{content:attr(data-check);display:block;margin-bottom:4px;padding-left:24px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 2 20.5h20z' fill='%23f2b705'/%3E%3Cpath d='M12 9.5v5' stroke='%233d2f00' stroke-width='2.2' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='17.4' r='1.3' fill='%233d2f00'/%3E%3C/svg%3E") left center/18px no-repeat;color:var(--game-ink);font-size:14px;font-weight:800;letter-spacing:-.1px}
+/* 문의 전화: 휴대폰에서 누르면 바로 걸림(tel:) (디자인 점검 9번) */
+.tel-link{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.footer-contact .tel-link{color:var(--on-dark)}
 
 .eco-mini{position:relative}
 .eco-mini canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .45s}
@@ -332,8 +345,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 편마다 색 바탕 + 오른쪽 아래 캐릭터(img/video-ep*.webp), 왼쪽 위 편 배지·준비 중 배지, 왼쪽 아래 재생 버튼 */
 .video-frame{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--forest)}
 .ep-1 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#17683f,#2f9a5e 60%,#4cae74)}
-/* 2편 파랑은 재활용 카드의 파랑(--recycle #2f7fd6) 계열: 1편 초록과 같은 무게로 */
-.ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
+/* 2편은 영상 주황(--video, 학습 띠 '영상' 단계와 같은 색) 계열: 1편 초록과 같은 무게로.
+   예전엔 재활용 파랑이었으나 파랑은 '재활용'에만 쓰도록 바꿈(디자인 점검 5번, C안) */
+.ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,var(--video-ink),var(--video) 60%,#f6a27f)}
 .video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto}
 .video-ep,.video-soon{display:inline-block;padding:4px 13px;border-radius:999px;color:var(--white);font-size:14px;font-weight:800;line-height:1.5}
 .video-ep{position:absolute;left:20px;top:20px;z-index:1;border:1.5px solid color-mix(in srgb,var(--white) 80%,transparent)}
@@ -350,7 +364,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .video-placeholder .play-circle{position:absolute;left:20px;bottom:20px}
 .play-circle{display:grid;place-items:center;width:64px;height:64px;border-radius:50%;background:var(--white);box-shadow:0 6px 18px color-mix(in srgb,#000 18%,transparent)}
 .play-circle svg{width:24px;height:24px;fill:var(--ink);margin-left:4px}
-.video-card h3{margin:18px 8px 6px;font-size:24px;letter-spacing:-.6px}
+.video-card h3{margin:18px 8px 6px;font-size:24px;line-height:1.35;letter-spacing:-.6px} /* 두 줄이 될 때 줄 사이가 벌어지지 않게(본문 1.7보다 좁게) */
 .video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
 /* 주제 태그는 한 줄로: 칸보다 길면(좁은 화면·긴 언어) 옆으로 밀어서 봄, 넘칠 때만 오른쪽 끝을 흐려 더 있음을 알림(main.js setupTagRows) */
 .video-tags{display:flex;flex-wrap:nowrap;gap:5px;margin:14px 4px 0;padding:0 0 2px;list-style:none;overflow-x:auto;scrollbar-width:none}
@@ -389,11 +403,46 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .footer-meta p{margin-top:0;font-size:15px}
 .draft-note{color:var(--fresh-strong)!important;font-weight:700}
 
+/* 머리 부분 두 줄(메뉴를 아래 줄로): 화면 폭이 아니라 '한 줄에 다 들어가는지'로 정함 (main.js setupHeaderFit이 html.hdr-stacked를 붙임)
+   필요한 폭이 언어마다 달라서(한·중 약 1030px, 영 약 1170px, 베트남어 약 1270px) 폭 하나로 자르면 들어가는데도 내려가거나 넘침
+   hdr-measure: 잴 때만 잠깐 붙여 각 칸을 줄바꿈 없이 펼친 폭으로 재게 함 */
+html.hdr-measure .header-inner>*{flex:none}
+html.hdr-measure .brand-title,html.hdr-measure .brand-sub{white-space:nowrap}
+@media(min-width:701px){
+  html.hdr-stacked{scroll-padding-top:170px}
+  html.hdr-stacked .header-inner{flex-wrap:wrap;padding:14px 0 12px;gap:12px}
+  html.hdr-stacked:not(.nav-collapsed) nav{order:3;width:100%;margin-left:0;justify-content:space-between;flex-wrap:wrap}
+  html.hdr-stacked:not(.nav-collapsed) .lang-switch{order:2;margin-left:auto}
+  /* 메뉴를 접어도 한 줄에 안 들어가면(좁은 태블릿·긴 언어): 로고·메뉴 버튼 / 언어 선택(오른쪽) 두 줄 */
+  html.hdr-stacked.nav-collapsed .lang-switch{order:3;margin-left:auto}
+}
+@media(max-width:700px){
+  /* 휴대폰: 언어 선택 한 줄(맨 위) / 로고 + 메뉴 버튼(오른쪽)
+     사이트 제목이 길면(베트남어 등) 메뉴 버튼을 다음 줄로 내리지 않고 제목이 버튼 옆에서 두 줄로 접힘 */
+  .header-inner{flex-wrap:wrap}
+  .brand{flex:1 1 0;min-width:0}
+  nav{order:2;flex:none;margin-left:auto}
+}
+
+/* ===== 머리 메뉴 드롭다운 (html.nav-collapsed, main.js setupHeaderFit·setupNavMenu) =====
+   한 줄에 다 안 들어가면 메뉴 3개를 '메뉴 ▾' 버튼 하나로 접고, 누르면 아래로 펼침. 언어 선택은 접지 않음(외국인이 가장 먼저 찾는 것)
+   버튼 글자는 지금 보는 칸 이름(영상·배출방법 안내·게임, 첫 화면이면 '메뉴'), 펼친 목록에서도 지금 칸은 연한 초록 */
+.nav-toggle{display:none}
+html.nav-collapsed nav{position:relative}
+html.nav-collapsed .nav-toggle{display:inline-flex;align-items:center;gap:8px;min-height:50px;padding:0 18px 0 20px;border:0;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 8%,var(--white));color:var(--ink-2);font:inherit;font-size:16px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background-color .2s}
+html.nav-collapsed .nav-toggle:hover,html.nav-collapsed nav.is-open .nav-toggle{background:color-mix(in srgb,var(--fresh-strong) 14%,var(--white))}
+html.nav-collapsed .nav-toggle.has-current{color:var(--fresh-strong)}
+.nav-toggle-label{display:inline-block;text-align:left} /* 폭은 main.js sizeToggle이 가장 긴 글자에 맞춰 고정 */
+.nav-caret{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s}
+nav.is-open .nav-caret{transform:rotate(180deg)}
+html.nav-collapsed .nav-links{display:none;position:absolute;top:calc(100% + 8px);right:0;z-index:60;flex-direction:column;align-items:stretch;gap:2px;width:max-content;min-width:200px;padding:6px;border:1px solid var(--line);border-radius:18px;background:var(--white);box-shadow:0 18px 36px -18px color-mix(in srgb,var(--ink) 45%,transparent)}
+html.nav-collapsed nav.is-open .nav-links{display:flex}
+html.nav-collapsed .nav-links a{justify-content:flex-start;min-height:44px;padding:0 16px;border-radius:12px;font-size:16px;white-space:nowrap;text-align:left}
+html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);color:var(--fresh-strong);box-shadow:none}
+@media(max-width:700px){
+  html.nav-collapsed .nav-toggle{min-height:42px;padding:0 14px 0 16px;font-size:15px}
+}
 @media(max-width:1200px){
-  html{scroll-padding-top:170px}
-  .header-inner{flex-wrap:wrap;padding:14px 0 12px;gap:12px}
-  nav{order:3;width:100%;margin-left:0;justify-content:space-between;flex-wrap:wrap}
-  .lang-switch{order:2;margin-left:auto}
   .eco-lab{grid-template-columns:1fr}
   .eco-stage{min-height:440px}
 }
@@ -440,7 +489,8 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   .nav-links a{min-height:40px;justify-content:center;padding:4px 8px;border-radius:14px;font-size:15px;line-height:1.3;text-align:center;white-space:normal}
   .lang-switch{order:-1;width:100%;margin-left:0;padding:4px 4px 4px 10px}
   /* 칸 폭을 똑같이 나누지 않고 글자 길이에 맞춰 나눔: 긴 'Tiếng Việt'도 양옆 여백이 8px 이상 남게 */
-  .lang-switch button{flex:1 1 auto;min-height:38px;padding:0 8px;font-size:14px}
+  /* 높이 42px: 필수 기준(WCAG 2.2 AA 24px)은 넘고, 권장 44px에 가깝게 (디자인 점검 7번, 원래 38px) */
+  .lang-switch button{flex:1 1 auto;min-height:42px;padding:0 8px;font-size:14px}
   .lang-globe{margin-right:2px}
   .hero h1{font-size:clamp(26px,8.4vw,34px);letter-spacing:-1px;margin-bottom:0}
   :lang(zh) .hero h1{font-size:clamp(24px,7.6vw,30px)}
@@ -464,7 +514,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
   /* 휴대폰: 품목 버튼은 한 줄로 두고 옆으로 밀어서 봄(잘린 버튼이 더 있다는 표시) — 두 줄이 되면 3D가 너무 아래로 밀림 */
   .eco-items{flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:10px 64px 10px 14px;scroll-padding:0 64px 0 14px;scrollbar-width:none}
   .eco-items::-webkit-scrollbar{display:none}
-  .eco-items button{flex:none;min-height:40px;padding:0 14px;font-size:15px}
+  .eco-items button{flex:none;min-height:42px;padding:0 14px;font-size:15px} /* 42px: 디자인 점검 7번, 원래 40px */
   .eco-panel h3{font-size:24px}
   .footer-inner{flex-direction:column}
   .footer-meta{text-align:left}
@@ -481,8 +531,6 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
      학습 띠·영상·게임은 그 아래로 (화면 순서만 바꾸고 PC 순서는 그대로) ── */
   .brand-sub{display:none}
   .brand{min-height:44px}
-  /* 메뉴 대신 첫 화면의 큰 버튼과 카드로 이동 */
-  .header nav{display:none}
   main{display:flex;flex-direction:column}
   .hero{order:-2}
   #guide{order:-1;padding:16px 0 30px}
@@ -679,12 +727,26 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 @media(min-width:701px) and (max-width:1000px){
   .put-band{order:3;margin:-40px 0 32px}
 }
-/* 두 줄 배치는 1200px까지: 1001~1200px에서 한 줄이면 베트남어처럼 긴 글이 칸마다 4줄로 접힘 */
-@media(min-width:701px) and (max-width:1200px){
-  .put-band-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 20px;padding:16px 16px 18px 22px}
-  .put-band-label{align-self:center}
-  .put-band-btn{grid-column:2;grid-row:1;justify-self:end;margin-left:0;min-height:44px;font-size:15px}
-  .put-band-item+.put-band-item{padding-left:20px}
+/* PC(배너 그림이 띠 뒤에 깔리는 폭): 띠 오른쪽 절반을 점점 투명하게 해서 뒤의 그림(학생들 발·잔디)이 비치게.
+   글자가 있는 왼쪽 절반은 흰색 그대로(읽기), 투명해지는 쪽은 바로 가기 칸처럼 살짝 흐림. 버튼은 원래 색 그대로 */
+@media(min-width:1001px){
+  .put-band-card{background:linear-gradient(90deg,var(--white) 0%,var(--white) 50%,color-mix(in srgb,var(--white) 8%,transparent) 100%);-webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px)}
+  /* 띠가 배너 안에 들어와 배너가 길어진 만큼 그림 아래 끝을 올림: 그림이 함께 늘어나 학생들 발이 띠 뒤로 내려가 가려지지 않게 (띠 높이 + 아래 여백 정도) */
+  .hero-art{bottom:100px}
+}
+@media(min-width:1001px){
+  .hero:has(.put-band.is-stacked) .hero-art{bottom:150px} /* 띠가 두 줄(main.js setupBandFit)이면 그만큼 더 올림 */
+}
+/* 두 줄 배치(이름표·버튼 / 시간 | 요일): 화면 폭이 아니라 '한 줄에 줄바꿈 없이 다 들어가는지'로 정함
+   (main.js setupBandFit이 .put-band에 is-stacked를 붙임 — 한국어는 1000px 남짓까지 한 줄, 베트남어는 더 넓어야 한 줄)
+   is-measure: 잴 때만 잠깐 붙여 각 칸을 줄바꿈 없이 펼친 폭으로 재게 함 */
+.put-band.is-measure .put-band-card>*{flex:none}
+.put-band.is-measure .put-band-label,.put-band.is-measure .put-band-item strong,.put-band.is-measure .put-band-item small{white-space:nowrap}
+@media(min-width:701px){
+  .put-band.is-stacked .put-band-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 20px;padding:16px 16px 18px 22px}
+  .put-band.is-stacked .put-band-label{align-self:center}
+  .put-band.is-stacked .put-band-btn{grid-column:2;grid-row:1;justify-self:end;margin-left:0;min-height:44px;font-size:15px}
+  .put-band.is-stacked .put-band-item+.put-band-item{padding-left:20px}
 }
 @media(max-width:700px){
   .put-band{order:3;margin:-8px 0 24px}
@@ -718,13 +780,14 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 }
 /* 배출방법 카드 썸네일: 남학생 밝은 미소(img/cta-boy.webp) + 재활용 파랑 바탕 (영상 카드 썸네일과 같은 짜임, 색만 파랑) */
 @media(min-width:701px){
-  .hero-actions .btn-ghost::before{background:url("../img/cta-boy.webp?v=20261114e") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#1f5fae,var(--recycle) 60%,#5a9be3)}
-  /* 강조색은 썸네일 색을 따름: 영상 카드는 초록, 배출방법 카드는 진한 파랑(#1d63b5, 흰 바탕 대비 약 5.9:1).
+  .hero-actions .btn-ghost::before{background:url("../img/cta-boy.webp?v=20261114e") right -7px top 3px/auto 150% no-repeat,radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 60%),linear-gradient(135deg,#0b2e22,#1f5a3d 60%,#3d8560)}
+  /* 강조색은 썸네일 색을 따름: 영상 카드는 초록, 배출방법 카드는 진한 숲색(#14412c).
+     예전엔 파랑이었으나 파랑은 '재활용'에만 쓰도록 바꿈(디자인 점검 5번, C안).
      마우스를 올리면 각자 색으로 테두리·바탕이 옅게 물듦 (아래 타일이 카테고리 색으로 물드는 것과 같은 방식) */
   .hero-actions .btn:not(.btn-ghost):hover{border-color:color-mix(in srgb,var(--fresh) 50%,transparent);background:color-mix(in srgb,var(--fresh) 7%,var(--white))}
-  .hero-actions .btn-ghost{color:#1d63b5}
-  .hero-actions .btn-ghost .btn-icon-line{stroke:#1d63b5}
-  .hero-actions .btn-ghost:hover{border-color:color-mix(in srgb,var(--recycle) 50%,transparent);background:color-mix(in srgb,var(--recycle) 7%,var(--white));color:#1d63b5;box-shadow:0 14px 26px -18px color-mix(in srgb,#1f5fae 70%,transparent)}
+  .hero-actions .btn-ghost{color:#14412c}
+  .hero-actions .btn-ghost .btn-icon-line{stroke:#14412c}
+  .hero-actions .btn-ghost:hover{border-color:color-mix(in srgb,#1f5a3d 50%,transparent);background:color-mix(in srgb,#1f5a3d 7%,var(--white));color:#14412c;box-shadow:0 14px 26px -18px color-mix(in srgb,#0b2e22 70%,transparent)}
 }
 
 /* ===== 바로가기 타일: 마우스를 올리면 품목마다 다른 동작 (마우스가 있는 기기만, 움직임 줄이기 설정이면 멈춤) =====

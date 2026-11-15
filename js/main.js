@@ -6,6 +6,7 @@
   var config = window.SITE_CONFIG || {};
   var current = "ko";
   var progress = null;
+  var fitters = []; // setupHeaderFit·setupBandFit이 넣음: 언어를 바꾸면 글 폭이 달라져 한 줄/두 줄을 다시 잼
 
   function t(key) {
     var dict = window.I18N[current] || window.I18N.ko;
@@ -53,6 +54,7 @@
     renderVideos();
     checkTagRows();
     if (progress) progress.render();
+    fitters.forEach(function (f) { f(); });
   }
 
   // 동 이름의 한국어 원래 이름: 한국어가 아닌 화면이면 동 이름(dong.* 키) 아래에 작게 한국어 이름을 붙임
@@ -65,12 +67,154 @@
 
   // 맨 위로 버튼: 첫 화면 높이만큼 내려가면 보이고, 누르면 맨 위로 (움직임 줄이기 설정이면 바로 이동)
   //   버튼을 누른 뒤에는 키보드 이용자를 위해 맨 위의 '본문 바로가기'(없으면 로고)로 초점을 옮김
+  // 머리 부분 한 줄/두 줄: 로고·메뉴·언어 선택이 한 줄에 다 들어가면 한 줄, 아니면 html.hdr-stacked(메뉴를 아래 줄로)
+  //   잴 때는 hdr-measure로 각 칸을 줄바꿈 없이 펼쳐 넘치는지 봄. 휴대폰(700px 이하)은 늘 두 줄(CSS가 따로 처리)
+  function setupHeaderFit() {
+    var root = document.documentElement, inner = document.querySelector(".header-inner");
+    if (!inner) return;
+    // 1) 메뉴를 펼친 채 한 줄에 들어가면 그대로 → 2) 안 되면 메뉴를 드롭다운 버튼으로 접고(nav-collapsed) 다시 잼
+    //    → 3) 그래도 안 되면 두 줄(hdr-stacked). 휴대폰은 늘 접은 메뉴(배치는 CSS)
+    var nav = inner.querySelector("nav"), lab = nav && nav.querySelector(".nav-toggle-label");
+    // 접은 메뉴 버튼 폭을 가장 긴 글자('메뉴'·칸 이름 셋 중)에 맞춰 고정: 스크롤로 글자가 바뀌어도 머리 부분이 한 줄↔두 줄로 출렁이지 않게
+    function sizeToggle() {
+      if (!lab) return;
+      var keep = lab.textContent, max = 0;
+      lab.style.minWidth = "";
+      [t("nav.menu")].concat(Array.prototype.map.call(nav.querySelectorAll(".nav-links a"), function (a) { return a.textContent.trim(); }))
+        .forEach(function (txt) { lab.textContent = txt; max = Math.max(max, lab.getBoundingClientRect().width); });
+      lab.textContent = keep;
+      lab.style.minWidth = Math.ceil(max) + "px";
+    }
+    function fit() {
+      root.classList.remove("hdr-stacked", "nav-collapsed");
+      if (nav) { nav.classList.remove("is-open"); var tb = nav.querySelector(".nav-toggle"); if (tb) tb.setAttribute("aria-expanded", "false"); }
+      // 휴대폰: 버튼 글자는 늘 '메뉴'(setLabel), 폭 고정 없음 — 칸 이름을 넣으면 긴 언어에서 사이트 제목이 세 줄로 눌림
+      if (window.innerWidth <= 700) { root.classList.add("nav-collapsed"); if (lab) lab.style.minWidth = ""; return; }
+      root.classList.add("hdr-measure");
+      var over = inner.scrollWidth > inner.clientWidth + 1;
+      if (over) {
+        root.classList.add("nav-collapsed");
+        sizeToggle();
+        over = inner.scrollWidth > inner.clientWidth + 1;
+      }
+      root.classList.remove("hdr-measure");
+      root.classList.toggle("hdr-stacked", over);
+    }
+    fitters.push(fit);
+    fit();
+    window.addEventListener("resize", fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit); // 글꼴이 늦게 받아지면 폭이 달라짐
+  }
+
+  // 버리는 날·시간 띠 한 줄/두 줄: 이름표·시간·요일·버튼이 줄바꿈 없이 한 줄에 들어가면 한 줄, 아니면 .is-stacked(두 줄)
+  //   휴대폰(700px 이하)은 CSS가 세로로 쌓음. 여유 24px은 한 줄일 때 칸 사이가 너무 붙지 않게
+  function setupBandFit() {
+    var band = document.querySelector(".put-band"), card = band && band.querySelector(".put-band-card");
+    if (!card) return;
+    function fit() {
+      band.classList.remove("is-stacked");
+      if (window.innerWidth <= 700) return;
+      band.classList.add("is-measure");
+      var cs = getComputedStyle(card), kids = card.children, need = 24;
+      need += parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + (parseFloat(cs.columnGap) || 0) * (kids.length - 1);
+      for (var i = 0; i < kids.length; i++) need += kids[i].getBoundingClientRect().width;
+      var over = need > card.clientWidth;
+      band.classList.remove("is-measure");
+      band.classList.toggle("is-stacked", over);
+    }
+    fitters.push(fit);
+    fit();
+    window.addEventListener("resize", fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  }
+
+  // 머리 메뉴: 지금 화면에 보이는 칸(영상·배출방법·게임)의 메뉴에 흰 칩(aria-current="location")
+  //   화면 위에서 40% 높이의 가로선이 지나는 칸을 '지금 보는 칸'으로 봄. 첫 화면(배너)이면 아무것도 고르지 않음
+  //   큰 화면에선 맨 끝 칸(게임)이 맨 아래까지 내려도 40% 선에 닿지 않으므로, 페이지 맨 아래면 화면에 보이는 마지막 칸을 고름
+  //   메뉴를 누르면 누른 메뉴를 바로 고르고, 사용자가 직접 스크롤(휠·터치·키·마우스)하기 전까지 유지
+  //   (이미 맨 아래라 화면이 안 움직이거나, 눌러서 맨 아래까지 내려가 '맨 아래 규칙'이 다른 칸을 고르는 경우에도 누른 메뉴가 보이게)
+  function setupNavSpy() {
+    var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+    var pairs = links.map(function (a) { return { a: a, sec: document.getElementById(a.getAttribute("href").slice(1)) }; })
+      .filter(function (p) { return p.sec; });
+    if (!pairs.length) return;
+    var queued = false, current = null, pinned = null;
+    // 접은 메뉴 버튼(.nav-toggle) 글자 = 지금 보는 칸 이름, 없으면 '메뉴' (언어를 바꾸면 다시 씀)
+    var toggle = document.querySelector(".nav-toggle"), label = toggle && toggle.querySelector(".nav-toggle-label");
+    function setLabel() {
+      if (!label) return;
+      var named = current && window.innerWidth > 700; // 휴대폰은 늘 '메뉴'(좁아서)
+      label.textContent = named ? current.a.textContent.trim() : t("nav.menu");
+      toggle.classList.toggle("has-current", !!named);
+    }
+    fitters.push(setLabel);
+    window.addEventListener("resize", setLabel);
+    function mark(hit) {
+      if (hit === current) return;
+      current = hit;
+      pairs.forEach(function (p) {
+        if (p === hit) p.a.setAttribute("aria-current", "location");
+        else p.a.removeAttribute("aria-current");
+      });
+      setLabel();
+    }
+    function update() {
+      queued = false;
+      if (pinned) { mark(pinned); return; }
+      var vh = window.innerHeight, y = vh * 0.4, hit = null;
+      var atBottom = window.scrollY > 0 && window.scrollY + vh >= document.documentElement.scrollHeight - 2;
+      pairs.forEach(function (p) {
+        var r = p.sec.getBoundingClientRect();
+        if (r.top <= y && r.bottom > y) hit = p;
+        if (atBottom && r.top < vh && r.bottom > 0) hit = p; // 맨 아래: 보이는 칸 중 마지막
+      });
+      mark(hit);
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(update); } }
+    pairs.forEach(function (p) { p.a.addEventListener("click", function () { pinned = p; mark(p); }); });
+    // 사용자가 직접 스크롤을 시작하면 고정을 풀고 다시 화면 위치로 판단
+    function unpin(e) {
+      if (!pinned) return;
+      if (e.type === "keydown" && !/^(Arrow|Page|Home|End| )/.test(e.key)) return;
+      if (e.type === "mousedown" && e.target.closest && e.target.closest(".nav-links")) return;
+      pinned = null;
+      queue();
+    }
+    ["wheel", "touchstart", "keydown", "mousedown"].forEach(function (t) { window.addEventListener(t, unpin, { passive: true }); });
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    update();
+    setLabel();
+  }
+
+  // 접은 메뉴 열기·닫기: 버튼을 누르면 펼침, 메뉴를 고르거나 바깥을 누르거나 Esc면 닫힘(Esc는 버튼으로 초점을 돌려줌)
+  function setupNavMenu() {
+    var nav = document.querySelector(".header nav"), btn = nav && nav.querySelector(".nav-toggle");
+    if (!btn) return;
+    function setOpen(open) {
+      nav.classList.toggle("is-open", open);
+      btn.setAttribute("aria-expanded", String(open));
+    }
+    btn.addEventListener("click", function () { setOpen(!nav.classList.contains("is-open")); });
+    nav.querySelectorAll(".nav-links a").forEach(function (a) { a.addEventListener("click", function () { setOpen(false); }); });
+    document.addEventListener("click", function (e) { if (nav.classList.contains("is-open") && !nav.contains(e.target)) setOpen(false); });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && nav.classList.contains("is-open")) { setOpen(false); btn.focus(); }
+    });
+  }
+
   function setupToTop() {
     var btn = document.querySelector(".to-top");
     if (!btn) return;
     var calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    var on = false;
+    var on = false, footer = document.querySelector(".footer"), lift = -1;
     function update() {
+      // 꼬리말이 화면에 들어오면 버튼을 꼬리말 위(12px 띄움)로 올려 꼬리말 글자를 가리지 않게 (디자인 점검 11번)
+      if (footer) {
+        var base = parseFloat(getComputedStyle(btn).bottom) || 0;
+        var l = Math.max(0, Math.round(window.innerHeight - footer.getBoundingClientRect().top - base + 12));
+        if (l !== lift) { lift = l; btn.style.setProperty("--lift", l + "px"); }
+      }
       var show = window.scrollY > window.innerHeight * 0.8;
       if (show === on) return;
       on = show;
@@ -78,6 +222,7 @@
       btn.tabIndex = on ? 0 : -1;
     }
     window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
     update();
     btn.addEventListener("click", function () {
       window.scrollTo({ top: 0, behavior: calm ? "auto" : "smooth" });
@@ -944,7 +1089,11 @@
 
   startAtTopOnReload();
   setupGame();
+  setupHeaderFit();
+  setupNavMenu();
+  setupBandFit();
   setupToTop();
+  setupNavSpy();
   setupHeroScene();
   setupBinMarks();
   setupFigures();
