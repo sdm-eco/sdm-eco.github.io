@@ -85,9 +85,14 @@
       lab.textContent = keep;
       lab.style.minWidth = Math.ceil(max) + "px";
     }
+    // 열린 메뉴는 '접은 메뉴'가 아니게 될 때만 닫음 (휴대폰은 스크롤할 때 주소창이 접히며 resize가 나서, 무조건 닫으면 열어 둔 메뉴가 저절로 닫힘)
+    function closeIfExpanded() {
+      if (!nav || root.classList.contains("nav-collapsed")) return;
+      nav.classList.remove("is-open");
+      var tb = nav.querySelector(".nav-toggle"); if (tb) tb.setAttribute("aria-expanded", "false");
+    }
     function fit() {
       root.classList.remove("hdr-stacked", "nav-collapsed");
-      if (nav) { nav.classList.remove("is-open"); var tb = nav.querySelector(".nav-toggle"); if (tb) tb.setAttribute("aria-expanded", "false"); }
       // 휴대폰: 버튼 글자는 늘 '메뉴'(setLabel), 폭 고정 없음 — 칸 이름을 넣으면 긴 언어에서 사이트 제목이 세 줄로 눌림
       if (window.innerWidth <= 700) { root.classList.add("nav-collapsed"); if (lab) lab.style.minWidth = ""; return; }
       root.classList.add("hdr-measure");
@@ -99,6 +104,7 @@
       }
       root.classList.remove("hdr-measure");
       root.classList.toggle("hdr-stacked", over);
+      closeIfExpanded();
     }
     fitters.push(fit);
     fit();
