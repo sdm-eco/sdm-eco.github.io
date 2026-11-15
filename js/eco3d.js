@@ -62,14 +62,15 @@ function initLab(lab) {
   // 자동 진행: 창을 열면 1단계부터 저절로 넘어감. 각 단계의 움직임이 끝난 뒤 그 단계 설명을 읽을 시간만큼 기다림.
   // 단계 버튼·다음 단계를 누르면 멈추고 사용자에게 맡김. 마지막 단계에서 멈춤.
   // 움직임 줄이기 설정이면 자동 진행 없이 지금처럼 직접 누르는 방식만 씀.
-  // 읽을 시간 = 1.5초 + 설명 글자 수 × 언어별 글자당 시간, 2~4.5초 사이 (예전엔 모든 단계 3.5초 고정)
-  //   같은 내용이라도 영어·베트남어는 글자가 2배쯤 많아 글자당 시간을 절반으로 둠 → 네 언어 평균 약 2.6초
+  // 읽을 시간 = 0.8초 + 설명 글자 수 × 언어별 글자당 시간, 1~3초 사이 (구청 의견 5-1 '다음 단계 이동이 느림')
+  //   같은 내용이라도 영어·베트남어는 글자가 2배쯤 많아 글자당 시간을 절반으로 둠
+  //   이 대기는 단계 움직임(대부분 2.4~3초)이 끝난 뒤에 시작하므로, 움직이는 동안에도 설명을 읽을 수 있음
   const PER_CHAR = { ko: 30, zh: 40, en: 15, vi: 15 };
   function dwell(n) {
     const btn = lab.querySelector('[data-step="' + n + '"]');
     const lang = (document.documentElement.lang || "ko").slice(0, 2);
     const len = btn ? btn.textContent.replace(/\s+/g, " ").trim().length : 0;
-    return Math.min(4500, Math.max(2000, 1500 + len * (PER_CHAR[lang] || 30)));
+    return Math.min(3000, Math.max(1000, 800 + len * (PER_CHAR[lang] || 30)));
   }
   const auto = lab.querySelector("[data-eco-auto]");
   const dialog = lab.closest("dialog");
