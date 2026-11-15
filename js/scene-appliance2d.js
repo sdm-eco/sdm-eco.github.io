@@ -1,7 +1,7 @@
 // 폐가전 장면 — 그림(2D)
 // 서대문구 폐금속자원 배출 안내: 냉장고·에어컨·세탁기·TV 등 대형폐가전(또는 소형 5개 이상)은 폐가전 무상방문수거 예약(☎1599-0903),
 // 소형폐가전 5개 미만은 구청 홈페이지 "대형폐기물 신고"에서 무상 신고 → 접수증 부착 후 건물 밖 배출
-// 그림: img/scene/appliance/*.webp (냉장고·전기 주전자·선풍기). 휴대폰·접수증·손수레·트럭은 그림이 없어 도형으로 그림
+// 그림: img/scene/appliance/*.webp (냉장고·전기 주전자·선풍기·헤어드라이기). 휴대폰·접수증·손수레·트럭은 그림이 없어 도형으로 그림
 // 단계 값은 3D 장면(scene-appliance.js)과 같아 효과음 순간도 같게 맞춤
 // 휴대폰·접수증·손가락 그리기는 대형 폐기물 장면(scene-bulky2d.js)의 것을 같이 씀
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
@@ -15,6 +15,7 @@ const TAU = Math.PI * 2;
 const FRIDGE = { w: 179, h: 337 };
 const KETTLE = { w: 220, h: 260, tag: { x: 92, y: 126 } };
 const FAN = { w: 203, h: 320 };
+const DRYER = { w: 190, h: 170 };
 
 // 장면 배치 (설계 크기 820×760 기준, eco2d.js)
 const GY = 700;                 // 바닥선
@@ -28,6 +29,8 @@ const BED = { x: -70, y: -100 };  // 트럭 가운데에서 짐칸 바닥 가운
 const DOLLY_STOP = 320;         // 손수레가 짐칸 뒤끝에 서는 자리
 const KK = 0.96, KN = 1;        // 주전자·선풍기 배율
 const KET_X = 290, FAN_X = 520; // 작은 가전 자리
+// 헤어드라이기: 주전자 왼쪽 조금 앞(바닥선 아래로 14) — 오른쪽은 3단계 휴대폰 자리라 왼쪽에 둠
+const DRY_X = 110, DRY_GY = GY + 14, KD = 0.9;
 const TAG = { w: 104, h: 69 };  // 주전자에 붙은 접수증 크기
 const CALL_BTN_Y = -PHONE.h / 2 + PHONE.sy + 236;  // 전화 화면 통화 버튼: 휴대폰 가운데에서 아래로
 
@@ -41,7 +44,7 @@ export default {
     { book: 1, pickup: 1, small: 1 }
   ],
   moves: [null, [["book", 2.4]], [["pickup", 3.0]], [["small", 2.8]]],
-  images: { fridge: D + "fridge.webp", kettle: D + "kettle.webp", fan: D + "fan.webp" },
+  images: { fridge: D + "fridge.webp", kettle: D + "kettle.webp", fan: D + "fan.webp", dryer: D + "dryer.webp?v=20261115b" },
   draw: draw
 };
 
@@ -123,11 +126,12 @@ function draw(ctx, v, s) {
   }
   if (truckOn && loaded) truckFront(ctx, tx, TGY);
 
-  // ── 3단계: 작은 가전(주전자·선풍기)이 위에서 떨어져 통통 내려앉음 ──
+  // ── 3단계: 작은 가전(주전자·선풍기·헤어드라이기)이 위에서 차례로 떨어져 통통 내려앉음 ──
   if (sp > 0) {
-    const kt = clamp01(sp / 0.3), nt = clamp01((sp - 0.06) / 0.3);
+    const kt = clamp01(sp / 0.3), nt = clamp01((sp - 0.06) / 0.3), dt = clamp01((sp - 0.12) / 0.3);
     const kLand = kt > 0.58 && kt < 0.8 ? Math.sin(Math.PI * (kt - 0.58) / 0.22) : 0;
     const nLand = nt > 0.58 && nt < 0.8 ? Math.sin(Math.PI * (nt - 0.58) / 0.22) : 0;
+    const dLand = dt > 0.58 && dt < 0.8 ? Math.sin(Math.PI * (dt - 0.58) / 0.22) : 0;
     const slap = clamp01((sp - 0.85) / 0.1);
     const jolt = wobble(clamp01((sp - 0.85) / 0.15), 2);
     // 선풍기
@@ -151,6 +155,12 @@ function draw(ctx, v, s) {
         { rot: 0.05 + wobble(slap, 2) * 0.12, sx: 1 + 0.15 * Math.sin(slap * Math.PI), sy: 1 - 0.1 * Math.sin(slap * Math.PI) });
     }
     ctx.restore();
+    // 헤어드라이기 (주전자보다 조금 앞이라 나중에 그림)
+    if (dt > 0) {
+      const dy = bounceDrop(dt) * 380, dsy = 1 - dLand * 0.12;
+      shade(ctx, DRY_X, DRY_GY, DRYER.w * KD * 1.05 * (1 - dy / 600), smooth(0, 0.1, dt));
+      put(ctx, img.dryer, DRY_X, DRY_GY - dy, DRYER.w * KD, DRYER.h * KD, { sx: 1 / Math.sqrt(dsy), sy: dsy, alpha: smooth(0, 0.08, dt) });
+    }
   }
 
   // ── 휴대폰 ──
@@ -368,7 +378,7 @@ function sounds(v) {
   if (hit(v, "pickup", 0.01)) sfx.play("roll", 0.75); // 손수레 들어옴
   if (hit(v, "pickup", 0.42)) sfx.play("tap");        // 냉장고가 기울어 실림
   if (hit(v, "pickup", 0.5)) sfx.play("roll", 1.5);   // 실어 나감
-  if (hit(v, "small", 0.18) || hit(v, "small", 0.24)) sfx.play("tap"); // 주전자·선풍기 톡톡
+  if (hit(v, "small", 0.18) || hit(v, "small", 0.24) || hit(v, "small", 0.3)) sfx.play("tap"); // 주전자·선풍기·드라이기 톡톡톡
   if (hit(v, "small", 0.85)) sfx.play("stick");       // 접수증 착
   if (hit(v, "small", 0.95)) sfx.play("chime");       // 끝 띵동
 }
