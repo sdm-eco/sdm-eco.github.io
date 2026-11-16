@@ -5,6 +5,7 @@
 //  - def.draw(ctx, v, s): 그리는 일은 장면 파일이 맡음. s = { img, dt, t, mem }, 좌표는 아래 설계 크기(W×H) 기준
 //  - 돌려주는 view: goTo(n, instant), busy(), destroy() — eco3d.js의 initLab이 쓰는 것과 같음
 // 3D와 달리 Three.js·WebGL이 필요 없어 빨리 뜨고, 드래그 회전은 없음
+import { marksReady } from "./eco2d-util.js?v=20261116c";
 const W = 820, H = 760; // 설계 크기: 장면은 이 안에 그리고, 화면 칸에 맞춰 비율을 지켜 줄이거나 늘림 (아래쪽 맞춤)
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -21,7 +22,8 @@ function loadImages(map) {
 }
 
 export async function create2DView(stage, canvas, def, opts) {
-  const img = await loadImages(def.images);
+  // 장면 그림과 수거함 이름표의 공식 도안을 모두 받은 뒤 시작(도안은 eco2d-util.js가 미리 받기 시작함)
+  const img = (await Promise.all([loadImages(def.images), marksReady]))[0];
   const ctx = canvas.getContext("2d");
   const states = def.states, moves = def.moves;
   // 단계 진행 (eco3d.js createView와 같은 방식): 값을 차례로 0~1 사이에서 직선으로 바꾸고 부드럽게 보이는 처리는 장면이 맡음

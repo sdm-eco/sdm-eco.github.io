@@ -126,10 +126,11 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .hero-scene{--scene-filter:hue-rotate(10deg) saturate(1.05) contrast(1.07) brightness(1.03);position:absolute;left:-8%;top:-6.5%;width:110%;height:110%;-webkit-mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to right,transparent 7.27%,#000 30.91%),linear-gradient(to bottom,#000 78.64%,transparent 96.82%);mask-composite:intersect}
 /* 나타나는 효과가 끝나면 효과를 남기지 않음(backwards): 끝난 뒤에도 그림이 별도 층으로 남으면 Edge에서 폭을 바꾼 뒤 흐림 마스크가 예전 크기로 남아 그림이 잘려 보였음 */
 /* 그림의 누런 기를 빼고(풀색을 푸르게) 조금 맑게
-   가로 기준 114%: 그림을 왼쪽으로 당겨 오른쪽 폭포가 더 보이게(58% → 114%, 1440px 화면에서 약 76px ≈ 2cm)
-   100%를 넘기면 그림 오른쪽 끝이 칸 오른쪽 끝보다 안쪽으로 들어옴 — 1400px 이상은 칸 오른쪽 1.82%가 투명(흐림)이라 빈 곳이 보이지 않음
-   (1440px: 그림 끝 1358px, 투명 시작 1360px). 1000px 이하는 그림이 칸에 맞아 가로 기준이 효과 없음 */
-.hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:114% 45%;filter:var(--scene-filter);animation:scene-in 1.4s ease-out backwards}
+   가로 기준 112%: 그림을 왼쪽으로 당겨 오른쪽 폭포가 더 보이게(58% → 112%, 1440px 화면에서 약 73px ≈ 2cm)
+   100%를 넘기면 그림 오른쪽 끝이 칸 오른쪽 끝보다 안쪽으로 들어옴. 1400px 이상은 그림이 칸보다 136px 넓고 칸 오른쪽 1.82%(약 16.9px)가 완전 투명이라
+   들어오는 폭 136 × 12% ≈ 16.3px가 그 안에 머물러 빈 곳이 보이지 않음(114%면 약 19px로 2px가 흐림 구간에 드러났음 — 코덱스 리뷰)
+   1000px 이하는 그림이 칸에 맞아 가로 기준이 효과 없음 */
+.hero-scene img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover;object-position:112% 45%;filter:var(--scene-filter);animation:scene-in 1.4s ease-out backwards}
 @keyframes scene-in{from{opacity:0;transform:scale(1.03)}}
 /* 넓은 화면(1400px 이상): 그림이 화면 오른쪽 끝까지 가면 아래 내용(최대 1280px)보다 튀어나오고 글과 사이가 벌어짐
    → 그림 오른쪽 끝을 내용 오른쪽 끝에 맞추고 폭도 내용 폭 기준으로, 오른쪽 끝도 살짝 흐려 잘린 느낌을 없앰 */

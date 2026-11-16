@@ -101,6 +101,12 @@ const MARK = {};
   im.src = "img/scene/common/mark-" + p[1] + ".svg";
   MARK[p[0]] = im;
 });
+// 공식 도안을 다 받을 때까지(못 받아도) 기다리는 약속: create2DView가 장면 그림과 함께 기다린 뒤 처음 그림
+//   (따로 받기만 하면, 장면이 멈춘 뒤 도안이 도착했을 때 다시 그리지 않아 이름표가 빈 채로 남았음 — 느린 망·움직임 줄이기 설정)
+export const marksReady = Promise.all(Object.keys(MARK).map(function (k) {
+  const im = MARK[k];
+  return im.complete ? null : new Promise(function (ok) { im.addEventListener("load", ok); im.addEventListener("error", ok); });
+}));
 // 두 줄까지 허용하는 글자: 너무 길면 띄어쓰기(없으면 가운데 글자)에서 나눠 두 줄로
 function fitText2(ctx, text, cx, cy, maxW, size, weight, color) {
   ctx.save(); ctx.font = `${weight} ${Math.round(size)}px ${FONT}`;
