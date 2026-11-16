@@ -50,7 +50,8 @@ p{margin:0;text-wrap:pretty}
 .brand{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center}
 .brand>span{display:contents}
 .brand-mark{grid-row:1;width:auto;height:44px}
-.brand-title{grid-column:2;display:block;font-size:22px;font-weight:850;line-height:1.25;letter-spacing:-.6px}
+/* 제목: 붓글씨 글자 그림(img/brand-title.webp, 504×168). 높이 = 폭 ÷ 3 */
+.brand-title{grid-column:2;display:block;width:162px;height:auto}
 nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 머리 메뉴: 메뉴 3개와 언어 선택을 같은 모양으로 — 연한 초록 트랙 하나에 묶고, 선택된(강조) 항목만 흰 칩으로 살짝 띄움 */
 .nav-links,.lang-switch{display:flex;align-items:center;gap:2px;padding:4px;border-radius:999px;background:color-mix(in srgb,var(--fresh-strong) 8%,var(--white))}
@@ -404,7 +405,6 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
    필요한 폭이 언어마다 달라서(한·중 약 1030px, 영 약 1170px, 베트남어 약 1270px) 폭 하나로 자르면 들어가는데도 내려가거나 넘침
    hdr-measure: 잴 때만 잠깐 붙여 각 칸을 줄바꿈 없이 펼친 폭으로 재게 함 */
 html.hdr-measure .header-inner>*{flex:none}
-html.hdr-measure .brand-title{white-space:nowrap}
 @media(min-width:701px){
   html.hdr-stacked{scroll-padding-top:170px}
   html.hdr-stacked .header-inner{flex-wrap:wrap;padding:14px 0 12px;gap:12px}
@@ -489,9 +489,7 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
   .header-inner{padding:10px 0;gap:8px}
   nav{row-gap:8px}
   .brand-mark{height:36px}
-  .brand-title{font-size:18px}
-  /* 베트남어 둘째 줄(Hướng dẫn phân loại rác)이 메뉴 버튼 옆에서 한 줄로 들어가게(360px 폭까지) */
-  :lang(vi) .brand-title{font-size:16px}
+  .brand-title{width:132px}
   /* 좁은 화면: 메뉴 3칸이 트랙을 꽉 채움. 긴 언어(베트남어 등)는 두 줄이 될 수 있어 모서리를 덜 둥글게 */
   .nav-links{width:100%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px;border-radius:18px}
   .nav-links a{min-height:40px;justify-content:center;padding:4px 8px;border-radius:14px;font-size:15px;line-height:1.3;text-align:center;white-space:normal}
