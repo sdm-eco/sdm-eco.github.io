@@ -90,18 +90,16 @@ export function fitText(ctx, text, cx, cy, maxW, size, weight, color) {
   ctx.fillText(text, cx, cy);
   ctx.restore();
 }
-// 분리배출 표시 (구청 2차 의견 2-8 '재활용 마크를 정확하게'): 환경부고시 제2021-140호 「분리배출 표시에 관한 지침」 별표 도안
-//  - 화살표 3개가 시계 방향으로 돌며 정삼각형을 이루고(화살표 뒷부분은 120°로 꺾임), 가운데에 도안 내부 표시 문자
-//  - 세부 재질(캔류의 철·알루미늄)은 삼각형 아래. 표시 문자는 제품에 찍힌 그대로 한국어(외국인도 제품에서 이 글자를 찾게 됨)
-//  - 색은 고시 표의 권장 색(무색페트 노랑·캔류 회색·유리 주황·일반팩 녹색). 흰 이름표 위에서 읽히게 조금 진하게
-//  - 우유팩 같은 살균팩은 '일반팩'(멸균팩과 구분), 페트는 '무색페트'
-const MARK = {
-  "item.pet": { text: "무색페트", color: "#c99400" },
-  // 고시 도안은 캔류 아래에 세부 재질(철·알루미늄)을 쓰지만, 수거함 이름표 크기에서는 읽히지 않아 '캔류'만 씀
-  "item.can": { text: "캔류", color: "#6f757c" },
-  "item.glass": { text: "유리", color: "#d9631c" },
-  "item.carton": { text: "일반팩", color: "#2e8b3a" }
-};
+// 분리배출 표시 (구청 2차 의견 2-8 '재활용 마크를 정확하게'): 한국환경공단이 배포하는 공식 도안 파일을 그대로 씀
+//  - img/scene/common/mark-*.svg: 한국환경공단 분리배출표시제도 '재질별 분리배출표시 기본도안' ai 파일의 벡터를 그대로 옮긴 것(모양·색 그대로)
+//  - 페트는 '무색페트', 캔은 '캔류 · 알미늄'(공식 도안은 캔류 아래에 재질을 씀), 우유팩 같은 살균팩은 '일반팩', 유리는 '유리'
+//  - 이 파일은 페이지를 열 때 eco3d.js와 함께 불러오므로 여기서 미리 받아 두면 수거함이 나올 때는 이미 받아져 있음
+const MARK = {};
+[["item.pet", "pet"], ["item.can", "can"], ["item.glass", "glass"], ["item.carton", "carton"]].forEach(function (p) {
+  const im = new Image();
+  im.src = "img/scene/common/mark-" + p[1] + ".svg";
+  MARK[p[0]] = im;
+});
 // 정삼각형 분리배출 표시: (cx, cy) = 삼각형 무게중심, s = 한 변 길이. text가 없으면 화살표만(공용 재활용 표시)
 //  표시 문자는 화살표·화살촉과 겹치지 않게 삼각형 안쪽 빈 곳에 들어가는 가장 큰 크기로 씀(고시 도안처럼 삼각형 안)
 //  그래서 화살촉은 꼭짓점 가까이(변의 71~87%)에 두고 안쪽으로 덜 튀어나오게 해 가운데를 비움 — 예전처럼 변 가운데 큰 화살촉이면 글자가 화살표를 덮음
@@ -218,21 +216,28 @@ export function clipBelowRim(ctx, left, top, kx, ky) {
   ctx.closePath();
   ctx.clip();
 }
-// 수거함 앞 이름표: 왼쪽에 분리배출 표시(정삼각형), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
-// 공용 재활용 수거함·폐건전지는 글자 없는 표시, 폐의약품은 재활용품이 아니라 표시 없이 이름만
+// 수거함 앞 이름표: 왼쪽에 분리배출 표시(공식 도안 그림), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
+// 공용 재활용 수거함·폐건전지는 글자 없는 표시(정삼각형), 폐의약품은 재활용품이 아니라 표시 없이 이름만
 // 품목 이름 색은 통 색을 따름: 초록 통(페트·유리·공용)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
 const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "cat.recycle": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
 export function binLabel(ctx, key, left, top, w, h, color) {
   color = color || INK[key] || "#1f5a9e";
   if (key === "item.medicine") { fitText(ctx, t(key), left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color); return; }
-  const m = MARK[key];
+  const im = MARK[key];
   const col = Math.min(h * 0.98, w * 0.46);             // 왼쪽 표시 칸 폭
-  const s = col * (m && m.sub ? 0.78 : 0.9);              // 삼각형 한 변
   const mx = left + w * 0.04 + col / 2;
-  const triH = s * Math.sqrt(3) / 2;
-  const my = top + h * 0.5 - (m && m.sub ? h * 0.08 : 0) + triH / 6;   // 무게중심(위로 1/3)
-  markTri(ctx, mx, my, s, m ? m.color : color, m ? m.text : "");
-  if (m && m.sub) fitText(ctx, m.sub, mx, my + triH / 3 + h * 0.13, col, h * 0.15, 800, m.color);
+  if (im) {
+    // 공식 도안 그림: 비율을 지켜 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에. 아직 받지 못했으면 그리지 않음
+    if (im.complete && im.naturalWidth) {
+      const k = Math.min(col * 0.94 / im.naturalWidth, h * 0.84 / im.naturalHeight);
+      const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
+      ctx.drawImage(im, mx - dw / 2, top + h / 2 - dh / 2, dw, dh);
+    }
+  } else {
+    const s = col * 0.9;                                  // 삼각형 한 변
+    const my = top + h * 0.5 + s * Math.sqrt(3) / 12;     // 무게중심(높이의 1/3 위)
+    markTri(ctx, mx, my, s, color, "");
+  }
   const nx = left + w * 0.04 + col + (w * 0.96 - col) / 2;
   fitText2(ctx, t(key), nx, top + h / 2, (w * 0.92 - col), h * 0.24, 800, color);
 }
