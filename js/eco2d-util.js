@@ -100,92 +100,6 @@ const MARK = {};
   im.src = "img/scene/common/mark-" + p[1] + ".svg";
   MARK[p[0]] = im;
 });
-// 정삼각형 분리배출 표시: (cx, cy) = 삼각형 무게중심, s = 한 변 길이. text가 없으면 화살표만(공용 재활용 표시)
-//  표시 문자는 화살표·화살촉과 겹치지 않게 삼각형 안쪽 빈 곳에 들어가는 가장 큰 크기로 씀(고시 도안처럼 삼각형 안)
-//  그래서 화살촉은 꼭짓점 가까이(변의 71~87%)에 두고 안쪽으로 덜 튀어나오게 해 가운데를 비움 — 예전처럼 변 가운데 큰 화살촉이면 글자가 화살표를 덮음
-//  값은 글자 자리(두 글자 기준 한 변의 약 21%)와 화살촉이 화살표로 보이는 크기(띠 폭의 약 2배)를 함께 맞춘 것
-const MARK_GEO = { lw: 0.10, tip: 0.87, ah: 1.6, half: 0.65, tail: 0.07 }; // 선 굵기(s 배), 화살촉 끝 위치(변 비율), 화살촉 길이·반폭(lw 배), 꼬리 시작(변 비율)
-function markShape(s) {
-  // 무게중심 (0, 0) 기준 도형: 꼭짓점 P, 변마다 몸통(꼬리→꼭짓점→끝)과 화살촉 삼각형
-  const g = MARK_GEO, lw = s * g.lw, R = s / Math.sqrt(3);
-  const P = [0, 1, 2].map(function (i) { const a = -Math.PI / 2 + i * Math.PI * 2 / 3; return [Math.cos(a) * R, Math.sin(a) * R]; });
-  const lerp2 = function (a, b, k) { return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k]; };
-  const arrows = [0, 1, 2].map(function (i) {
-    const a = P[i], b = P[(i + 1) % 3], prev = P[(i + 2) % 3];
-    const d = Math.atan2(b[1] - a[1], b[0] - a[0]), ah = lw * g.ah, hw = ah * g.half;
-    const tip = lerp2(a, b, g.tip), bx = tip[0] - Math.cos(d) * ah, by = tip[1] - Math.sin(d) * ah;
-    const nx = Math.cos(d + Math.PI / 2), ny = Math.sin(d + Math.PI / 2);
-    return { tail: lerp2(a, prev, g.tail), a: a, end: [bx + Math.cos(d) * 1, by + Math.sin(d) * 1],
-      head: [tip, [bx + nx * hw, by + ny * hw], [bx - nx * hw, by - ny * hw]] };
-  });
-  return { lw: lw, R: R, P: P, arrows: arrows };
-}
-// 글자 상자(가로 w, 세로 h, 가운데 y = oy)가 화살표에 닿지 않는지: 상자 네 귀퉁이가 띠 안쪽 삼각형 안에 있고, 화살촉과 겹치지 않음
-function textClear(shape, w, h, oy, pad) {
-  const inr = shape.R / 2 - shape.lw / 2 - pad;           // 무게중심에서 띠 안쪽 선까지
-  const xs = [-w / 2, w / 2], ys = [oy - h / 2, oy + h / 2];
-  for (let i = 0; i < 3; i++) {                           // 변마다 바깥쪽 방향(꼭짓점 반대편 = 변의 법선)
-    const a = Math.PI / 2 + i * Math.PI * 2 / 3, ux = Math.cos(a), uy = Math.sin(a);
-    for (const x of xs) for (const y of ys) if (x * ux + y * uy > inr) return false;
-  }
-  const inTri = function (p, q) { // 점 p가 삼각형 q 안(또는 pad 이내)인지
-    let sgn = 0;
-    for (let k = 0; k < 3; k++) {
-      const A = q[k], B = q[(k + 1) % 3], ex = B[0] - A[0], ey = B[1] - A[1], L = Math.hypot(ex, ey);
-      const c = (ex * (p[1] - A[1]) - ey * (p[0] - A[0])) / L;
-      if (Math.abs(c) < pad) continue;
-      const s2 = Math.sign(c); if (sgn && s2 !== sgn) return false; sgn = s2;
-    }
-    return true;
-  };
-  for (const ar of shape.arrows) {
-    for (const p of ar.head) if (p[0] > xs[0] - pad && p[0] < xs[1] + pad && p[1] > ys[0] - pad && p[1] < ys[1] + pad) return false;
-    for (let k = 0; k <= 8; k++) {                        // 상자 둘레의 점이 화살촉 안이면 겹침
-      const f = k / 8;
-      for (const p of [[xs[0] + w * f, ys[0]], [xs[0] + w * f, ys[1]], [xs[0], ys[0] + h * f], [xs[1], ys[0] + h * f]]) if (inTri(p, ar.head)) return false;
-    }
-  }
-  return true;
-}
-const markFit = new Map(); // (한 변, 글자) → { size, oy } : 매 장면 그리기마다 다시 재지 않게
-function markText(ctx, s, text) {
-  const key = Math.round(s) + "|" + text;
-  if (markFit.has(key)) return markFit.get(key);
-  const shape = markShape(s), pad = s * 0.035;
-  let best = null;
-  for (let size = Math.round(s * 0.34); size >= 4; size--) {
-    ctx.font = `900 ${size}px ${FONT}`;
-    const m = ctx.measureText(text), w = m.width;
-    const asc = m.actualBoundingBoxAscent || size * 0.72, desc = m.actualBoundingBoxDescent || size * 0.08;
-    const oy = [0.06, 0.08, 0.04, 0.1, 0.02, 0.12].map(function (k) { return s * k; }).find(function (y) { return textClear(shape, w, asc + desc, y, pad); });
-    best = { size: size, base: (oy === undefined ? s * 0.06 : oy) + (asc - desc) / 2 }; // base: 글자 상자 가운데가 oy가 되는 기준선
-    if (oy !== undefined) break;
-  }
-  // 글꼴을 다 받기 전에 잰 값은 저장하지 않음(대체 글꼴 폭이라 다를 수 있음)
-  if (!document.fonts || document.fonts.status === "loaded") markFit.set(key, best);
-  return best;
-}
-function markTri(ctx, cx, cy, s, color, text) {
-  const shape = markShape(s);
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.strokeStyle = ctx.fillStyle = color; ctx.lineWidth = shape.lw; ctx.lineCap = "butt"; ctx.lineJoin = "miter";
-  for (const ar of shape.arrows) {
-    // 꼬리: 앞 변 끝부분(꼭짓점 앞)에서 시작해 꼭짓점에서 120°로 꺾여 이번 변을 따라감 → 화살촉: 다음 꼭짓점 쪽으로
-    ctx.beginPath(); ctx.moveTo(ar.tail[0], ar.tail[1]); ctx.lineTo(ar.a[0], ar.a[1]); ctx.lineTo(ar.end[0], ar.end[1]); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(ar.head[0][0], ar.head[0][1]); ctx.lineTo(ar.head[1][0], ar.head[1][1]); ctx.lineTo(ar.head[2][0], ar.head[2][1]); ctx.closePath(); ctx.fill();
-  }
-  if (text) {
-    // 표시 문자: 삼각형 안쪽 빈 곳에 맞춘 크기·높이로(화살표와 겹치지 않음)
-    ctx.save();
-    const fit = markText(ctx, s, text);
-    ctx.restore();
-    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-    ctx.font = `900 ${fit.size}px ${FONT}`;
-    ctx.fillText(text, 0, fit.base);
-  }
-  ctx.restore();
-}
 // 두 줄까지 허용하는 글자: 너무 길면 띄어쓰기(없으면 가운데 글자)에서 나눠 두 줄로
 function fitText2(ctx, text, cx, cy, maxW, size, weight, color) {
   ctx.save(); ctx.font = `${weight} ${Math.round(size)}px ${FONT}`;
@@ -217,26 +131,26 @@ export function clipBelowRim(ctx, left, top, kx, ky) {
   ctx.clip();
 }
 // 수거함 앞 이름표: 왼쪽에 분리배출 표시(공식 도안 그림), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
-// 공용 재활용 수거함·폐건전지는 글자 없는 표시(정삼각형), 폐의약품은 재활용품이 아니라 표시 없이 이름만
+// 공식 도안이 없는 통(공용 재활용 수거함·건전지·형광등·폐의약품)은 표시 없이 이름만 이름표 가운데에
+//  분리배출 표시 공식 도안은 재질별(페트·캔류·유리·종이팩 등)로만 있어 '재활용품 전체'나 건전지를 뜻하는 것이 없음
 // 품목 이름 색은 통 색을 따름: 초록 통(페트·유리·공용)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
 const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "cat.recycle": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
 export function binLabel(ctx, key, left, top, w, h, color) {
   color = color || INK[key] || "#1f5a9e";
-  if (key === "item.medicine") { fitText(ctx, t(key), left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color); return; }
   const im = MARK[key];
+  if (!im) {
+    // 이름만: 띄어쓰기가 있는 긴 이름(영어·베트남어)은 띄어쓰기에서 두 줄로, 띄어쓰기가 없으면 한 줄에 맞게 글자를 줄임
+    const name = t(key);
+    (name.indexOf(" ") > 0 ? fitText2 : fitText)(ctx, name, left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color);
+    return;
+  }
   const col = Math.min(h * 0.98, w * 0.46);             // 왼쪽 표시 칸 폭
   const mx = left + w * 0.04 + col / 2;
-  if (im) {
-    // 공식 도안 그림: 비율을 지켜 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에. 아직 받지 못했으면 그리지 않음
-    if (im.complete && im.naturalWidth) {
-      const k = Math.min(col * 0.94 / im.naturalWidth, h * 0.84 / im.naturalHeight);
-      const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
-      ctx.drawImage(im, mx - dw / 2, top + h / 2 - dh / 2, dw, dh);
-    }
-  } else {
-    const s = col * 0.9;                                  // 삼각형 한 변
-    const my = top + h * 0.5 + s * Math.sqrt(3) / 12;     // 무게중심(높이의 1/3 위)
-    markTri(ctx, mx, my, s, color, "");
+  // 공식 도안 그림: 비율을 지켜 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에. 아직 받지 못했으면 그리지 않음
+  if (im.complete && im.naturalWidth) {
+    const k = Math.min(col * 0.94 / im.naturalWidth, h * 0.84 / im.naturalHeight);
+    const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
+    ctx.drawImage(im, mx - dw / 2, top + h / 2 - dh / 2, dw, dh);
   }
   const nx = left + w * 0.04 + col + (w * 0.96 - col) / 2;
   fitText2(ctx, t(key), nx, top + h / 2, (w * 0.92 - col), h * 0.24, 800, color);
