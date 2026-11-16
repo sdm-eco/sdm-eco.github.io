@@ -131,13 +131,11 @@ export function clipBelowRim(ctx, left, top, kx, ky) {
   ctx.closePath();
   ctx.clip();
 }
-// 수거함 앞 이름표: 왼쪽에 분리배출 표시(공식 도안 그림), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
-// 공용 재활용 수거함(재활용품)은 이름 글자 없이 초록 문양만 이름표 가운데에 (구청·외주처 협의: '재활용품' 글자 대신 공식 문양으로)
-// 공식 도안이 없는 통(건전지·형광등·폐의약품)은 표시 없이 이름만 이름표 가운데에
-//  분리배출 표시 공식 도안은 재질별(페트·캔류·유리·종이팩 등)로만 있어 건전지 등을 뜻하는 것이 없음
-// 품목 이름 색은 통 색을 따름: 초록 통(페트·유리)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
-const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
-const MARK_ONLY = { "cat.recycle": true };
+// 수거함 앞 이름표 (통 그림에는 글자가 없어 여기서 그림)
+//  - 공식 분리배출 표시가 있는 통(페트·캔·유리·종이팩, 공용 재활용품)은 표시만 이름표 가운데에, 품목 이름 글자는 쓰지 않음
+//    (구청·외주처 협의: 글자 대신 공식 문양으로. 재질은 공식 도안 안의 글자(무색페트·캔류·유리·일반팩)가 알려 줌)
+//  - 공식 도안이 없는 통(건전지·형광등·폐의약품)은 표시 없이 이름만 이름표 가운데에(사이트 언어)
+//    분리배출 표시 공식 도안은 재질별(페트·캔류·유리·종이팩 등)로만 있어 건전지 등을 뜻하는 것이 없음
 // 공식 도안 그림을 비율을 지켜 (cx, cy) 가운데, maxW×maxH 안에. 아직 받지 못했으면 그리지 않음
 function drawMark(ctx, im, cx, cy, maxW, maxH) {
   if (!im.complete || !im.naturalWidth) return;
@@ -146,21 +144,12 @@ function drawMark(ctx, im, cx, cy, maxW, maxH) {
   ctx.drawImage(im, cx - dw / 2, cy - dh / 2, dw, dh);
 }
 export function binLabel(ctx, key, left, top, w, h, color) {
-  color = color || INK[key] || "#1f5a9e";
   const im = MARK[key];
-  if (!im) {
-    // 이름만: 띄어쓰기가 있는 긴 이름(영어·베트남어)은 띄어쓰기에서 두 줄로, 띄어쓰기가 없으면 한 줄에 맞게 글자를 줄임
-    const name = t(key);
-    (name.indexOf(" ") > 0 ? fitText2 : fitText)(ctx, name, left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color);
-    return;
-  }
-  // 문양만: 이름표 높이의 84%로 가운데에
-  if (MARK_ONLY[key]) { drawMark(ctx, im, left + w / 2, top + h / 2, w * 0.9, h * 0.84); return; }
-  const col = Math.min(h * 0.98, w * 0.46);             // 왼쪽 표시 칸 폭
-  // 공식 도안 그림: 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에
-  drawMark(ctx, im, left + w * 0.04 + col / 2, top + h / 2, col * 0.94, h * 0.84);
-  const nx = left + w * 0.04 + col + (w * 0.96 - col) / 2;
-  fitText2(ctx, t(key), nx, top + h / 2, (w * 0.92 - col), h * 0.24, 800, color);
+  // 표시만: 이름표 높이의 84%로 가운데에
+  if (im) { drawMark(ctx, im, left + w / 2, top + h / 2, w * 0.9, h * 0.84); return; }
+  // 이름만: 띄어쓰기가 있는 긴 이름(영어·베트남어)은 띄어쓰기에서 두 줄로, 띄어쓰기가 없으면 한 줄에 맞게 글자를 줄임
+  const name = t(key);
+  (name.indexOf(" ") > 0 ? fitText2 : fitText)(ctx, name, left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color || "#1f5a9e");
 }
 // 통 그림과 함께 움직이는 이름표: 통을 그린 put()과 같은 기준점(x, gy = 통 그림 아래 가운데)·같은 움직임 o = { rot, sx, sy }를 씌운 채로
 //   통이 가만히 서 있을 때의 이름표 자리(left, top, w, h)에 그림 → 통이 흔들리면 함께 기울고, 출렁이면 함께 눌림

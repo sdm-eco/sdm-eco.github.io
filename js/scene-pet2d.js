@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-pet.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabelOn, clipBelowRim } from "./eco2d-util.js?v=20261116a";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabelOn, clipBelowRim } from "./eco2d-util.js?v=20261116b";
 
 const D = "img/scene/pet/";
 // 그림 조각의 원래 크기와 그 안의 위치 (pet_assets.py가 잰 값)
@@ -212,7 +212,7 @@ function capClose(ctx, img, v, bx, by, cw, ch) {
   put(ctx, img.cap, x, y, w, h, { rot: rot });
 }
 
-// 수거함 앞 이름표: 분리배출 표시 + 사이트 언어로 '투명 페트병' (그림에는 글자를 넣지 않고 여기서 씀). 통이 출렁이면(sy) 함께 눌림
+// 수거함 앞 이름표: 분리배출 표시(공식 도안 '무색페트')만. 통이 출렁이면(sy) 함께 눌림
 function binLabel(ctx, x, nw, nh, sy) {
   binLabelOn(ctx, "item.pet", x, GY, { sy: sy }, x - nw / 2 + BIN.label.x * KN, GY - nh + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
 }
