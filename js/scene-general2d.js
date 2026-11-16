@@ -5,7 +5,7 @@
 // 단계 값은 3D 장면(scene-general.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, t, fitText, binLabel } from "./eco2d-util.js?v=20261115m";
+import { put, shadow as shade, t, fitText, binLabelOn } from "./eco2d-util.js?v=20261116a";
 
 const D = "img/scene/general/";
 // 종량제 봉투 사진 (구청 검토 의견 자료, bags_cut.py가 배경을 지움): 일반용(흰색)·음식물용(노랑)
@@ -73,8 +73,9 @@ function draw(ctx, v, s) {
   const binTop = GY - nh;
   if (sp > 0 && binOut < 1) {
     shadow(ctx, binX, nw * 1.05, 1 - binOut);
-    put(ctx, img.bin, binX, GY, nw, nh, { rot: binShake * 0.03 });
-    binLabel(ctx, "cat.recycle", binX - nw / 2 + BIN.label.x * KN, binTop + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
+    const pose = { rot: binShake * 0.03 };   // 흔들림(기울기): 통 그림과 이름표(분리배출 표시)에 똑같이
+    put(ctx, img.bin, binX, GY, nw, nh, pose);
+    binLabelOn(ctx, "cat.recycle", binX, GY, pose, binX - nw / 2 + BIN.label.x * KN, binTop + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
   }
 
   // ── 종량제 봉투: 2단계에 위에서 떨어져 통통 튐 → 쓰레기가 들어가며 불룩 → 입구를 묶음, 3단계에 집 앞으로 폴짝 ──

@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-can.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabelOn, clipBelowRim } from "./eco2d-util.js?v=20261116a";
 
 const D = "img/scene/can/";
 // 그림 조각의 원래 크기와 그 안의 위치 (can_assets.py가 잰 값)
@@ -56,7 +56,7 @@ function draw(ctx, v, s) {
   if (b > 0) {
     shadow(ctx, binX, nw * 1.05, binIn);
     put(ctx, img.bin, binX, GY, nw, nh, { sy: binSy });
-    label(ctx, "item.can", binX - nw / 2 + BIN.label.x * KN, GY - nh * binSy + BIN.label.y * KN * binSy, BIN.label.w * KN, BIN.label.h * KN * binSy);
+    binLabelOn(ctx, "item.can", binX, GY, { sy: binSy }, binX - nw / 2 + BIN.label.x * KN, GY - nh + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
   }
 
   // 헹구기: 수도꼭지가 위에서 내려와 물을 받고 올라감 (캔보다 뒤에 그림)

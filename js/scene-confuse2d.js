@@ -7,8 +7,8 @@
 // 단계 값은 3D 장면(scene-confuse.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText, binLabel } from "./eco2d-util.js?v=20261115m";
-import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261115m";
+import { put, shadow as shade, dropsEmit, dropsDraw, t, fitText, binLabelOn } from "./eco2d-util.js?v=20261116a";
+import { drawBag, bagMouth, BAG_IMG } from "./scene-general2d.js?v=20261116a";
 
 const D = "img/scene/confuse/";
 // 그림 조각의 원래 크기와 그 안의 위치 (confuse_assets.py가 잰 값)
@@ -69,8 +69,9 @@ function draw(ctx, v, s) {
   const binLand = wobble(clamp01((cp - 0.9) / 0.1), 2);
   const binSy = 1 - binLand * 0.05;
   shadow(ctx, BIN_X, BIN.w * 1.05, 1);
-  put(ctx, img.bin, BIN_X, GY, BIN.w, BIN.h, { sy: binSy });
-  binLabel(ctx, "cat.recycle", BIN_X - BIN.w / 2 + BIN.label.x, GY - BIN.h * binSy + BIN.label.y * binSy, BIN.label.w, BIN.label.h * binSy);
+  const pose = { sy: binSy };   // 출렁임(눌림): 통 그림과 이름표(분리배출 표시)에 똑같이
+  put(ctx, img.bin, BIN_X, GY, BIN.w, BIN.h, pose);
+  binLabelOn(ctx, "cat.recycle", BIN_X, GY, pose, BIN_X - BIN.w / 2 + BIN.label.x, GY - BIN.h + BIN.label.y, BIN.label.w, BIN.label.h);
 
   // ── 종량제 봉투: 떨어져 통통 튀고, 쓰레기가 들어갈 때마다 출렁, 끝에 입구를 묶음 ──
   let jiggle = 0;

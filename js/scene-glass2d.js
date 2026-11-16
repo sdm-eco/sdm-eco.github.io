@@ -5,7 +5,7 @@
 // 단계 값은 3D 장면(scene-glass.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, lerp, tiltCurve, bounceDrop, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabelOn, clipBelowRim } from "./eco2d-util.js?v=20261116a";
 
 const D = "img/scene/glass/";
 const TAU = Math.PI * 2;
@@ -338,7 +338,7 @@ function drawToBin(ctx, img, v, binX, nh, binSy, land) {
   bottle(ctx, img, 0, 0, rot, k, 0, false);
   ctx.restore();
   // 수거함 이름표는 병보다 앞에
-  label(ctx, "item.glass", binX - BIN.w * KN / 2 + BIN.label.x * KN, GY - nh * binSy + BIN.label.y * KN * binSy, BIN.label.w * KN, BIN.label.h * KN * binSy);
+  binLabelOn(ctx, "item.glass", binX, GY, { sy: binSy }, binX - BIN.w * KN / 2 + BIN.label.x * KN, GY - nh + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
 }
 
 // 효과음 (3D 장면과 같은 순간)

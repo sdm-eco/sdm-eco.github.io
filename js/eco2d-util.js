@@ -93,9 +93,10 @@ export function fitText(ctx, text, cx, cy, maxW, size, weight, color) {
 // 분리배출 표시 (구청 2차 의견 2-8 '재활용 마크를 정확하게'): 한국환경공단이 배포하는 공식 도안 파일을 그대로 씀
 //  - img/scene/common/mark-*.svg: 한국환경공단 분리배출표시제도 '재질별 분리배출표시 기본도안' ai 파일의 벡터를 그대로 옮긴 것(모양·색 그대로)
 //  - 페트는 '무색페트', 캔은 '캔류 · 알미늄'(공식 도안은 캔류 아래에 재질을 씀), 우유팩 같은 살균팩은 '일반팩', 유리는 '유리'
+//  - 공용 재활용 수거함(재활용품)은 mark-recycle.svg: 초록 '일반팩' 도안에서 가운데 재질 글자만 뺀 것(화살표 모양·색 그대로)
 //  - 이 파일은 페이지를 열 때 eco3d.js와 함께 불러오므로 여기서 미리 받아 두면 수거함이 나올 때는 이미 받아져 있음
 const MARK = {};
-[["item.pet", "pet"], ["item.can", "can"], ["item.glass", "glass"], ["item.carton", "carton"]].forEach(function (p) {
+[["item.pet", "pet"], ["item.can", "can"], ["item.glass", "glass"], ["item.carton", "carton"], ["cat.recycle", "recycle"]].forEach(function (p) {
   const im = new Image();
   im.src = "img/scene/common/mark-" + p[1] + ".svg";
   MARK[p[0]] = im;
@@ -131,10 +132,19 @@ export function clipBelowRim(ctx, left, top, kx, ky) {
   ctx.clip();
 }
 // 수거함 앞 이름표: 왼쪽에 분리배출 표시(공식 도안 그림), 오른쪽에 품목 이름(사이트 언어, 두 줄까지). 그림에는 글자를 넣지 않고 여기서 씀
-// 공식 도안이 없는 통(공용 재활용 수거함·건전지·형광등·폐의약품)은 표시 없이 이름만 이름표 가운데에
-//  분리배출 표시 공식 도안은 재질별(페트·캔류·유리·종이팩 등)로만 있어 '재활용품 전체'나 건전지를 뜻하는 것이 없음
-// 품목 이름 색은 통 색을 따름: 초록 통(페트·유리·공용)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
-const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "cat.recycle": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
+// 공용 재활용 수거함(재활용품)은 이름 글자 없이 초록 문양만 이름표 가운데에 (구청·외주처 협의: '재활용품' 글자 대신 공식 문양으로)
+// 공식 도안이 없는 통(건전지·형광등·폐의약품)은 표시 없이 이름만 이름표 가운데에
+//  분리배출 표시 공식 도안은 재질별(페트·캔류·유리·종이팩 등)로만 있어 건전지 등을 뜻하는 것이 없음
+// 품목 이름 색은 통 색을 따름: 초록 통(페트·유리)은 진한 초록, 노랑 통(캔·종이팩)은 진한 갈색 (흰 이름표 위 대비 4.5 이상)
+const INK = { "item.pet": "#2c6b34", "item.glass": "#2c6b34", "item.can": "#7a4f00", "item.carton": "#7a4f00" };
+const MARK_ONLY = { "cat.recycle": true };
+// 공식 도안 그림을 비율을 지켜 (cx, cy) 가운데, maxW×maxH 안에. 아직 받지 못했으면 그리지 않음
+function drawMark(ctx, im, cx, cy, maxW, maxH) {
+  if (!im.complete || !im.naturalWidth) return;
+  const k = Math.min(maxW / im.naturalWidth, maxH / im.naturalHeight);
+  const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
+  ctx.drawImage(im, cx - dw / 2, cy - dh / 2, dw, dh);
+}
 export function binLabel(ctx, key, left, top, w, h, color) {
   color = color || INK[key] || "#1f5a9e";
   const im = MARK[key];
@@ -144,14 +154,25 @@ export function binLabel(ctx, key, left, top, w, h, color) {
     (name.indexOf(" ") > 0 ? fitText2 : fitText)(ctx, name, left + w / 2, top + h / 2, w * 0.9, h * 0.34, 800, color);
     return;
   }
+  // 문양만: 이름표 높이의 84%로 가운데에
+  if (MARK_ONLY[key]) { drawMark(ctx, im, left + w / 2, top + h / 2, w * 0.9, h * 0.84); return; }
   const col = Math.min(h * 0.98, w * 0.46);             // 왼쪽 표시 칸 폭
-  const mx = left + w * 0.04 + col / 2;
-  // 공식 도안 그림: 비율을 지켜 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에. 아직 받지 못했으면 그리지 않음
-  if (im.complete && im.naturalWidth) {
-    const k = Math.min(col * 0.94 / im.naturalWidth, h * 0.84 / im.naturalHeight);
-    const dw = im.naturalWidth * k, dh = im.naturalHeight * k;
-    ctx.drawImage(im, mx - dw / 2, top + h / 2 - dh / 2, dw, dh);
-  }
+  // 공식 도안 그림: 표시 칸(칸 폭의 94%, 이름표 높이의 84%) 가운데에
+  drawMark(ctx, im, left + w * 0.04 + col / 2, top + h / 2, col * 0.94, h * 0.84);
   const nx = left + w * 0.04 + col + (w * 0.96 - col) / 2;
   fitText2(ctx, t(key), nx, top + h / 2, (w * 0.92 - col), h * 0.24, 800, color);
+}
+// 통 그림과 함께 움직이는 이름표: 통을 그린 put()과 같은 기준점(x, gy = 통 그림 아래 가운데)·같은 움직임 o = { rot, sx, sy }를 씌운 채로
+//   통이 가만히 서 있을 때의 이름표 자리(left, top, w, h)에 그림 → 통이 흔들리면 함께 기울고, 출렁이면 함께 눌림
+//   (예전에는 이름표 자리만 따라가고 분리배출 표시는 똑바로 선 채 크기만 바뀌어, 통이 흔들릴 때 표시만 가만히 있는 것처럼 보였음)
+//   통을 ctx.translate·rotate·scale 안에서 직접 그리는 장면(의약품·건전지·음식물)은 그 안에서 binLabel을 부르므로 이미 함께 움직임
+export function binLabelOn(ctx, key, x, gy, o, left, top, w, h, color) {
+  o = o || {};
+  ctx.save();
+  ctx.translate(x, gy);
+  if (o.rot) ctx.rotate(o.rot);
+  ctx.scale(o.sx ?? 1, o.sy ?? 1);
+  ctx.translate(-x, -gy);
+  binLabel(ctx, key, left, top, w, h, color);
+  ctx.restore();
 }

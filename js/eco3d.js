@@ -4,20 +4,20 @@
 //  [data-eco-loop="이름"]  혼자서 단계를 천천히 반복하는 작은 장면 (카드 장식용)
 //    data-eco-zoom="1.2"   작은 칸에서 물건이 잘 보이도록 확대 (기본 1)
 //  [data-eco-open="id"]    눌러서 체험 창(dialog)을 여는 버튼
-import pet from "./scene-pet2d.js?v=20261115m";
-import food from "./scene-food2d.js?v=20261115m";
-import general from "./scene-general2d.js?v=20261115m";
-import bulky from "./scene-bulky2d.js?v=20261115m";
-import can from "./scene-can2d.js?v=20261115m";
-import vinyl from "./scene-vinyl2d.js?v=20261115m";
-import carton from "./scene-carton2d.js?v=20261115m";
-import medicine from "./scene-medicine2d.js?v=20261115m";
-import battery from "./scene-battery2d.js?v=20261115m";
-import glass from "./scene-glass2d.js?v=20261115m";
-import paper from "./scene-paper2d.js?v=20261115m";
-import appliance from "./scene-appliance2d.js?v=20261115m";
-import confuse from "./scene-confuse2d.js?v=20261115m";
-import { create2DView } from "./eco2d.js?v=20261114h";
+import pet from "./scene-pet2d.js?v=20261116a";
+import food from "./scene-food2d.js?v=20261116a";
+import general from "./scene-general2d.js?v=20261116a";
+import bulky from "./scene-bulky2d.js?v=20261116a";
+import can from "./scene-can2d.js?v=20261116a";
+import vinyl from "./scene-vinyl2d.js?v=20261116a";
+import carton from "./scene-carton2d.js?v=20261116a";
+import medicine from "./scene-medicine2d.js?v=20261116a";
+import battery from "./scene-battery2d.js?v=20261116a";
+import glass from "./scene-glass2d.js?v=20261116a";
+import paper from "./scene-paper2d.js?v=20261116a";
+import appliance from "./scene-appliance2d.js?v=20261116a";
+import confuse from "./scene-confuse2d.js?v=20261116a";
+import { create2DView } from "./eco2d.js?v=20261116a";
 import { sfx } from "./eco3d-sound.js?v=20261108r";
 
 // 품목별 장면 (scene-*2d.js, eco2d.js 형식)

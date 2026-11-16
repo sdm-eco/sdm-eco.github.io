@@ -340,7 +340,10 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 /* 타일 색보다 버튼이 먼저 눈에 띄지 않게 흰 바탕 버튼, 마우스를 올리면 진한 초록 */
 .eco-open{align-self:center;display:inline-flex;align-items:center;gap:8px;margin-top:16px;min-height:40px;padding:0 16px;border:1.5px solid var(--fresh-strong);border-radius:999px;background:var(--white);color:var(--fresh-strong);font-size:16px;font-weight:800;transition:background-color .2s,color .2s}
 .eco-open:hover{background:var(--fresh-strong);color:var(--white)}
-.eco-dialog{width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto}
+/* overscroll-behavior: 창 안을 끝까지 밀거나 세게 끌어도 창이 출렁이거나 뒤 페이지로 이어서 움직이지 않게
+   (휴대폰에서 창을 세게 끌어내리면 창이 밀려 내려가며 뒤 페이지가 비치던 문제, 구청 요청). 창이 열린 동안은 뒤 페이지도 출렁이지 않게 */
+.eco-dialog{width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto;overscroll-behavior:none}
+html:has(.eco-dialog[open]){overscroll-behavior:none}
 .eco-dialog::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
 .eco-dialog .eco-lab{margin-top:0}
 .eco-close{position:absolute;right:14px;top:14px;z-index:2;width:44px;height:44px;border:0;border-radius:50%;background:var(--white);color:var(--ink);font-size:26px;line-height:1;box-shadow:0 4px 14px color-mix(in srgb,var(--forest) 20%,transparent)}
@@ -571,8 +574,9 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
   .guide-card h3{font-size:19px;letter-spacing:-.4px}
   .guide-card p{margin-bottom:12px;font-size:14px}
   .eco-open{width:100%;min-height:44px;justify-content:center}
-  /* 체험 창은 화면 전체를 덮는 한 페이지처럼 (뒤로 가기로 닫힘) */
-  .eco-dialog{width:100%;max-width:none;height:100%;max-height:none;margin:0;border-radius:0}
+  /* 체험 창은 화면 전체를 덮는 한 페이지처럼 (뒤로 가기로 닫힘)
+     흰 바탕: 출렁임을 막지 못하는 예전 브라우저(아이폰 iOS 15 이하)에서 끌어내려도 비치는 곳이 뒤 페이지가 아니라 흰색이 되게 */
+  .eco-dialog{width:100%;max-width:none;height:100%;max-height:none;margin:0;border-radius:0;background:var(--white)}
   .eco-dialog .eco-lab{min-height:100%;border:0;border-radius:0}
   .eco-close{position:fixed}
   /* 체험 창 그림을 창 맨 위에 붙여 둠: 단계 설명·버튼을 보려고 내려도 그림이 함께 보이게 (디자인 점검 2번)

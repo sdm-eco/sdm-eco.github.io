@@ -30,15 +30,19 @@ export async function create2DView(stage, canvas, def, opts) {
   const mem = {}; // 장면이 그림 사이에 기억할 것(물방울 등)
   let shown = 0, active = null;
   const queue = [];
+  // 그 단계의 완성 모습으로 곧장 바꿈(남은 움직임·물방울 등은 버림)
+  function snap(n) {
+    queue.length = 0;
+    active = null;
+    Object.assign(v, states[n], { $key: null, $p: 0 });
+    for (const k in mem) delete mem[k];
+    shown = n;
+  }
   function goTo(n, instant) {
-    if (instant || reduced || n < shown) {
-      queue.length = 0;
-      active = null;
-      Object.assign(v, states[n], { $key: null, $p: 0 });
-      for (const k in mem) delete mem[k];
-      shown = n;
-      return;
-    }
+    if (instant || reduced || n < shown) { snap(n); return; }
+    // 여러 단계를 건너뛰면(예: 1단계에서 3단계를 누름) 바로 앞 단계(2단계) 모습으로 곧장 바꾸고 마지막 단계(2→3) 움직임만 보여 줌
+    //   (구청 요청: 예전에는 1→2, 2→3 움직임을 차례로 모두 보여 줌). 한 단계씩 넘어가면(자동 진행·다음 단계 버튼) 지금처럼 이어서 움직임
+    if (n > shown + 1) snap(n - 1);
     for (let s = shown + 1; s <= n; s++) {
       moves[s].forEach(function (m) { queue.push({ key: m[0], from: states[s - 1][m[0]], to: states[s][m[0]], dur: m[1], t: 0 }); });
     }

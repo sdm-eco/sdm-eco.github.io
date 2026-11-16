@@ -4,7 +4,7 @@
 // 단계 값은 3D 장면(scene-carton.js)과 같아 효과음 순간도 같게 맞춤
 import { clamp01, smooth, easeInOut, backOut, lerp, tiltCurve, wobble } from "./eco3d-util.js?v=20261114b";
 import { sfx, hit } from "./eco3d-sound.js?v=20261108r";
-import { put, shadow as shade, dropsEmit, dropsDraw, binLabel as label, clipBelowRim } from "./eco2d-util.js?v=20261115m";
+import { put, shadow as shade, dropsEmit, dropsDraw, binLabelOn, clipBelowRim } from "./eco2d-util.js?v=20261116a";
 
 const D = "img/scene/carton/";
 // 그림 조각의 원래 크기와 그 안의 위치
@@ -61,7 +61,7 @@ function draw(ctx, v, s) {
   if (b > 0) {
     shadow(ctx, binX, nw * 1.05, binIn);
     put(ctx, img.bin, binX, GY, nw, nh, { sy: binSy });
-    label(ctx, "item.carton", binX - nw / 2 + BIN.label.x * KN, GY - nh * binSy + BIN.label.y * KN * binSy, BIN.label.w * KN, BIN.label.h * KN * binSy);
+    binLabelOn(ctx, "item.carton", binX, GY, { sy: binSy }, binX - nw / 2 + BIN.label.x * KN, GY - nh + BIN.label.y * KN, BIN.label.w * KN, BIN.label.h * KN);
   }
 
   if (v.flat > 0) {
