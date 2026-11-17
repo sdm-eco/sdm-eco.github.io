@@ -348,6 +348,17 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 html:has(.eco-dialog[open]){overscroll-behavior:none}
 .eco-dialog::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
 .eco-dialog .eco-lab{margin-top:0}
+/* 창 높이 고정 (PC·태블릿): 창은 화면 세로 가운데에 놓이므로, 내용 길이에 따라 창 높이가 바뀌면 창 전체가 위아래로 움직임
+   (동별 배출요일에서 충현동·신촌동의 구역 칸이 생기고 없어질 때, 품목 탭을 바꿀 때). 높이를 정해 두고 남는 자리는 아래 칸이 채움
+   가로 두 칸(1201px~)은 가장 긴 탭(베트남어 페트병 약 964px)이 들어가는 1000px, 세로로 쌓이는 폭은 내용이 화면보다 길어 화면 높이 그대로 */
+@media(min-width:701px){
+  .eco-dialog{height:calc(100% - 32px)}
+  .eco-dialog .eco-lab{min-height:100%;grid-template-rows:auto auto 1fr}
+}
+@media(min-width:1201px){
+  .eco-dialog{height:min(1000px,calc(100% - 32px))}
+  .eco-dialog .eco-lab{grid-template-rows:auto 1fr}
+}
 .eco-close{position:absolute;right:14px;top:14px;z-index:2;width:44px;height:44px;border:0;border-radius:50%;background:var(--white);color:var(--ink);font-size:26px;line-height:1;box-shadow:0 4px 14px color-mix(in srgb,var(--forest) 20%,transparent)}
 
 .video-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}

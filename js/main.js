@@ -364,6 +364,33 @@
       var r = board.getBoundingClientRect();
       if (r.top < 0) board.scrollIntoView({ block: "start", behavior: calm ? "auto" : "smooth" });
     }
+    // 높이 미리 잡기: 동 이름(다른 언어면 아래에 한국어 이름 줄)과 요약 문장은 고를 때마다 줄 수가 달라짐
+    //   → 좁은 화면(결과 판이 동 버튼 위)에서 아래 동 버튼이 위아래로 밀림. 나올 수 있는 글을 하나씩 넣어 재고 가장 높은 높이를 min-height로
+    //   창이 닫혀 판이 안 보이면 재지 않음. 판이 보이게 되거나 폭이 바뀔 때(ResizeObserver), 언어를 바꿀 때(fitters) 다시 잼
+    var nameKeys = ["days.pickfirst"];
+    dongBtns.forEach(function (b) { nameKeys.push("dong." + b.dataset.dong); });
+    var sumKeys = [null, "days.zonepick", "days.sum.mwf", "days.sum.tts"];
+    function tallest(el, keys) {
+      var key = el.getAttribute("data-i18n"), max = 0;
+      el.style.minHeight = "";
+      keys.forEach(function (k) { setText(el, k); max = Math.max(max, el.getBoundingClientRect().height); });
+      setText(el, key);
+      if (max) el.style.minHeight = Math.ceil(max) + "px";
+    }
+    function reserve() {
+      if (!board.offsetWidth) return;
+      tallest(nameEl, nameKeys);
+      tallest(sumEl, sumKeys);
+    }
+    fitters.push(reserve);
+    if (window.ResizeObserver) {
+      var lastW = 0;
+      new ResizeObserver(function () {
+        var w = board.offsetWidth;
+        if (w && w !== lastW) { lastW = w; reserve(); }
+      }).observe(board);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(reserve); // 글꼴이 늦게 받아지면 줄 수가 달라짐
     dongBtns.forEach(function (btn) {
       btn.addEventListener("click", function () {
         var code = btn.dataset.dong, group = btn.dataset.days;
