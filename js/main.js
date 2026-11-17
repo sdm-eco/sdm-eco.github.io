@@ -414,6 +414,51 @@
         reveal();
       });
     });
+    return reserve; // setupDialogHeight가 창 높이를 잴 때 먼저 글 높이를 잡게
+  }
+
+  // 체험 창 높이(PC·태블릿): 창 안 품목 탭 가운데 가장 긴 것에 맞춰 창마다 높이를 정함
+  //   창은 화면 세로 가운데 놓여, 탭이나 동을 바꿀 때 높이가 달라지면 창 전체가 위아래로 움직임 → 높이는 고정하되
+  //   모든 창을 한 높이(1000px)로 두면 짧은 창은 아래가 크게 빔 → 창마다, 언어·화면 폭에 맞춰 잼(열 때, 언어를 바꿀 때, 폭이 바뀔 때)
+  //   숨은 탭은 잠깐 보이게 해 재고 바로 숨김(같은 순간 안이라 화면에 나타나지 않음). 동별 배출요일은 구역 칸이 열린 경우까지 잼
+  //   잰 값은 --dlg-h로 넘기고 CSS가 화면 높이와 비교해 작은 쪽을 씀. 휴대폰(700px 이하)은 전체 화면이라 재지 않음
+  function setupDialogHeight(daysReserve) {
+    var dialogs = document.querySelectorAll("dialog.eco-dialog");
+    if (!dialogs.length || !window.matchMedia) return;
+    var wide = matchMedia("(min-width: 701px)");
+    function fit(dlg) {
+      if (!dlg.open) return;
+      if (!wide.matches) { dlg.style.removeProperty("--dlg-h"); return; }
+      var max = 0, scroll = dlg.scrollTop;
+      // 창 높이와 품목 칸의 min-height:100%를 풀어야 품목 칸이 제 길이로 재짐
+      //   (창은 화면 위에 띄운 상자라 높이가 auto여도 100%가 창 최대 높이로 풀림 → 칸에도 직접 0을 줌)
+      dlg.style.height = "auto";
+      dlg.querySelectorAll("[data-eco-lab]").forEach(function (lab) {
+        var was = lab.hidden;
+        lab.hidden = false;
+        lab.style.minHeight = "0";
+        if (lab.dataset.ecoLab === "days" && daysReserve) daysReserve();
+        max = Math.max(max, lab.offsetHeight);
+        lab.querySelectorAll("[data-zones-of]").forEach(function (box) {
+          var shut = box.hidden;
+          box.hidden = false;
+          max = Math.max(max, lab.offsetHeight);
+          box.hidden = shut;
+        });
+        lab.style.minHeight = "";
+        lab.hidden = was;
+      });
+      dlg.style.height = "";
+      if (max) dlg.style.setProperty("--dlg-h", Math.ceil(max) + "px");
+      dlg.scrollTop = scroll;
+    }
+    function fitOpen() { dialogs.forEach(fit); }
+    dialogs.forEach(function (dlg) {
+      dlg.addEventListener("eco:open", function () { fit(dlg); });
+    });
+    fitters.push(fitOpen);
+    window.addEventListener("resize", fitOpen);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitOpen);
   }
 
   // 학습 띠: 이 브라우저에서 끝낸 단계를 ✓로, 다음에 할 단계를 강조해서 보여줌
@@ -1164,7 +1209,7 @@
   setupFigures();
   setupWaterfall();
   setupBirds();
-  setupDays();
+  setupDialogHeight(setupDays());
   setupTelLinks();
   setupBlink();
   progress = setupProgress();
