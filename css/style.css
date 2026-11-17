@@ -321,8 +321,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
    제목은 data-check(4개 언어, i18n note.check)를 ::before로 보여 줌, 앞에 ⚠ 아이콘 */
 .eco-note.eco-check{margin:16px 0 0;padding:12px 16px 13px;border:1px solid var(--food-hi);border-radius:14px;background:var(--food-bg);color:var(--ink-2);font-size:15px;font-weight:600;line-height:1.6}
 .eco-check::before{content:attr(data-check);display:block;margin-bottom:4px;padding-left:24px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 3 2 20.5h20z' fill='%23f2b705'/%3E%3Cpath d='M12 9.5v5' stroke='%233d2f00' stroke-width='2.2' stroke-linecap='round'/%3E%3Ccircle cx='12' cy='17.4' r='1.3' fill='%233d2f00'/%3E%3C/svg%3E") left center/18px no-repeat;color:var(--game-ink);font-size:14px;font-weight:800;letter-spacing:-.1px}
-/* 문의 전화: 휴대폰에서 누르면 바로 걸림(tel:) (디자인 점검 9번) */
+/* 문의 전화: 휴대폰에서 누르면 바로 걸림(tel:) (디자인 점검 9번). PC에서는 main.js가 링크를 뗌 */
 .tel-link{color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.tel-link:not([href]){text-decoration:none} /* PC: 전화 링크를 뗀 번호는 밑줄 없이 글자만 */
 
 .eco-mini{position:relative}
 .eco-mini canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .45s}

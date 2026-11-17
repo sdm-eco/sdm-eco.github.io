@@ -313,6 +313,23 @@
     });
   }
 
+  // 문의 전화(tel:) 링크: PC에서 누르면 전화 앱을 찾는 오류 창이 뜸
+  //   → 마우스로 쓰는 기기(PC)에서는 링크를 떼어 번호 글자만 남기고, 휴대폰·태블릿(손가락 터치)에서는 그대로 눌러 전화
+  function setupTelLinks() {
+    var links = document.querySelectorAll(".tel-link");
+    if (!links.length || !window.matchMedia) return;
+    var pc = matchMedia("(hover: hover) and (pointer: fine)");
+    function apply() {
+      links.forEach(function (a) {
+        if (!a.dataset.tel) a.dataset.tel = a.getAttribute("href") || "";
+        if (pc.matches) a.removeAttribute("href");
+        else if (a.dataset.tel) a.setAttribute("href", a.dataset.tel);
+      });
+    }
+    apply();
+    if (pc.addEventListener) pc.addEventListener("change", apply);
+  }
+
   // 동별 배출요일 (일반 쓰레기 창의 세 번째 탭): 동을 고르면 그 동의 요일을 주간 표에 켜고 요약 문장을 보여 줌.
   //   묶음(data-days)은 mwf = 월·수·금, tts = 화·목·일. 충현동·신촌동은 옛 동(구역)마다 달라 구역 버튼을 한 번 더 보여 줌.
   //   글자는 data-i18n 키를 바꿔 달아 두므로 언어를 바꾸면 applyLang이 함께 번역함
@@ -1121,6 +1138,7 @@
   setupWaterfall();
   setupBirds();
   setupDays();
+  setupTelLinks();
   setupBlink();
   progress = setupProgress();
   applyLang(detectLang());
