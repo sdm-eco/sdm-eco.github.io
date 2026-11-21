@@ -370,10 +370,11 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
    예전엔 재활용 파랑이었으나 파랑은 '재활용'에만 쓰도록 바꿈(디자인 점검 5번, C안) */
 .ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,var(--video-ink),var(--video) 60%,#f6a27f)}
 .video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto;transform-origin:50% 100%;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
-/* 표정 바꿈(영상이 있는 칸만): 표지에 마우스 · 키보드가 오면 걱정 · 놀람 → 미소. .alt는 같은 자리(오른쪽 끝 기준)에 겹쳐 둔 미소 그림, is-cheer는 main.js renderVideos가 붙임 */
+/* 표정 바꿈: 칸에 마우스가 오면(영상이 있는 칸은 키보드로 표지를 골라도) 걱정 · 놀람 → 미소. .alt는 같은 자리(오른쪽 끝 기준)에 겹쳐 둔 미소 그림, is-cheer는 main.js renderVideos가 붙임 */
 .video-char.alt{opacity:0}
 .video-frame.is-cheer .video-char:not(.alt){opacity:0}
-.video-frame.is-cheer .video-char.alt{opacity:1;transform:translateY(-4px) scale(1.02)}
+/* 위로 올리지 않고 아래 끝을 붙인 채 조금 커지게만 함(그림 아래가 직선으로 잘려 있어, 올리면 칸 바닥과 사이가 떠 보임) */
+.video-frame.is-cheer .video-char.alt{opacity:1;transform:scale(1.03)}
 .video-ep,.video-soon{display:inline-block;padding:4px 13px;border-radius:999px;color:var(--white);font-size:14px;font-weight:800;line-height:1.5}
 .video-ep{position:absolute;left:20px;top:20px;z-index:1;border:1.5px solid color-mix(in srgb,var(--white) 80%,transparent)}
 .video-soon{position:absolute;left:20px;top:58px;background:color-mix(in srgb,#000 30%,transparent)}
@@ -418,7 +419,7 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .game-chars img{transform-origin:50% 100%;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
 .game-chars .alt{opacity:0}
 .game-stage.is-cheer .game-chars img:not(.alt),.game-stage.is-laugh .game-chars .girl:not(.alt){opacity:0}
-.game-stage.is-cheer .game-chars .alt,.game-stage.is-laugh .game-chars .girl.alt{opacity:1;transform:translateY(-5px) scale(1.02)}
+.game-stage.is-cheer .game-chars .alt,.game-stage.is-laugh .game-chars .girl.alt{opacity:1;transform:scale(1.03)} /* 올리지 않고 아래 끝을 붙인 채 커지게만(올리면 칸 바닥과 사이가 뜸) */
 /* 등장 장면(한 번): 칸이 화면에 들어오면 아래에서 올라옴. anim은 움직임을 쓸 수 있을 때만 붙음 */
 .game-stage.anim:not(.is-in) .game-chars img:not(.alt){opacity:0}
 .game-stage.is-in .game-chars img:not(.alt){animation:game-char-in .55s cubic-bezier(.16,1,.3,1) backwards}

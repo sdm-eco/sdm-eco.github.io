@@ -570,7 +570,9 @@
         if (poster) cover.querySelector("img").src = poster;
         cover.addEventListener("click", function () { play(frame, v); });
         frame.appendChild(cover);
-        cheerOnCover(frame, cover);
+        // 키보드로 표지를 고르면 캐릭터가 웃음(마우스 반응은 setupVideoCheer가 칸 전체에 걸어 둠)
+        cover.addEventListener("focus", function () { frame.classList.add("is-cheer"); });
+        cover.addEventListener("blur", function () { frame.classList.remove("is-cheer"); });
       }
       // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜
       var label = t(frame.dataset.ended ? "video.replay" : "video.play");
@@ -579,28 +581,29 @@
     });
   }
 
-  // 영상이 있는 칸의 캐릭터 표정: 표지에 마우스를 올리거나 키보드로 고르면 미소(is-cheer)
+  // 영상 칸 캐릭터 표정: 칸에 마우스를 올리면 걱정 · 놀람 → 미소(is-cheer). 영상이 아직 없는 칸도 반응함
   // 마우스가 없는 기기(휴대폰)는 칸이 화면에 들어올 때 한 번 미소를 보여 주고 돌아옴(움직임 줄이기 설정이면 안 함)
-  function cheerOnCover(frame, cover) {
-    if (!frame.querySelector(".video-char.alt")) return;
-    function cheer(on) { return function () { frame.classList.toggle("is-cheer", on); }; }
-    cover.addEventListener("mouseenter", cheer(true));
-    cover.addEventListener("mouseleave", cheer(false));
-    cover.addEventListener("focus", cheer(true));
-    cover.addEventListener("blur", cheer(false));
-    if (!window.matchMedia || !("IntersectionObserver" in window)) return;
-    if (!matchMedia("(hover: none)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    var io = new IntersectionObserver(function (entries) {
-      if (!entries[0].isIntersecting) return;
-      io.disconnect();
-      setTimeout(cheer(true), 500);
-      setTimeout(cheer(false), 2000);
-    }, { threshold: 0.7 });
-    io.observe(frame);
+  // 재생 중에는 영상이 캐릭터를 덮어 보이지 않고, 영상이 끝나 표지로 돌아왔을 때 마우스가 아직 칸 위에 있으면 웃는 채로 보임
+  function setupVideoCheer() {
+    var touchOnce = window.matchMedia && "IntersectionObserver" in window &&
+      matchMedia("(hover: none)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.querySelectorAll(".video-frame").forEach(function (frame) {
+      if (!frame.querySelector(".video-char.alt")) return;
+      function cheer(on) { return function () { frame.classList.toggle("is-cheer", on); }; }
+      frame.addEventListener("mouseenter", cheer(true));
+      frame.addEventListener("mouseleave", cheer(false));
+      if (!touchOnce) return;
+      var io = new IntersectionObserver(function (entries) {
+        if (!entries[0].isIntersecting) return;
+        io.disconnect();
+        setTimeout(cheer(true), 500);
+        setTimeout(cheer(false), 2000);
+      }, { threshold: 0.7 });
+      io.observe(frame);
+    });
   }
 
   function play(frame, v) {
-    frame.classList.remove("is-cheer"); // 누른 채 영상으로 넘어가면 마우스가 나갔다는 신호가 오지 않으므로 여기서 되돌림
     var player = document.createElement("video");
     player.controls = true;
     player.playsInline = true;
@@ -1261,6 +1264,7 @@
   startAtTopOnReload();
   setupGame();
   setupGameChars();
+  setupVideoCheer();
   setupHeaderFit();
   setupNavMenu();
   setupBandFit();
