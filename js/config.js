@@ -9,7 +9,8 @@ window.SITE_CONFIG = {
     // captions: 언어별 자막 파일(WebVTT, .vtt). 사이트 언어에 맞는 자막이 자동으로 켜짐
     // 영상은 재생 버튼을 누를 때만 받음(누르기 전에는 대표 그림만)
     // 1편 기초편: 480p · 2분 27초 · 16MB. 한국어 · 영어 자막이 영상에 들어 있어 자막 파일은 비움
-    { src: "media/ep1.mp4", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } },
+    // 소리는 받은 원본의 70%로 줄여 넣음(-3.1dB). 파일을 바꾸면 ?v= 값을 올릴 것(브라우저가 예전 파일을 쓰지 않게)
+    { src: "media/ep1.mp4?v=20261121b", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } },
     { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
   game: {

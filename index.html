@@ -224,9 +224,9 @@
           <!-- 캐릭터: 눈 깜빡임(data-blink, main.js setupBlink) + 표정 바꿈 그림(.alt)과 말풍선(main.js setupGameChars)
                .alt 그림은 기준 그림과 같은 크기 · 같은 몸통 자리로 만들어 겹쳐 둠 -->
           <div class="game-chars" aria-hidden="true">
-            <img class="boy" src="img/game-boy.webp?v=20261114e" data-blink="img/game-boy-half.webp?v=20261121a img/game-boy-blink.webp?v=20261121a" alt="" width="345" height="418" loading="lazy">
+            <img class="boy" src="img/game-boy.webp?v=20261114e" data-blink="img/game-boy-half.webp?v=20261121a img/game-boy-blink.webp?v=20261121a" data-blink-gap="5000,8000" alt="" width="345" height="418" loading="lazy">
             <img class="boy alt" src="img/game-boy-smile.webp?v=20261121b" alt="" width="345" height="418" loading="lazy">
-            <img class="girl" src="img/game-girl.webp?v=20261121a" data-blink="img/game-girl-half.webp?v=20261121b img/game-girl-blink.webp?v=20261121b" alt="" width="325" height="422" loading="lazy">
+            <img class="girl" src="img/game-girl.webp?v=20261121a" data-blink="img/game-girl-half.webp?v=20261121b img/game-girl-blink.webp?v=20261121b" data-blink-gap="5000,8000" alt="" width="325" height="422" loading="lazy">
             <img class="girl alt" src="img/game-girl-laugh.webp?v=20261121b" alt="" width="325" height="422" loading="lazy">
             <span class="game-say say-boy" data-i18n="game.say.stop">잠깐!</span>
             <span class="game-say say-girl" data-i18n="game.say.ok">정답!</span>
@@ -622,9 +622,9 @@
 <!-- 맨 위로(main.js setupToTop): 조금 내려가면 화면 오른쪽 아래에 나타남 -->
 <button type="button" class="to-top" data-i18n-attr="aria-label:top.label" aria-label="맨 위로" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
-<script src="js/config.js?v=20261121b"></script>
+<script src="js/config.js?v=20261121c"></script>
 <script src="js/i18n.js?v=20261121b"></script>
-<script src="js/main.js?v=20261121e"></script>
+<script src="js/main.js?v=20261121f"></script>
 <script type="module" src="js/eco3d.js?v=20261116c"></script>
 </body>
 </html>
