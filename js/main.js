@@ -566,7 +566,7 @@
         cover.className = "video-cover";
         var poster = sameSite(v.cfg.poster);
         cover.innerHTML = (poster ? '<img alt="" loading="lazy">' : "") +
-          '<span class="play-circle" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span><span class="video-cover-label"></span>';
+          '<span class="play-circle" aria-hidden="true"></span><span class="video-cover-label"></span>';
         if (poster) cover.querySelector("img").src = poster;
         cover.addEventListener("click", function () { play(frame, v); });
         frame.appendChild(cover);
