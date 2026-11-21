@@ -410,6 +410,7 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .game-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) auto;align-items:end;gap:20px;min-height:330px;padding:0 44px}
 .game-copy{align-self:center;padding:44px 0}
+.game-stage .eyebrow{color:var(--link-dark)} /* 연한 초록 바탕 위라 기본 초록(#1d7a43, 대비 3.9)보다 진하게: #bfe5cc 위에서 6.9 */
 .game-desc{margin:18px 0 0;max-width:460px;color:var(--ink-2);font-size:17px;line-height:1.7;text-wrap:balance}
 /* 캐릭터 크기는 칸 폭에 맞춰 줄어듦(cqw): 여학생 오른쪽 끝이 칸 안에 들어오도록 높이 ≤ 칸 폭의 64~66%
    원본(사용자 캐릭터 시트)이 작아 크게 늘리면 흐려서 높이 280px 정도로 씀. 큰 원본이 생기면 그림만 바꾸면 됨 */
@@ -854,6 +855,11 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
   .hero-actions .btn-ghost .btn-icon-line{stroke:#14412c}
   .hero-actions .btn-ghost:hover{border-color:color-mix(in srgb,#1f5a3d 50%,transparent);background:color-mix(in srgb,#1f5a3d 7%,var(--white));color:#14412c;box-shadow:0 14px 26px -18px color-mix(in srgb,#0b2e22 70%,transparent)}
 }
+/* 첫 화면 카드의 작은 아이콘: 영상 칸 재생 버튼과 같은 유리 버튼 재질로 맞춤 (위 두 묶음의 흰 원 규칙을 덮어씀)
+   영상 카드: 영상 칸과 같은 그림(play-green.webp)을 그대로 씀 — 세모가 그림에 들어 있어 svg 세모는 투명하게
+   배출방법 카드: 같은 모양의 그림이 없어 스타일로 만든 유리 구슬 + 고리(카드 강조색인 짙은 초록), 책 선 그림은 그대로 */
+.hero-actions .btn:not(.btn-ghost) .btn-icon{left:11px;bottom:11px;width:32px;height:32px;padding:0;background:url("../img/play-green.webp?v=20261121a") center/contain no-repeat;fill:transparent;box-shadow:0 3px 8px -3px color-mix(in srgb,#000 45%,transparent)}
+.hero-actions .btn-ghost .btn-icon-line{left:11px;bottom:11px;box-sizing:border-box;width:32px;height:32px;padding:5px;border:3px solid var(--link);background:radial-gradient(circle at 32% 24%,color-mix(in srgb,var(--white) 95%,transparent) 0 9%,transparent 10%),radial-gradient(ellipse 120% 70% at 50% 108%,color-mix(in srgb,#1f5a3d 22%,transparent),transparent 60%),radial-gradient(circle at 50% 42%,var(--white) 0 60%,#eef4f0 100%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--white) 65%,transparent),0 3px 8px -3px color-mix(in srgb,#000 45%,transparent)}
 
 /* ===== 바로가기 타일: 마우스를 올리면 품목마다 다른 동작 (마우스가 있는 기기만, 움직임 줄이기 설정이면 멈춤) =====
    일반 봉투는 매듭을 잡고 대롱대롱, 음식물 통은 콩콩 두 번 뜀, 재활용 통은 꾹 눌렸다 쏙(무언가를 받아먹듯), 대형 의자는 흔들의자처럼 까딱
