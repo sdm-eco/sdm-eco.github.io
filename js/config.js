@@ -8,7 +8,8 @@ window.SITE_CONFIG = {
     // poster: 누르기 전에 보이는 대표 그림(jpg·webp). 비우면 "영상 보기" 단색 화면
     // captions: 언어별 자막 파일(WebVTT, .vtt). 사이트 언어에 맞는 자막이 자동으로 켜짐
     // 영상은 재생 버튼을 누를 때만 받음(누르기 전에는 대표 그림만)
-    { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } },
+    // 1편 기초편: 480p · 2분 27초 · 16MB. 한국어 · 영어 자막이 영상에 들어 있어 자막 파일은 비움
+    { src: "media/ep1.mp4", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } },
     { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
   game: {
