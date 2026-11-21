@@ -271,8 +271,9 @@
     });
   }
 
-  // 영상 카드 캐릭터 눈 깜빡임: data-blink="반쯤 감은 그림 감은 그림"
+  // 캐릭터 눈 깜빡임(영상 칸 · 게임 칸): data-blink="반쯤 감은 그림 감은 그림"
   //   뜬 눈 → 반쯤(50ms) → 감음(70ms) → 반쯤(50ms) → 뜬 눈, 캐릭터마다 2.5~4초 사이 무작위, 다섯 번 중 한 번은 두 번 연속
+  //   간격을 바꾸려면 data-blink-gap="가장 짧게,가장 길게"(ms). 게임 칸은 둘이 나란히 있어 더 드물게(5~8초) 깜빡임
   //   그림을 미리 받아 둔 뒤에만 시작(바꿔 끼울 때 깜빡 비는 일 없게), 화면 밖·탭 숨김이면 멈춤, 움직임 줄이기 설정이면 안 함
   function setupBlink() {
     var imgs = document.querySelectorAll("img[data-blink]");
@@ -281,6 +282,7 @@
     imgs.forEach(function (img) {
       var open = img.getAttribute("src");
       var frames = img.dataset.blink.split(" ");
+      var gap = (img.dataset.blinkGap || "2500,4000").split(",").map(Number);
       var ready = false, visible = false, timer = 0;
       function preload() {
         if (ready) return;
@@ -303,7 +305,7 @@
             if (Math.random() < 0.2) setTimeout(function () { blinkOnce(schedule); }, 140);
             else schedule();
           });
-        }, 2500 + Math.random() * 1500);
+        }, gap[0] + Math.random() * (gap[1] - gap[0]));
       }
       new IntersectionObserver(function (entries) {
         visible = entries[0].isIntersecting;
