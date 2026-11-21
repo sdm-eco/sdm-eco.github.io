@@ -410,9 +410,10 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .game-chars .boy{left:0}
 .game-chars .girl{left:40%;height:min(288px,66cqw)}
 .game-cta{align-self:center;display:grid;justify-items:center;gap:12px}
-.game-start{display:grid;place-items:center;align-content:center;gap:6px;width:160px;height:160px;padding:0;border:0;border-radius:50%;background:var(--fresh-strong);color:var(--white);font:inherit;font-size:19px;font-weight:800;box-shadow:0 0 0 14px color-mix(in srgb,var(--fresh-strong) 14%,transparent);cursor:pointer;transition:transform .2s,background-color .2s}
-.game-start:hover{background:var(--fresh-hover);transform:scale(1.04)}
-.game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:18px}
+/* 게임 시작 버튼: 둥근 버튼 그림(글자 없음) 위에 글자·화살표를 얹음 → 4개 언어가 그대로 바뀜. 좁은 화면의 알약 버튼은 그림 없이 단색 */
+.game-start{display:grid;place-items:center;align-content:center;gap:6px;width:176px;height:176px;padding:0;border:0;border-radius:50%;background:url("../img/game-start.webp?v=20261121a") center/contain no-repeat;color:var(--white);font:inherit;font-size:19px;font-weight:800;text-shadow:0 1px 2px color-mix(in srgb,#000 28%,transparent);box-shadow:0 12px 24px -12px color-mix(in srgb,#000 38%,transparent);cursor:pointer;transition:transform .2s,filter .2s}
+.game-start:hover{filter:brightness(1.06);transform:scale(1.04)}
+.game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:6px}
 .game-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .game-status{margin:0;font-size:15px;font-weight:700;color:var(--fresh-hover)}
 .action-link{display:inline-flex;align-items:center;gap:10px;margin-top:24px;min-height:48px;padding:6px 24px;border:1.5px solid var(--link);border-radius:999px;background:var(--link);color:var(--on-dark);font-size:17px;font-weight:700;transition:background-color .2s,border-color .2s}
@@ -487,8 +488,8 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
   .game-hero{grid-template-columns:minmax(0,1fr);gap:0;min-height:0;padding:0 24px}
   .game-copy{padding:32px 0 6px}
   .game-cta{order:2;justify-items:start;grid-auto-flow:column;align-items:center;justify-content:start;gap:14px;padding:14px 0 10px}
-  .game-start{grid-auto-flow:column;width:auto;height:auto;min-height:52px;padding:0 28px;border-radius:999px;box-shadow:none;font-size:18px;white-space:nowrap}
-  .game-start:hover{transform:none}
+  .game-start{grid-auto-flow:column;width:auto;height:auto;min-height:52px;padding:0 28px;border-radius:999px;background:var(--fresh-strong);box-shadow:none;text-shadow:none;font-size:18px;white-space:nowrap;transition:background-color .2s}
+  .game-start:hover{background:var(--fresh-hover);filter:none;transform:none}
   .game-start:focus-visible{outline-offset:4px}
   .game-start svg{width:18px;height:18px}
   /* 캐릭터 칸 높이 = 그림 높이(칸 폭의 60~62%, 칸 폭 ≈ 화면 폭 - 83px): 버튼과 캐릭터 사이가 비지 않게 */
