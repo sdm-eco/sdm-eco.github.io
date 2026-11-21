@@ -477,6 +477,30 @@
     };
     var countEl = document.querySelector("[data-learn-count]");
     var barEl = document.querySelector("[data-learn-bar]");
+    // 받을 배지('분리배출 준비 완료'): 처음부터 흐릿하게 보여 주고, 단계를 모두 끝내면 색이 켜짐
+    //   축하(배지가 튀고 나뭇잎이 흩날림)는 한 번만, 학습 띠가 화면에 보이고 탭이 켜져 있을 때 함
+    //   (게임은 새 창으로 열리므로, 돌아와서 띠를 볼 때 보이도록 기다렸다가 함. 했다는 기록은 done.cheered)
+    var learnEl = document.querySelector(".learn");
+    var rewardEl = document.querySelector("[data-learn-reward]");
+    var badgeEl = document.querySelector("[data-learn-badge]");
+    var earnedBefore = null, cheerPending = false, learnSeen = false;
+    function cheerIfSeen() {
+      if (!cheerPending || !learnSeen || document.hidden) return;
+      cheerPending = false;
+      done.cheered = true;
+      try { localStorage.setItem(PROGRESS_KEY, JSON.stringify(done)); } catch (e) {}
+      if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      learnEl.classList.add("is-cheer");
+      for (var i = 0; i < 8; i++) { var leaf = document.createElement("i"); leaf.className = "learn-leaf"; badgeEl.appendChild(leaf); }
+      setTimeout(function () {
+        learnEl.classList.remove("is-cheer");
+        Array.prototype.forEach.call(badgeEl.querySelectorAll(".learn-leaf"), function (l) { l.remove(); });
+      }, 1600);
+    }
+    if (learnEl && badgeEl && "IntersectionObserver" in window) {
+      new IntersectionObserver(function (entries) { learnSeen = entries[0].isIntersecting; cheerIfSeen(); }, { threshold: 0.6 }).observe(badgeEl);
+      document.addEventListener("visibilitychange", cheerIfSeen);
+    }
 
     function render() {
       var finished = 0, nextFound = false;
@@ -498,8 +522,17 @@
       });
       countEl.textContent = t("learn.progress").replace("{n}", finished).replace("{total}", steps.length);
       barEl.style.transform = "scaleX(" + finished / steps.length + ")";
-      // 처음 온 사람에게 "0단계 완료"를 보이지 않도록, 한 단계라도 끝내야 진행 막대·문구를 보임
-      countEl.hidden = barEl.parentNode.hidden = finished === 0;
+      // 처음 온 사람에게 "0단계 완료"를 보이지 않도록, 한 단계라도 끝내야 진행 문구를 보임(막대는 배지로 가는 길이라 빈 채로도 보임)
+      countEl.hidden = finished === 0;
+      if (learnEl && rewardEl) {
+        var earned = finished === steps.length;
+        learnEl.dataset.got = finished;
+        learnEl.toggleAttribute("data-earned", earned);
+        rewardEl.textContent = t(earned ? "learn.reward.done" : "learn.reward.todo");
+        // 방금 다 마쳤거나, 전에 다 마쳤는데 축하를 아직 못 본 경우 → 띠가 보일 때 한 번
+        if (earned && !done.cheered && (earnedBefore === false || earnedBefore === null)) { cheerPending = true; cheerIfSeen(); }
+        earnedBefore = earned;
+      }
     }
 
     function mark(key) {

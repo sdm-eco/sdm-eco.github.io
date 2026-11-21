@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261121h">
+<link rel="stylesheet" href="css/style.css?v=20261121i">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -117,8 +117,13 @@
       <div class="learn-head">
         <h2 id="learn-title" data-i18n="panel.root.title">함께하는 분리배출 학습</h2>
         <p data-i18n="panel.root.sub">3단계로 배워요</p>
-        <div class="learn-meter" aria-hidden="true"><span data-learn-bar></span></div>
+        <!-- 진행 막대 끝에 받을 배지를 처음부터 보여 줌(잠긴 동안 흐릿, 단계마다 또렷해짐, 3단계를 마치면 색이 켜짐: main.js setupProgress) -->
+        <div class="learn-goal" aria-hidden="true">
+          <div class="learn-meter"><span data-learn-bar></span></div>
+          <span class="learn-badge" data-learn-badge><img src="img/badge-ready.webp?v=20261121a" alt="" width="192" height="192" loading="lazy"></span>
+        </div>
         <p class="learn-count" data-learn-count></p>
+        <p class="learn-reward" data-learn-reward></p>
       </div>
       <ol class="learn-steps">
         <li data-learn-step="video"><a href="#videos"><span class="learn-num"><span class="learn-n">1</span><svg class="learn-check" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8.5l3 3 6-7"/></svg></span><svg class="learn-icon" viewBox="0 0 48 48" aria-hidden="true"><rect x="7" y="10" width="34" height="23" rx="3"/><path d="M3 38h42"/><path d="M21 17l8 4.5-8 4.5z"/></svg><strong data-i18n="nav.video">영상</strong><small data-i18n="step2.sub">영상 2편</small><em class="learn-tag" data-learn-tag hidden></em></a></li>
@@ -623,8 +628,8 @@
 <button type="button" class="to-top" data-i18n-attr="aria-label:top.label" aria-label="맨 위로" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
 <script src="js/config.js?v=20261121c"></script>
-<script src="js/i18n.js?v=20261121b"></script>
-<script src="js/main.js?v=20261121f"></script>
+<script src="js/i18n.js?v=20261121c"></script>
+<script src="js/main.js?v=20261121g"></script>
 <script type="module" src="js/eco3d.js?v=20261116c"></script>
 </body>
 </html>
