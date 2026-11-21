@@ -570,13 +570,37 @@
         if (poster) cover.querySelector("img").src = poster;
         cover.addEventListener("click", function () { play(frame, v); });
         frame.appendChild(cover);
+        cheerOnCover(frame, cover);
       }
-      cover.querySelector(".video-cover-label").textContent = t("video.play");
-      cover.setAttribute("aria-label", t("video.play") + ": " + title);
+      // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜
+      var label = t(frame.dataset.ended ? "video.replay" : "video.play");
+      cover.querySelector(".video-cover-label").textContent = label;
+      cover.setAttribute("aria-label", label + ": " + title);
     });
   }
 
+  // 영상이 있는 칸의 캐릭터 표정: 표지에 마우스를 올리거나 키보드로 고르면 미소(is-cheer)
+  // 마우스가 없는 기기(휴대폰)는 칸이 화면에 들어올 때 한 번 미소를 보여 주고 돌아옴(움직임 줄이기 설정이면 안 함)
+  function cheerOnCover(frame, cover) {
+    if (!frame.querySelector(".video-char.alt")) return;
+    function cheer(on) { return function () { frame.classList.toggle("is-cheer", on); }; }
+    cover.addEventListener("mouseenter", cheer(true));
+    cover.addEventListener("mouseleave", cheer(false));
+    cover.addEventListener("focus", cheer(true));
+    cover.addEventListener("blur", cheer(false));
+    if (!window.matchMedia || !("IntersectionObserver" in window)) return;
+    if (!matchMedia("(hover: none)").matches || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var io = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      io.disconnect();
+      setTimeout(cheer(true), 500);
+      setTimeout(cheer(false), 2000);
+    }, { threshold: 0.7 });
+    io.observe(frame);
+  }
+
   function play(frame, v) {
+    frame.classList.remove("is-cheer"); // 누른 채 영상으로 넘어가면 마우스가 나갔다는 신호가 오지 않으므로 여기서 되돌림
     var player = document.createElement("video");
     player.controls = true;
     player.playsInline = true;
@@ -609,7 +633,17 @@
         if (progress) progress.watched(v.index);
       }
     });
-    frame.innerHTML = "";
+    // 표지(바탕 · 캐릭터 · 편 배지 · 버튼)는 지우지 않고 영상을 그 위에 덮음. 영상이 끝나면 영상만 걷어 표지로 돌아감
+    // (그대로 두면 브라우저가 마지막 장면을 띄워 두는데, 영상이 검게 사라지며 끝나 검은 칸만 남음)
+    var cover = frame.querySelector(".video-cover");
+    player.addEventListener("ended", function () {
+      player.remove();
+      frame.dataset.ended = "1";
+      cover.hidden = false;
+      renderVideos();
+      cover.focus({ preventScroll: true });
+    });
+    cover.hidden = true;
     frame.appendChild(player);
     showCaption(player);
     player.play().catch(function () { /* 자동 재생이 막히면 재생 버튼으로 직접 시작 */ });
@@ -676,6 +710,33 @@
       stage.classList.add("is-playing");
       stage.appendChild(iframe);
     });
+  }
+
+  // 게임 칸 캐릭터의 표정 · 말풍선 (눈 깜빡임은 setupBlink가 따로 맡음)
+  //  - 시작 버튼에 마우스를 올리거나 키보드로 고르면 둘 다 웃는 표정(is-cheer)
+  //  - 칸이 화면에 들어오면 한 번: 아래에서 올라옴 → 남학생 "잠깐!" → 여학생이 활짝 웃으며 "정답!" (게임 안의 틀림 · 맞힘 반응을 미리 보여 줌)
+  //  - 움직임 줄이기 설정이면 등장 장면은 하지 않음(표정 바꿈만)
+  function setupGameChars() {
+    var stage = document.getElementById("game-stage");
+    var button = document.getElementById("game-play");
+    if (!stage || !button || !stage.querySelector(".game-chars .alt")) return;
+    function cheer(on) { return function () { stage.classList.toggle("is-cheer", on); }; }
+    button.addEventListener("mouseenter", cheer(true));
+    button.addEventListener("mouseleave", cheer(false));
+    button.addEventListener("focus", cheer(true));
+    button.addEventListener("blur", cheer(false));
+    if (!("IntersectionObserver" in window)) return;
+    if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    stage.classList.add("anim");
+    // [시각(ms), 클래스, 켬/끔]
+    var SCENE = [[750, "say-stop", true], [1950, "say-stop", false], [2050, "is-laugh", true], [2050, "say-ok", true], [3350, "say-ok", false], [3450, "is-laugh", false]];
+    var io = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      io.disconnect();
+      stage.classList.add("is-in");
+      SCENE.forEach(function (s) { setTimeout(function () { stage.classList.toggle(s[1], s[2]); }, s[0]); });
+    }, { threshold: 0.5 });
+    io.observe(stage.querySelector(".game-chars"));
   }
 
   document.querySelectorAll(".lang-switch button").forEach(function (btn) {
@@ -1199,6 +1260,7 @@
 
   startAtTopOnReload();
   setupGame();
+  setupGameChars();
   setupHeaderFit();
   setupNavMenu();
   setupBandFit();

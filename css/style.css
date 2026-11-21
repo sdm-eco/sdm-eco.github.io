@@ -369,7 +369,11 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 /* 2편은 영상 주황(--video, 학습 띠 '영상' 단계와 같은 색) 계열: 1편 초록과 같은 무게로.
    예전엔 재활용 파랑이었으나 파랑은 '재활용'에만 쓰도록 바꿈(디자인 점검 5번, C안) */
 .ep-2 .video-frame{background:radial-gradient(circle at 88% 0,color-mix(in srgb,var(--white) 38%,transparent),transparent 55%),linear-gradient(135deg,var(--video-ink),var(--video) 60%,#f6a27f)}
-.video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto}
+.video-char{position:absolute;right:7%;bottom:0;height:96%;width:auto;transform-origin:50% 100%;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
+/* 표정 바꿈(영상이 있는 칸만): 표지에 마우스 · 키보드가 오면 걱정 · 놀람 → 미소. .alt는 같은 자리(오른쪽 끝 기준)에 겹쳐 둔 미소 그림, is-cheer는 main.js renderVideos가 붙임 */
+.video-char.alt{opacity:0}
+.video-frame.is-cheer .video-char:not(.alt){opacity:0}
+.video-frame.is-cheer .video-char.alt{opacity:1;transform:translateY(-4px) scale(1.02)}
 .video-ep,.video-soon{display:inline-block;padding:4px 13px;border-radius:999px;color:var(--white);font-size:14px;font-weight:800;line-height:1.5}
 .video-ep{position:absolute;left:20px;top:20px;z-index:1;border:1.5px solid color-mix(in srgb,var(--white) 80%,transparent)}
 .video-soon{position:absolute;left:20px;top:58px;background:color-mix(in srgb,#000 30%,transparent)}
@@ -409,6 +413,25 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .game-chars img{position:absolute;bottom:0;height:min(280px,64cqw);width:auto}
 .game-chars .boy{left:0}
 .game-chars .girl{left:40%;height:min(288px,66cqw)}
+/* 표정 바꿈: 기준 그림 위에 같은 자리로 겹쳐 둔 .alt 그림을 통째로 바꿔 보여 줌(자세가 달라 서서히 섞으면 비쳐 보임 → 바로 바꾸고 살짝 튀어 오름)
+   is-cheer = 시작 버튼에 마우스 · 키보드(둘 다 웃음), is-laugh = 등장 장면의 여학생. 클래스는 main.js setupGameChars가 붙임 */
+.game-chars img{transform-origin:50% 100%;transition:transform .32s cubic-bezier(.34,1.56,.64,1)}
+.game-chars .alt{opacity:0}
+.game-stage.is-cheer .game-chars img:not(.alt),.game-stage.is-laugh .game-chars .girl:not(.alt){opacity:0}
+.game-stage.is-cheer .game-chars .alt,.game-stage.is-laugh .game-chars .girl.alt{opacity:1;transform:translateY(-5px) scale(1.02)}
+/* 등장 장면(한 번): 칸이 화면에 들어오면 아래에서 올라옴. anim은 움직임을 쓸 수 있을 때만 붙음 */
+.game-stage.anim:not(.is-in) .game-chars img:not(.alt){opacity:0}
+.game-stage.is-in .game-chars img:not(.alt){animation:game-char-in .55s cubic-bezier(.16,1,.3,1) backwards}
+.game-stage.is-in .game-chars .girl:not(.alt){animation-delay:.12s}
+@keyframes game-char-in{from{opacity:0;transform:translateY(30px)}}
+/* 말풍선: 남학생 "잠깐!"(틀렸을 때) · 여학생 "정답!"(맞혔을 때) — 게임 안의 반응을 미리 보여 줌 */
+.game-say{position:absolute;z-index:1;padding:5px 14px;border-radius:999px;background:var(--white);color:var(--ink);font-size:16px;font-weight:800;line-height:1.4;white-space:nowrap;box-shadow:0 6px 16px -8px color-mix(in srgb,#000 40%,transparent);opacity:0;transform:translateY(8px) scale(.9);transition:opacity .18s,transform .28s cubic-bezier(.34,1.56,.64,1);pointer-events:none}
+.game-say::after{content:"";position:absolute;top:100%;width:12px;height:8px;background:var(--white);clip-path:polygon(0 0,100% 0,50% 100%)}
+.say-boy{left:0;top:10%}
+.say-boy::after{left:60%}
+.say-girl{right:0;top:14%;color:var(--fresh-strong)}
+.say-girl::after{left:22%}
+.game-stage.say-stop .say-boy,.game-stage.say-ok .say-girl{opacity:1;transform:none}
 .game-cta{align-self:center;display:grid;justify-items:center;gap:12px}
 /* 게임 시작 버튼: 둥근 버튼 그림(글자 없음) 위에 글자·화살표를 얹음 → 4개 언어가 그대로 바뀜. 좁은 화면의 알약 버튼은 그림 없이 단색 */
 .game-start{display:grid;place-items:center;align-content:center;gap:6px;width:176px;height:176px;padding:0;border:0;border-radius:50%;background:url("../img/game-start.webp?v=20261121a") center/contain no-repeat;color:var(--white);font:inherit;font-size:19px;font-weight:800;text-shadow:0 1px 2px color-mix(in srgb,#000 28%,transparent);box-shadow:0 12px 24px -12px color-mix(in srgb,#000 38%,transparent);cursor:pointer;transition:transform .2s,filter .2s}
@@ -496,6 +519,10 @@ html.nav-collapsed .nav-links a[aria-current="location"]{background:var(--mint);
   .game-chars{order:3;height:min(242px,calc((100vw - 83px) * .62));max-width:520px;width:100%;justify-self:center}
   .game-chars img{height:min(236px,60cqw)}
   .game-chars .girl{height:min(242px,62cqw)}
+  /* 캐릭터가 작아져 말풍선이 머리와 겹치지 않게 조금 위 · 바깥으로 */
+  .game-say{padding:4px 12px;font-size:15px}
+  .say-boy{left:-8px;top:0}
+  .say-girl{top:8%}
 }
 /* 태블릿(701~1000px): 문구·버튼은 왼쪽, 캐릭터는 오른쪽에 나란히(아래 끝 맞춤) — 세로로 쌓으면 오른쪽이 비고 칸이 높아짐 */
 @media(min-width:701px) and (max-width:1000px){
