@@ -12,10 +12,10 @@ window.SITE_CONFIG = {
     { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
   game: {
-    // 게임 주소: 별도 저장소 sdm-eco/game 을 GitHub Pages로 열면 "/game/"
-    // 아직 올리지 않았으면 "게임 시작"을 눌러도 "준비 중"으로 보임 (페이지를 열 때 있는지 확인함)
-    url: "/game/",
-    // true: 이 페이지 안에 띄우기, false: 새 창으로 열기
-    embed: true
+    // 게임 주소: 지금은 팀원이 올려 둔 시연판(다른 사이트). 이 사이트 안(/game/)으로 옮기면 "/game/"으로 바꿀 것
+    // 이 사이트 안 주소일 때만 페이지를 열 때 있는지 확인하고, 없으면 "준비 중"으로 보임
+    url: "https://sdm-eco.vercel.app/game/",
+    // true: 이 페이지 안에 띄우기(다른 사이트 주소면 index.html의 frame-src에도 그 주소를 넣어야 함), false: 새 창으로 열기
+    embed: false
   }
 };
