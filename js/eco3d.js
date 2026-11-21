@@ -46,8 +46,21 @@ function initLab(lab) {
   let view = null;
   let cancelMount = null; // 장면 그림을 불러오는 중이면 그 대기를 취소하는 함수
 
+  // 칭찬 말풍선(.eco-cheer): 마지막 단계까지 보면 그 단계의 움직임이 끝난 뒤 장면 위에 뜸. 단계가 바뀌면 바로 사라짐
+  const cheer = lab.querySelector(".eco-cheer");
+  let cheerRun = 0; // 회차. 단계가 바뀌면 올라가서, 기다리던 이전 회차가 뒤늦게 띄우지 못하게 함
+  async function showCheer(on) {
+    const id = ++cheerRun;
+    if (!cheer) return;
+    cheer.hidden = true;
+    if (!on) return;
+    for (let t = 0; id === cheerRun && t < 5000 && view && view.busy(); t += 100) await wait(100);
+    if (id === cheerRun) cheer.hidden = false;
+  }
+
   function setStep(n) {
     step = n;
+    showCheer(n === last);
     buttons.forEach(function (btn) {
       const s = Number(btn.dataset.step);
       btn.setAttribute("aria-pressed", String(s === n));
