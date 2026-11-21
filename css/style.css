@@ -188,9 +188,9 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
 .learn-inner{display:grid;grid-template-columns:230px 1fr;align-items:center;gap:24px;padding:14px 28px;border:1.5px solid var(--card-line);border-radius:28px;background:linear-gradient(90deg,var(--mint),#eef7fb)}
 .learn-head h2{margin:0;font-size:26px;line-height:1.35;letter-spacing:-.8px;font-weight:850;text-wrap:balance}
 .learn-head p{margin-top:4px;font-size:16px;color:var(--muted)}
-.learn-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.learn-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
 .learn-steps li{position:relative}
-.learn-steps li+li:before{content:"";position:absolute;left:-10px;top:50%;width:9px;height:9px;border-top:2px solid var(--leaf);border-right:2px solid var(--leaf);transform:translate(-50%,-50%) rotate(45deg)}
+.learn-steps li+li:before{content:"";position:absolute;left:-16px;top:50%;width:28px;height:24px;background:url("../img/step-next.webp?v=20261121b") center/contain no-repeat;transform:translate(-50%,-50%);pointer-events:none}
 .learn-steps a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;border:2px solid transparent;border-radius:18px;text-align:center;transition:background-color .2s,border-color .2s}
 .learn-steps a:hover{background:var(--white)}
 /* 단계 색 = 그 단계가 가리키는 섹션의 색 (영상=산호, 배출방법=4색 점, 게임=금빛). 넓은 면과 진행 상태는 초록, 이 색들은 번호·아이콘에만 */
