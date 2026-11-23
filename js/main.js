@@ -713,6 +713,51 @@
     });
   }
 
+  // 자막 위치 맞추기: 브라우저(크롬)는 조작 막대가 나타나면 자막을 막대 위로 올리지만, 막대가 사라질 때는
+  // 떠 있는 자막을 그 자리에 두고 다음 자막부터 내려놓음. 그래서 막대가 사라진 뒤와 다시 나타날 때 보이는 자막을
+  // 껐다 켜 브라우저가 지금 막대 상태에 맞게 다시 놓게 함(껐다 켜도 깜빡임은 보이지 않았음)
+  //  - 2026-11 실험(크롬): 마우스를 빼면 막대는 0.5초 안에 사라지지만 껐다 켜기는 1초 뒤부터 들음(0.6초에는 그대로).
+  //    영상 위에서 움직이지 않으면 막대는 약 2초 뒤 사라짐
+  //  - 막대가 사라지는 때는 브라우저가 알려 주지 않아 시간으로 맞추고, 놓치지 않게 두 번씩 함
+  //    (마우스를 빼고 1.2 · 2초, 멈추고 3 · 4초). 브라우저가 이 시간을 바꾸면 조금 늦게 내려올 수 있음
+  //    (그래도 다음 자막에서는 브라우저가 스스로 맞춤)
+  //  - 영상 위에서 멈춰 있으면 크기 단추(.video-tools)도 막대가 사라질 때(2초) 함께 감춤(is-idle)
+  //  - 마우스가 있는 기기만(휴대폰은 막대가 탭으로 나타나고 영상 칸이 화면 폭에 가까워 그대로 둠)
+  function setupCueRelayout() {
+    if (!window.matchMedia || !matchMedia("(hover: hover)").matches) return;
+    document.querySelectorAll(".video-frame").forEach(function (frame) {
+      var timers = [];
+      function clear() { timers.forEach(clearTimeout); timers = []; }
+      function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+      function relayout() {
+        var player = frame.querySelector("video");
+        if (!player) return;
+        Array.prototype.forEach.call(player.textTracks, function (track) {
+          if (track.mode !== "showing" || !track.activeCues || !track.activeCues.length) return;
+          track.mode = "hidden";
+          track.mode = "showing";
+        });
+      }
+      function playing() { var player = frame.querySelector("video"); return player && !player.paused; } // 멈춘 동안은 막대가 계속 보임
+      frame.addEventListener("mousemove", function () {
+        var wasIdle = frame.classList.contains("is-idle");
+        clear();
+        frame.classList.remove("is-idle");
+        if (wasIdle) at(80, relayout); // 막대가 다시 나타남
+        at(2000, function () { if (playing()) frame.classList.add("is-idle"); });
+        at(3000, function () { if (playing()) relayout(); });
+        at(4000, function () { if (playing()) relayout(); });
+      });
+      frame.addEventListener("mouseenter", function () { clear(); at(80, relayout); });
+      frame.addEventListener("mouseleave", function () {
+        clear();
+        frame.classList.remove("is-idle");
+        at(1200, relayout);
+        at(2000, relayout);
+      });
+    });
+  }
+
   function play(frame, v) {
     var player = document.createElement("video");
     player.controls = true;
@@ -1469,6 +1514,7 @@
   setupGameChars();
   setupVideoCheer();
   setupBigView();
+  setupCueRelayout();
   setupHeaderFit();
   setupNavMenu();
   setupBandFit();

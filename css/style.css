@@ -444,6 +444,7 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-tools svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .video-tools .i-normal,.video-tools .is-big .i-big{display:none}
 .video-tools .is-big .i-normal{display:block}
+.video-frame.is-idle:not(.is-paused) .video-tools:not(:has(:focus-visible)){opacity:0} /* 영상 위에서 멈춰 있으면 조작 막대와 함께 감춤(main.js setupCueRelayout) */
 @media(max-width:1000px){.video-tools{display:none}}
 /* 영상 크게 보기 창(main.js openBig): 폭은 화면의 약 3/4(최대 1080px), 제목 · 자막 단추 줄까지 화면 높이 안에 들어오게 */
 .video-dialog{width:min(1080px,calc(100% - 96px),calc((100vh - 200px) * 16 / 9 + 40px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:visible}
