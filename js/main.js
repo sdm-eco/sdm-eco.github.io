@@ -582,13 +582,63 @@
   //    영상 칸 아래 '자막' 단추 줄로 다른 언어 자막을 고르거나 끌 수 있음(renderCaptionBar)
   //  - 거의 끝까지(90%) 보면 학습 띠의 영상 단계에 기록
   var captionLang = null; // 자막 단추 줄을 마지막으로 그린 사이트 언어(언어가 바뀌면 고른 자막을 지우고 새 언어를 따름)
+
+  // ---- 크게 보기 창 (넓은 화면) ----
+  // 칸 안의 영상(1440px 창에서 약 466px)은 작고 전체 화면은 너무 커서, 넓은 화면에서는 그 사이 크기의 창에서 재생
+  //  - 재생 버튼을 누르면 영상 칸(표지 · 영상)과 자막 단추 줄을 이 창으로 옮겨 재생하고, 닫으면 제자리로 돌려놓음
+  //    (칸을 통째로 옮기므로 자막 · 표정 · 학습 기록 코드는 그대로 씀)
+  //  - 닫기 단추 · Esc · 바깥 누르기로 닫음. 보다가 닫으면 그 자리를 기억해 다시 누를 때 이어서('이어 보기')
+  //  - 끝까지 보면 창을 닫고 칸에 '다시 보기'. 영상 조작 막대의 전체 화면 단추는 그대로
+  //  - 1000px 이하(휴대폰 · 세로 태블릿)는 칸이 화면 폭에 가까워 지금처럼 칸 안에서 재생
+  var bigDialog = document.getElementById("video-dialog");
+  var BIG_VIEW = window.matchMedia ? matchMedia("(min-width: 1001px)") : null;
+  function setBigTitle(frame) {
+    bigDialog.querySelector(".video-dialog-ep").textContent = frame.querySelector(".video-ep").textContent;
+    bigDialog.querySelector(".video-dialog-title").textContent = frame._card.querySelector("h3").textContent;
+  }
+  function openBig(frame) {
+    if (!bigDialog || !BIG_VIEW || !BIG_VIEW.matches || bigDialog.open) return;
+    var slot = bigDialog.querySelector(".video-dialog-slot");
+    frame._home = document.createComment("video-frame"); // 돌아올 자리 표시
+    frame.before(frame._home);
+    slot.appendChild(frame);
+    if (frame._bar) slot.appendChild(frame._bar);
+    bigDialog._frame = frame;
+    setBigTitle(frame);
+    bigDialog.showModal();
+  }
+  function setupBigView() {
+    if (!bigDialog) return;
+    bigDialog.querySelector("[data-video-close]").addEventListener("click", function () { bigDialog.close(); });
+    bigDialog.addEventListener("click", function (e) { if (e.target === bigDialog) bigDialog.close(); });
+    bigDialog.addEventListener("close", function () {
+      var frame = bigDialog._frame;
+      if (!frame) return;
+      bigDialog._frame = null;
+      var player = frame.querySelector("video");
+      if (player) { // 보다가 닫음: 본 자리를 기억하고 표지로
+        if (player.currentTime > 1) frame.dataset.resume = String(player.currentTime);
+        player.pause();
+        player.remove();
+        frame.querySelector(".video-cover").hidden = false;
+      }
+      frame.classList.remove("is-cheer");
+      frame._home.replaceWith(frame);
+      if (frame._bar) frame.after(frame._bar);
+      renderVideos();
+      var cover = frame.querySelector(".video-cover");
+      if (cover) cover.focus({ preventScroll: true });
+    });
+  }
   function renderVideos() {
     var langChanged = captionLang !== current;
     captionLang = current;
     videoList().forEach(function (v) {
       var frame = document.querySelector('[data-video-index="' + v.index + '"]');
       if (!frame) return;
-      var title = frame.closest(".video-card").querySelector("h3").textContent;
+      frame._card = frame._card || frame.closest(".video-card"); // 크게 보기 창으로 옮겨도 원래 카드를 찾도록
+      var title = frame._card.querySelector("h3").textContent;
+      if (bigDialog && bigDialog._frame === frame) setBigTitle(frame);
       if (langChanged) delete frame.dataset.cap;
       renderCaptionBar(frame, v);
       var player = frame.querySelector("video");
@@ -608,14 +658,14 @@
         cover.innerHTML = (poster ? '<img alt="" loading="lazy">' : "") +
           '<span class="play-circle" aria-hidden="true"></span><span class="video-cover-label"></span>';
         if (poster) cover.querySelector("img").src = poster;
-        cover.addEventListener("click", function () { play(frame, v); });
+        cover.addEventListener("click", function () { openBig(frame); play(frame, v); });
         frame.appendChild(cover);
         // 키보드로 표지를 고르면 캐릭터가 웃음(마우스 반응은 setupVideoCheer가 칸 전체에 걸어 둠)
         cover.addEventListener("focus", function () { frame.classList.add("is-cheer"); });
         cover.addEventListener("blur", function () { frame.classList.remove("is-cheer"); });
       }
-      // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜
-      var label = t(frame.dataset.ended ? "video.replay" : "video.play");
+      // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜. 크게 보기 창을 보다가 닫았으면 '이어 보기'
+      var label = t(frame.dataset.ended ? "video.replay" : frame.dataset.resume ? "video.resume" : "video.play");
       cover.querySelector(".video-cover-label").textContent = label;
       cover.setAttribute("aria-label", label + ": " + title);
     });
@@ -650,7 +700,12 @@
     player.preload = "auto";
     var poster = sameSite(v.cfg.poster);
     if (poster) player.poster = poster;
-    player.setAttribute("aria-label", frame.closest(".video-card").querySelector("h3").textContent);
+    player.setAttribute("aria-label", frame._card.querySelector("h3").textContent);
+    // 크게 보기 창을 보다가 닫았던 영상은 그 자리부터 이어서
+    var resume = Number(frame.dataset.resume) || 0;
+    delete frame.dataset.resume;
+    delete frame.dataset.ended; // 다시 보기를 시작하면 '끝까지 봄' 표시는 지움(보다가 닫으면 '이어 보기'가 되게)
+    if (resume) player.addEventListener("loadedmetadata", function () { player.currentTime = resume; }, { once: true });
     var source = document.createElement("source");
     source.src = v.src;
     source.type = "video/mp4";
@@ -695,6 +750,7 @@
       player.remove();
       frame.dataset.ended = "1";
       cover.hidden = false;
+      if (bigDialog && bigDialog._frame === frame) { bigDialog.close(); return; } // 창을 닫으면 칸을 제자리로 돌리고 '다시 보기'를 보임(close)
       renderVideos();
       cover.focus({ preventScroll: true });
     });
@@ -722,10 +778,9 @@
     return captionLangs(v).indexOf(choice) > -1 ? choice : "off";
   }
   function renderCaptionBar(frame, v) {
-    var card = frame.closest(".video-card");
-    var bar = card.querySelector(".video-caps");
+    var bar = frame._bar; // 크게 보기 창으로 함께 옮겨 다니므로 칸에 붙여 둔 것을 씀
     var langs = captionLangs(v);
-    if (!langs.length) { if (bar) bar.remove(); return; } // 자막 파일이 없는 영상은 단추 줄도 없음
+    if (!langs.length) { if (bar) { bar.remove(); frame._bar = null; } return; } // 자막 파일이 없는 영상은 단추 줄도 없음
     if (!bar) {
       bar = document.createElement("div");
       bar.className = "video-caps";
@@ -748,6 +803,7 @@
         bar.appendChild(btn);
       });
       bar._video = v;
+      frame._bar = bar;
       frame.insertAdjacentElement("afterend", bar);
     }
     bar.setAttribute("aria-label", t("video.caption"));
@@ -757,7 +813,7 @@
   }
   // 단추 줄의 눌림 표시와 재생 중인 영상의 자막을 고른 값에 맞춤
   function applyCaption(frame) {
-    var bar = frame.closest(".video-card").querySelector(".video-caps");
+    var bar = frame._bar;
     if (!bar) return;
     var shown = shownCaption(frame, bar._video);
     bar.querySelectorAll("button").forEach(function (btn) {
@@ -1375,6 +1431,7 @@
   setupGame();
   setupGameChars();
   setupVideoCheer();
+  setupBigView();
   setupHeaderFit();
   setupNavMenu();
   setupBandFit();

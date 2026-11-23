@@ -375,7 +375,7 @@ nav{display:flex;align-items:center;gap:18px;order:2;margin-left:auto}
    (휴대폰에서 창을 세게 끌어내리면 창이 밀려 내려가며 뒤 페이지가 비치던 문제, 구청 요청). 창이 열린 동안은 뒤 페이지도 출렁이지 않게 */
 .eco-dialog{width:min(1100px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto;overscroll-behavior:none}
 html:has(.eco-dialog[open]){overscroll-behavior:none}
-.eco-dialog::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
+.eco-dialog::backdrop,.video-dialog::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
 .eco-dialog .eco-lab{margin-top:0}
 /* 창 높이 고정 (PC·태블릿): 창은 화면 세로 가운데에 놓이므로, 내용 길이에 따라 창 높이가 바뀌면 창 전체가 위아래로 움직임
    (동별 배출요일에서 충현동·신촌동의 구역 칸이 생기고 없어질 때, 품목 탭을 바꿀 때). 높이를 정해 두고 남는 자리는 아래 칸이 채움
@@ -434,6 +434,13 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-caps button:hover{border-color:var(--fresh-strong)}
 .video-caps button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
 .video-caps button:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:2px}
+/* 영상 크게 보기 창(main.js openBig): 폭은 화면의 약 3/4(최대 1080px), 제목 · 자막 단추 줄까지 화면 높이 안에 들어오게 */
+.video-dialog{width:min(1080px,calc(100% - 96px),calc((100vh - 200px) * 16 / 9 + 40px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:visible}
+.video-dialog-panel{position:relative;padding:16px 20px 18px;border-radius:28px;background:var(--white);box-shadow:0 30px 80px -24px color-mix(in srgb,#000 55%,transparent)}
+.video-dialog-head{display:flex;align-items:center;gap:12px;min-height:44px;margin:0 58px 12px 2px;color:var(--ink);font-size:20px;font-weight:800;line-height:1.35;letter-spacing:-.4px}
+.video-dialog-ep{flex:none;padding:3px 12px;border-radius:999px;background:var(--mint);color:var(--fresh-strong);font-size:14px;letter-spacing:0}
+.video-dialog .eco-close{top:16px;right:18px}
+.video-dialog .video-caps{margin:12px 2px 0}
 .video-card h3{margin:18px 8px 6px;font-size:24px;line-height:1.35;letter-spacing:-.6px} /* 두 줄이 될 때 줄 사이가 벌어지지 않게(본문 1.7보다 좁게) */
 .video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
 /* 주제 태그는 한 줄로: 칸보다 길면(좁은 화면·긴 언어) 옆으로 밀어서 봄, 넘칠 때만 오른쪽 끝을 흐려 더 있음을 알림(main.js setupTagRows) */
