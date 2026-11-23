@@ -12,7 +12,7 @@ window.SITE_CONFIG = {
     //   자막 4개 언어(media/ep1.*.vtt): 한국어는 내레이션만, 중국어 · 영어 · 베트남어는 내레이션 + 화면 글자 설명([On screen] …)
     //   자막은 영상 속 글자와 같은 모양으로 영상 위에 그림(main.js drawSubs). 파일의 <c.hl>은 연두색 핵심어, <c.note>는 화면 글자 설명
     // 소리는 완성본의 70%로 줄여 넣음(-3.1dB, 예전 파일과 같게). 파일을 바꾸면 ?v= 값을 올릴 것(브라우저가 예전 파일을 쓰지 않게)
-    { src: "media/ep1.mp4?v=20261123a", poster: "",
+    { src: "media/ep1.mp4?v=20261123b", poster: "",
       captions: { ko: "media/ep1.ko.vtt?v=20261123c", zh: "media/ep1.zh.vtt?v=20261123c", en: "media/ep1.en.vtt?v=20261123c", vi: "media/ep1.vi.vtt?v=20261123c" } },
     { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
