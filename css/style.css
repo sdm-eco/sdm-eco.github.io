@@ -434,6 +434,17 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-caps button:hover{border-color:var(--fresh-strong)}
 .video-caps button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
 .video-caps button:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:2px}
+/* 재생 중 영상 오른쪽 위의 크기 단추(main.js play · renderVideoTools): 크게 보기 ↔ 기본 보기, 전체 화면
+   마우스를 올렸을 때 · 멈췄을 때 · 키보드로 고를 때 보임. 1000px 이하는 칸이 화면 폭에 가까워 숨김(전체 화면은 조작 막대로) */
+.video-tools{position:absolute;top:12px;right:12px;z-index:3;display:flex;gap:6px;opacity:0;transition:opacity .2s}
+.video-frame:hover .video-tools,.video-frame.is-paused .video-tools,.video-tools:has(:focus-visible){opacity:1}
+.video-tools button{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:6px 12px;border:0;border-radius:999px;background:color-mix(in srgb,var(--night) 74%,transparent);color:var(--white);font:inherit;font-size:13.5px;font-weight:700;line-height:1.2;white-space:nowrap;cursor:pointer}
+.video-tools button:hover{background:color-mix(in srgb,var(--night) 92%,transparent)}
+.video-tools button:focus-visible{outline:3px solid var(--lime);outline-offset:2px}
+.video-tools svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.video-tools .i-normal,.video-tools .is-big .i-big{display:none}
+.video-tools .is-big .i-normal{display:block}
+@media(max-width:1000px){.video-tools{display:none}}
 /* 영상 크게 보기 창(main.js openBig): 폭은 화면의 약 3/4(최대 1080px), 제목 · 자막 단추 줄까지 화면 높이 안에 들어오게 */
 .video-dialog{width:min(1080px,calc(100% - 96px),calc((100vh - 200px) * 16 / 9 + 40px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:visible}
 .video-dialog-panel{position:relative;padding:16px 20px 18px;border-radius:28px;background:var(--white);box-shadow:0 30px 80px -24px color-mix(in srgb,#000 55%,transparent)}

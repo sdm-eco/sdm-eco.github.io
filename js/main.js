@@ -583,29 +583,43 @@
   //  - 거의 끝까지(90%) 보면 학습 띠의 영상 단계에 기록
   var captionLang = null; // 자막 단추 줄을 마지막으로 그린 사이트 언어(언어가 바뀌면 고른 자막을 지우고 새 언어를 따름)
 
-  // ---- 크게 보기 창 (넓은 화면) ----
-  // 칸 안의 영상(1440px 창에서 약 466px)은 작고 전체 화면은 너무 커서, 넓은 화면에서는 그 사이 크기의 창에서 재생
-  //  - 재생 버튼을 누르면 영상 칸(표지 · 영상)과 자막 단추 줄을 이 창으로 옮겨 재생하고, 닫으면 제자리로 돌려놓음
-  //    (칸을 통째로 옮기므로 자막 · 표정 · 학습 기록 코드는 그대로 씀)
-  //  - 닫기 단추 · Esc · 바깥 누르기로 닫음. 보다가 닫으면 그 자리를 기억해 다시 누를 때 이어서('이어 보기')
-  //  - 끝까지 보면 창을 닫고 칸에 '다시 보기'. 영상 조작 막대의 전체 화면 단추는 그대로
-  //  - 1000px 이하(휴대폰 · 세로 태블릿)는 칸이 화면 폭에 가까워 지금처럼 칸 안에서 재생
+  // ---- 영상 크기: 기본 보기(칸) · 크게 보기(창) · 전체 화면 ----
+  // 처음에는 칸 안에서 재생하고, 재생 중 영상 오른쪽 위의 단추로 크기를 바꿈(넓은 화면만, play · renderVideoTools)
+  //  - 크게 보기: 영상 칸(표지 · 영상)과 자막 단추 줄을 이 창으로 옮김. 폭은 화면의 약 3/4(최대 1080px)
+  //    칸을 통째로 옮기므로 자막 · 표정 · 학습 기록 코드는 그대로 쓰고, 보던 장면에서 이어서 재생
+  //  - 창의 '기본 보기' · ✕ · Esc · 바깥 누르기: 칸으로 돌아가 이어서 재생
+  //  - 전체 화면: 영상만 화면 가득(영상 조작 막대의 전체 화면 단추와 같음)
+  //  - 끝까지 보면 창을 닫고 칸에 '다시 보기'
+  //  - 1000px 이하(휴대폰 · 세로 태블릿)는 칸이 화면 폭에 가까워 단추 없이 칸 안에서 재생(전체 화면은 조작 막대로)
   var bigDialog = document.getElementById("video-dialog");
   var BIG_VIEW = window.matchMedia ? matchMedia("(min-width: 1001px)") : null;
+  function isBig(frame) { return !!bigDialog && bigDialog._frame === frame; }
   function setBigTitle(frame) {
     bigDialog.querySelector(".video-dialog-ep").textContent = frame.querySelector(".video-ep").textContent;
     bigDialog.querySelector(".video-dialog-title").textContent = frame._card.querySelector("h3").textContent;
   }
+  // 칸을 옮기는 동안 재생을 멈추는 브라우저가 있어, 재생 중이었으면 옮긴 뒤 이어서 재생
+  function moveFrame(frame, move) {
+    var player = frame.querySelector("video");
+    var playing = player && !player.paused;
+    move();
+    if (playing && player.paused) player.play().catch(function () {});
+  }
   function openBig(frame) {
     if (!bigDialog || !BIG_VIEW || !BIG_VIEW.matches || bigDialog.open) return;
     var slot = bigDialog.querySelector(".video-dialog-slot");
-    frame._home = document.createComment("video-frame"); // 돌아올 자리 표시
-    frame.before(frame._home);
-    slot.appendChild(frame);
-    if (frame._bar) slot.appendChild(frame._bar);
+    moveFrame(frame, function () {
+      frame._home = document.createComment("video-frame"); // 돌아올 자리 표시
+      frame.before(frame._home);
+      slot.appendChild(frame);
+      if (frame._bar) slot.appendChild(frame._bar);
+    });
     bigDialog._frame = frame;
     setBigTitle(frame);
     bigDialog.showModal();
+    renderVideoTools(frame);
+    var size = frame.querySelector("[data-video-size]");
+    if (size) size.focus({ preventScroll: true });
   }
   function setupBigView() {
     if (!bigDialog) return;
@@ -615,20 +629,25 @@
       var frame = bigDialog._frame;
       if (!frame) return;
       bigDialog._frame = null;
-      var player = frame.querySelector("video");
-      if (player) { // 보다가 닫음: 본 자리를 기억하고 표지로
-        if (player.currentTime > 1) frame.dataset.resume = String(player.currentTime);
-        player.pause();
-        player.remove();
-        frame.querySelector(".video-cover").hidden = false;
-      }
       frame.classList.remove("is-cheer");
-      frame._home.replaceWith(frame);
-      if (frame._bar) frame.after(frame._bar);
+      moveFrame(frame, function () {
+        frame._home.replaceWith(frame);
+        if (frame._bar) frame.after(frame._bar);
+      });
       renderVideos();
-      var cover = frame.querySelector(".video-cover");
-      if (cover) cover.focus({ preventScroll: true });
+      // 재생 중이면 크기 단추로, 끝나서 닫혔으면 표지(다시 보기)로 초점
+      var back = frame.querySelector("[data-video-size]") || frame.querySelector(".video-cover");
+      if (back) back.focus({ preventScroll: true });
     });
+  }
+  // 재생 중 영상 위의 크기 단추 글자: 칸에서는 '크게 보기', 창에서는 '기본 보기'
+  function renderVideoTools(frame) {
+    var tools = frame.querySelector(".video-tools");
+    if (!tools) return;
+    var size = tools.querySelector("[data-video-size]");
+    size.classList.toggle("is-big", isBig(frame));
+    size.querySelector("span").textContent = t(isBig(frame) ? "video.normal" : "video.big");
+    tools.querySelector("[data-video-full] span").textContent = t("video.full");
   }
   function renderVideos() {
     var langChanged = captionLang !== current;
@@ -642,8 +661,9 @@
       if (langChanged) delete frame.dataset.cap;
       renderCaptionBar(frame, v);
       var player = frame.querySelector("video");
-      if (player) { // 이미 재생을 시작한 칸: 이름만 맞춤(자막 언어는 renderCaptionBar가 맞춤)
+      if (player) { // 이미 재생을 시작한 칸: 이름 · 크기 단추 글자만 맞춤(자막 언어는 renderCaptionBar가 맞춤)
         player.setAttribute("aria-label", title);
+        renderVideoTools(frame);
         return;
       }
       var cover = frame.querySelector(".video-cover");
@@ -658,14 +678,14 @@
         cover.innerHTML = (poster ? '<img alt="" loading="lazy">' : "") +
           '<span class="play-circle" aria-hidden="true"></span><span class="video-cover-label"></span>';
         if (poster) cover.querySelector("img").src = poster;
-        cover.addEventListener("click", function () { openBig(frame); play(frame, v); });
+        cover.addEventListener("click", function () { play(frame, v); });
         frame.appendChild(cover);
         // 키보드로 표지를 고르면 캐릭터가 웃음(마우스 반응은 setupVideoCheer가 칸 전체에 걸어 둠)
         cover.addEventListener("focus", function () { frame.classList.add("is-cheer"); });
         cover.addEventListener("blur", function () { frame.classList.remove("is-cheer"); });
       }
-      // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜. 크게 보기 창을 보다가 닫았으면 '이어 보기'
-      var label = t(frame.dataset.ended ? "video.replay" : frame.dataset.resume ? "video.resume" : "video.play");
+      // 끝까지 본 칸은 표지로 돌아와 있고(play의 ended), 글자만 '다시 보기'로 바뀜
+      var label = t(frame.dataset.ended ? "video.replay" : "video.play");
       cover.querySelector(".video-cover-label").textContent = label;
       cover.setAttribute("aria-label", label + ": " + title);
     });
@@ -701,11 +721,6 @@
     var poster = sameSite(v.cfg.poster);
     if (poster) player.poster = poster;
     player.setAttribute("aria-label", frame._card.querySelector("h3").textContent);
-    // 크게 보기 창을 보다가 닫았던 영상은 그 자리부터 이어서
-    var resume = Number(frame.dataset.resume) || 0;
-    delete frame.dataset.resume;
-    delete frame.dataset.ended; // 다시 보기를 시작하면 '끝까지 봄' 표시는 지움(보다가 닫으면 '이어 보기'가 되게)
-    if (resume) player.addEventListener("loadedmetadata", function () { player.currentTime = resume; }, { once: true });
     var source = document.createElement("source");
     source.src = v.src;
     source.type = "video/mp4";
@@ -746,16 +761,38 @@
     // 표지(바탕 · 캐릭터 · 편 배지 · 버튼)는 지우지 않고 영상을 그 위에 덮음. 영상이 끝나면 영상만 걷어 표지로 돌아감
     // (그대로 두면 브라우저가 마지막 장면을 띄워 두는데, 영상이 검게 사라지며 끝나 검은 칸만 남음)
     var cover = frame.querySelector(".video-cover");
+    // 크기 단추(영상 오른쪽 위): 크게 보기 ↔ 기본 보기, 전체 화면. 넓은 화면에서만 보임(CSS .video-tools)
+    var tools = document.createElement("div");
+    tools.className = "video-tools";
+    tools.innerHTML =
+      '<button type="button" data-video-size><svg class="i-big" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>' +
+      '<svg class="i-normal" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10h-6V4M4 14h6v6M14 10l7-7M10 14l-7 7"/></svg><span></span></button>' +
+      '<button type="button" data-video-full><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span></span></button>';
+    tools.querySelector("[data-video-size]").addEventListener("click", function () {
+      if (isBig(frame)) bigDialog.close(); else openBig(frame);
+    });
+    tools.querySelector("[data-video-full]").addEventListener("click", function () {
+      var full = player.requestFullscreen || player.webkitRequestFullscreen || player.webkitEnterFullscreen;
+      if (full) Promise.resolve(full.call(player)).catch(function () { /* 전체 화면이 막힌 브라우저: 조작 막대로 */ });
+    });
+    // 멈춘 동안에는 단추를 계속 보임(재생 중에는 마우스를 올리거나 키보드로 고를 때)
+    player.addEventListener("pause", function () { frame.classList.add("is-paused"); });
+    player.addEventListener("play", function () { frame.classList.remove("is-paused"); });
     player.addEventListener("ended", function () {
       player.remove();
+      tools.remove();
+      frame.classList.remove("is-paused");
       frame.dataset.ended = "1";
       cover.hidden = false;
-      if (bigDialog && bigDialog._frame === frame) { bigDialog.close(); return; } // 창을 닫으면 칸을 제자리로 돌리고 '다시 보기'를 보임(close)
+      if (isBig(frame)) { bigDialog.close(); return; } // 창을 닫으면 칸을 제자리로 돌리고 '다시 보기'를 보임(close)
       renderVideos();
       cover.focus({ preventScroll: true });
     });
+    delete frame.dataset.ended;
     cover.hidden = true;
     frame.appendChild(player);
+    frame.appendChild(tools);
+    renderVideoTools(frame);
     applyCaption(frame);
     player.play().catch(function () { /* 자동 재생이 막히면 재생 버튼으로 직접 시작 */ });
     player.focus();
