@@ -10,9 +10,10 @@ window.SITE_CONFIG = {
     // 영상은 재생 버튼을 누를 때만 받음(누르기 전에는 대표 그림만)
     // 1편 기초편(3분 판): 720p · 3분 00초 · 29MB. 화면 글자는 한국어이고 자막은 영상에 넣지 않고 파일로 따로 붙임
     //   자막 4개 언어(media/ep1.*.vtt): 한국어는 내레이션만, 중국어 · 영어 · 베트남어는 내레이션 + 화면 글자 설명([On screen] …)
+    //   자막은 영상 속 글자와 같은 모양으로 영상 위에 그림(main.js drawSubs). 파일의 <c.hl>은 연두색 핵심어, <c.note>는 화면 글자 설명
     // 소리는 완성본의 70%로 줄여 넣음(-3.1dB, 예전 파일과 같게). 파일을 바꾸면 ?v= 값을 올릴 것(브라우저가 예전 파일을 쓰지 않게)
     { src: "media/ep1.mp4?v=20261123a", poster: "",
-      captions: { ko: "media/ep1.ko.vtt?v=20261123b", zh: "media/ep1.zh.vtt?v=20261123b", en: "media/ep1.en.vtt?v=20261123b", vi: "media/ep1.vi.vtt?v=20261123b" } },
+      captions: { ko: "media/ep1.ko.vtt?v=20261123c", zh: "media/ep1.zh.vtt?v=20261123c", en: "media/ep1.en.vtt?v=20261123c", vi: "media/ep1.vi.vtt?v=20261123c" } },
     { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
   game: {

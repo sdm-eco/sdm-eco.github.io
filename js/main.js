@@ -719,6 +719,7 @@
     });
   }
 
+  // (자막을 직접 그리게 된 뒤로는 영상만 전체 화면일 때의 브라우저 자막에만 해당. 칸 · 크게 보기의 자막 자리는 setupSubs가 맞춤)
   // 자막 위치 맞추기: 브라우저(크롬)는 조작 막대가 나타나면 자막을 막대 위로 올리지만, 막대가 사라질 때는
   // 떠 있는 자막을 그 자리에 두고 다음 자막부터 내려놓음. 그래서 막대가 사라진 뒤와 다시 나타날 때 보이는 자막을
   // 껐다 켜 브라우저가 지금 막대 상태에 맞게 다시 놓게 함(껐다 켜도 깜빡임은 보이지 않았음)
@@ -788,20 +789,30 @@
       track.src = src;
       track.default = lang === choice; // 브라우저가 스스로 다른 언어 자막을 고르지 않게 고른 자막(기본은 사이트 언어)을 기본으로
       player.appendChild(track);
+      // 지금 자막이 바뀔 때마다 영상 위에 직접 그림(drawSubs). 고른 트랙만 hidden이라 그 트랙에서만 옴
+      (track.track || track).addEventListener("cuechange", function () { drawSubs(frame); });
     });
     // 브라우저가 영상 정보를 읽은 뒤 자막을 다시 고르는 경우가 있어 그때 한 번 더 맞춤
     player.addEventListener("loadedmetadata", function () { applyCaption(frame); });
     // 영상 조작 막대의 자막 메뉴로 바꾼 것도 아래 단추 줄에 반영(재생을 시작한 뒤부터: 그 전에 브라우저가 스스로 고르는 것은 따르지 않음)
+    //  - 자막을 직접 그리는 동안(칸 · 크게 보기)에는 고른 트랙이 hidden이라 '보이는(showing) 트랙'이 없음
+    //    → 메뉴에서 언어를 고른 때(showing이 생김)만 그 언어로 바꿈. 메뉴의 '끔'은 알 수 없어, 끄기는 아래 단추 줄로
+    //  - 영상만 전체 화면일 때는 브라우저 자막을 쓰므로(nativeSubs) 메뉴의 '끔'도 그대로 따름
+    //  - 어느 경우든 마지막에 고른 값대로 다시 놓음(이미 맞으면 바꾸지 않으므로 되풀이되지 않음)
     var started = false;
     player.addEventListener("playing", function () { started = true; });
     player.textTracks.addEventListener("change", function () {
-      if (!started || !player.isConnected) return;
+      if (!player.isConnected) return;
       var showing = Array.prototype.filter.call(player.textTracks, function (track) { return track.mode === "showing"; })[0];
-      var now = showing ? showing.language : "off";
-      if (now === shownCaption(frame, v)) return;
-      frame.dataset.cap = now;
+      if (started && (showing || nativeSubs(frame))) {
+        var now = showing ? showing.language : "off";
+        if (now !== shownCaption(frame, v)) frame.dataset.cap = now;
+      }
       applyCaption(frame);
     });
+    // 아이폰은 영상 전체 화면이 따로 있어(document의 fullscreenchange가 오지 않음) 영상이 직접 알려 줌
+    player.addEventListener("webkitbeginfullscreen", function () { frame._iosFull = true; applyCaption(frame); });
+    player.addEventListener("webkitendfullscreen", function () { frame._iosFull = null; applyCaption(frame); });
     var counted = false;
     player.addEventListener("timeupdate", function () {
       if (!counted && player.duration && player.currentTime / player.duration >= 0.9) {
@@ -829,9 +840,16 @@
     // 멈춘 동안에는 단추를 계속 보임(재생 중에는 마우스를 올리거나 키보드로 고를 때)
     player.addEventListener("pause", function () { frame.classList.add("is-paused"); });
     player.addEventListener("play", function () { frame.classList.remove("is-paused"); });
+    // 자막을 그릴 칸(영상 위, 크기 단추 아래). 자막 글자는 drawSubs가 채움
+    var subs = document.createElement("div");
+    subs.className = "video-subs";
+    frame._subs = subs;
     player.addEventListener("ended", function () {
       player.remove();
       tools.remove();
+      subs.remove();
+      frame._subs = null;
+      frame._iosFull = null;
       frame.classList.remove("is-paused");
       frame.dataset.ended = "1";
       cover.hidden = false;
@@ -842,9 +860,11 @@
     delete frame.dataset.ended;
     cover.hidden = true;
     frame.appendChild(player);
+    frame.appendChild(subs);
     frame.appendChild(tools);
     renderVideoTools(frame);
     applyCaption(frame);
+    if (frame._showBar) frame._showBar(2700); // 표지를 눌러 시작하면 마우스가 영상 위에 있어 조작 막대가 잠깐 보임 → 그동안 자막 자리를 막대 위로
     player.play().catch(function () { /* 자동 재생이 막히면 재생 버튼으로 직접 시작 */ });
     player.focus();
   }
@@ -909,8 +929,148 @@
     });
     var player = frame.querySelector("video");
     if (!player) return;
+    // 고른 자막: 보통은 hidden(브라우저는 그리지 않고 지금 자막만 알려 줌 → drawSubs가 영상 속 글자 모양으로 그림),
+    // 영상만 전체 화면일 때는 showing(브라우저 자막). 값이 같으면 다시 넣지 않음(change 이벤트가 되풀이되지 않게)
+    var native = nativeSubs(frame);
     Array.prototype.forEach.call(player.textTracks, function (track) {
-      track.mode = track.language === shown ? "showing" : "disabled";
+      var mode = track.language !== shown ? "disabled" : native ? "showing" : "hidden";
+      if (track.mode !== mode) track.mode = mode;
+    });
+    drawSubs(frame);
+  }
+
+  // ---- 자막 그리기 ----
+  // 브라우저 기본 자막(검은 띠 + 흰 글자) 대신 영상 속 글자와 같은 모양으로 영상 위에 직접 그림(css .video-subs):
+  // 굵은 흰 글자 + 짙은 초록 테두리, 핵심어는 연두(자막 파일의 <c.hl>), 화면 글자 설명(<c.note>, [On screen] …)은 연두 딱지 + 한 단계 작은 글자,
+  // 자막이 바뀔 때 0.15초 동안 살짝 떠오르며 나타남(영상 편집의 자막 줄과 같은 값)
+  //  - 그리는 곳: 칸 안과 크게 보기 창(영상 칸을 통째로 옮기므로 그대로 따라감)
+  //  - 영상만 전체 화면일 때는 겹쳐 그린 글자가 보이지 않아 브라우저 자막으로 바꿈(applyCaption). 모양은 css의 ::cue로 비슷하게 맞춤
+  //    (아이폰 전체 화면은 기기 자막 설정을 따름)
+  function nativeSubs(frame) {
+    var player = frame.querySelector("video");
+    if (!player) return false;
+    if (frame._iosFull) return true;
+    return (document.fullscreenElement || document.webkitFullscreenElement) === player;
+  }
+  var SUB_TAG = /^\s*\[([^\]]+)\]\s*/; // 화면 글자 설명 첫 줄 앞의 표시 [On screen] · [画面文字] · [Trên màn hình] → 딱지로
+  var SUB_CHARS = { amp: "&", lt: "<", gt: ">", nbsp: "\u00a0", lrm: "", rlm: "" };
+  // 자막 한 개의 글(WebVTT)을 줄 · 조각으로: [[{ text, hl, note }, …], …]. <c.hl> · <c.note> 말고 다른 표시는 글자만 남김
+  function parseCue(text) {
+    var lines = [[]], open = [], m;
+    var re = /<(\/?)([a-zA-Z]*)((?:\.[^\s.<>]+)*)[^<>]*>|\r?\n|[^<\r\n]+|</g;
+    while ((m = re.exec(text))) {
+      var tok = m[0];
+      if (tok === "\n" || tok === "\r\n") { lines.push([]); continue; }
+      if (tok.length > 1 && tok.charAt(0) === "<") { // 표시: 닫으면 하나 빼고, 열면 class를 쌓음(시각 표시 <00:01.000>는 이름이 없어 건너뜀)
+        if (m[1]) open.pop(); else if (m[2]) open.push(m[3]);
+        continue;
+      }
+      var cls = open.join("") + ".";
+      lines[lines.length - 1].push({
+        text: tok.replace(/&(amp|lt|gt|nbsp|lrm|rlm);/g, function (all, name) { return SUB_CHARS[name]; }),
+        hl: cls.indexOf(".hl.") > -1,
+        note: cls.indexOf(".note.") > -1
+      });
+    }
+    return lines.filter(function (line) { return line.length; });
+  }
+  // 자막 한 줄: 글자를 두 겹으로 그림(.vs-edge 테두리 위에 .vs-face 글자) → 테두리가 글자를 파먹지 않고 어느 브라우저에서나 같은 모양
+  function subRow(line) {
+    var note = line[0].note, tag = "";
+    if (note) {
+      var m = SUB_TAG.exec(line[0].text);
+      if (m) { tag = m[1]; line = [{ text: line[0].text.slice(m[0].length) }].concat(line.slice(1)); }
+    }
+    var row = document.createElement("p");
+    row.className = "video-sub-row" + (note ? " is-note" : "");
+    ["vs-edge", "vs-face"].forEach(function (name) {
+      var layer = document.createElement("span");
+      layer.className = name;
+      if (name === "vs-edge") layer.setAttribute("aria-hidden", "true");
+      if (tag) {
+        var chip = document.createElement("span");
+        chip.className = "video-sub-tag";
+        chip.textContent = tag;
+        layer.appendChild(chip);
+      }
+      line.forEach(function (seg) {
+        if (!seg.text) return;
+        if (seg.hl && name === "vs-face") {
+          var hl = document.createElement("span");
+          hl.className = "hl";
+          hl.textContent = seg.text;
+          layer.appendChild(hl);
+        } else layer.appendChild(document.createTextNode(seg.text));
+      });
+      row.appendChild(layer);
+    });
+    return row;
+  }
+  function drawSubs(frame) {
+    var box = frame._subs;
+    if (!box) return;
+    var player = frame.querySelector("video");
+    var shown = frame._bar ? shownCaption(frame, frame._bar._video) : "off";
+    var cues = [];
+    if (player && shown !== "off" && !nativeSubs(frame)) {
+      Array.prototype.forEach.call(player.textTracks, function (track) {
+        if (track.language === shown && track.mode === "hidden" && track.activeCues) cues = Array.prototype.slice.call(track.activeCues);
+      });
+    }
+    var key = shown + cues.map(function (cue) { return "|" + cue.startTime + "|" + cue.text; }).join("");
+    if (box._key === key) return; // 같은 자막이면 그대로 둠(나타나는 움직임을 되풀이하지 않게)
+    box._key = key;
+    box.textContent = "";
+    box.lang = HTML_LANG[shown] || ""; // 글꼴 · 줄 나눔이 자막 언어를 따르게(css :lang)
+    cues.forEach(function (cue) {
+      var item = document.createElement("div");
+      item.className = "video-sub";
+      parseCue(cue.text).forEach(function (line) { item.appendChild(subRow(line)); });
+      box.appendChild(item);
+    });
+    fitSubs(frame);
+  }
+  // 글자 크기와 자리: 영상 폭에 맞춤. 영상 속 자막은 폭 1920에 50px(2.6%)인데 칸이 작아 2.9%로 조금 키우고 15~62px 사이로 둠.
+  // 줄이 칸보다 길면 한 줄에 들어가게 줄이고(85%까지), 그래도 넘치면 줄을 나눔(휴대폰의 긴 문장)
+  function fitSubs(frame) {
+    var box = frame._subs;
+    if (!box) return;
+    var w = frame.clientWidth;
+    if (!w) return;
+    var size = Math.min(62, Math.max(15, w * 0.029));
+    box.classList.remove("is-wrap");
+    box.style.fontSize = size + "px";
+    box.style.setProperty("--subs-low", Math.max(8, Math.round(w * 0.021)) + "px"); // 영상 속 자막 자리(높이의 3.7% = 폭의 2.1%)
+    var room = box.clientWidth, widest = 0;
+    Array.prototype.forEach.call(box.querySelectorAll(".video-sub-row"), function (row) { widest = Math.max(widest, row.offsetWidth); });
+    if (widest <= room) return;
+    if (room / widest >= 0.85) box.style.fontSize = Math.floor(size * room / widest * 10) / 10 + "px";
+    else box.classList.add("is-wrap");
+  }
+  // 자막 자리: 조작 막대가 보이는 동안은 막대 위로 올림(is-bar, css). 브라우저가 막대를 언제 보이고 감추는지 알려 주지 않아 같은 때를 흉내 냄
+  //  - 마우스: 영상 위에서 움직이면 막대가 보이고 2.5초 가만히 있으면 사라짐(크롬) → 2.7초 뒤 내림. 영상 밖으로 나가면 바로 사라짐 → 0.3초 뒤
+  //  - 손가락: 영상을 누르면 약 3초 보임 → 3.3초 뒤 내림
+  //  - 멈춘 동안에는 막대가 계속 보임(is-paused, play가 붙임)
+  //  - 칸 크기가 바뀌면(창 크기 · 크게 보기) 글자 크기를 다시 맞춤
+  function setupSubs() {
+    document.querySelectorAll(".video-frame").forEach(function (frame) {
+      var timer = 0;
+      frame._showBar = function (ms) {
+        clearTimeout(timer);
+        frame.classList.add("is-bar");
+        timer = setTimeout(function () { frame.classList.remove("is-bar"); }, ms);
+      };
+      frame.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") frame._showBar(2700); });
+      frame.addEventListener("pointerleave", function (e) { if (e.pointerType === "mouse") frame._showBar(300); });
+      frame.addEventListener("pointerup", function (e) { if (e.pointerType !== "mouse") frame._showBar(3300); });
+      frame.addEventListener("keydown", function () { frame._showBar(2700); });
+      if (window.ResizeObserver) new ResizeObserver(function () { fitSubs(frame); }).observe(frame);
+    });
+    // 영상이 전체 화면에 들어가고 나올 때: 브라우저 자막 ↔ 직접 그린 자막
+    ["fullscreenchange", "webkitfullscreenchange"].forEach(function (name) {
+      document.addEventListener(name, function () {
+        document.querySelectorAll(".video-frame").forEach(function (frame) { if (frame._subs) applyCaption(frame); });
+      });
     });
   }
 
@@ -1521,6 +1681,7 @@
   setupVideoCheer();
   setupBigView();
   setupCueRelayout();
+  setupSubs();
   setupHeaderFit();
   setupNavMenu();
   setupBandFit();

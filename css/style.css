@@ -413,9 +413,31 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* 이 사이트 영상: 누르기 전 대표 그림 + 재생 버튼(main.js renderVideos), 누르면 영상 플레이어 */
 .video-frame video{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:#000}
-/* 자막 글자: 화면 글자 설명(자막 파일의 <c.note>, [On screen] …)은 연한 노랑으로 내레이션 자막과 구분 */
-.video-frame video::cue{background:rgba(0,0,0,.74);color:#fff}
-.video-frame video::cue(.note){color:#ffe58a}
+/* 자막(main.js drawSubs · fitSubs · setupSubs): 브라우저 기본 자막(검은 띠 + 흰 글자) 대신 영상 속 글자와 같은 모양으로 영상 위에 직접 그림
+   - 글자는 영상 편집의 자막 줄과 같은 값: 굵기 800, 흰색, 짙은 초록 테두리(글자 크기의 0.09배가 바깥으로 나옴), 아래 그림자, 줄 간격 1.28, 핵심어(자막 파일의 <c.hl>)는 연두
+   - 테두리는 글자를 두 겹으로 겹쳐 냄(.vs-edge 테두리 · 그 위에 .vs-face 글자): 테두리를 글자 뒤에 그리는 기능(paint-order)이 없는 브라우저에서도 글자가 가늘어지지 않게
+   - 화면 글자 설명(<c.note>, [On screen] …): 한 단계 작은 글자, 앞의 표시는 영상의 연두 딱지 모양으로
+   - 크기 · 아래 자리(--subs-low)는 main.js가 영상 폭에 맞춰 넣음. 조작 막대가 보이는 동안(멈춤 is-paused · 방금 마우스나 손가락이 닿음 is-bar)은 막대 위로
+   - 자막이 바뀔 때 0.15초 동안 살짝 떠오르며 나타남(움직임 줄이기 설정이면 바로) */
+.video-subs{position:absolute;left:4%;right:4%;bottom:var(--subs-low,10px);z-index:2;display:flex;flex-direction:column;align-items:center;gap:.12em;pointer-events:none;color:#fff;font-family:var(--font);font-size:16px;font-weight:800;line-height:1.28;letter-spacing:0;text-align:center;transition:bottom .2s ease-out}
+.video-frame.is-paused .video-subs,.video-frame.is-bar .video-subs{bottom:78px}
+.video-sub{display:flex;flex-direction:column;align-items:center;max-width:100%;animation:video-sub-in .15s ease-out both}
+.video-sub-row{display:grid;margin:0;white-space:nowrap}
+.video-subs.is-wrap .video-sub-row{max-width:100%;white-space:normal;text-wrap:balance}
+.vs-edge,.vs-face{grid-area:1/1}
+.vs-edge{color:rgba(8,24,16,.92);-webkit-text-stroke:.18em rgba(8,24,16,.92);text-shadow:0 .08em .28em rgba(0,0,0,.35)}
+.vs-face .hl{color:var(--lime)}
+.video-sub-row.is-note{font-size:.86em;font-weight:700}
+.video-sub-tag{display:inline-block;margin-right:.5em;padding:.08em .5em;border-radius:.32em;background:var(--lime);color:var(--ink);font-size:.86em;font-weight:900;line-height:1.35;vertical-align:.06em;-webkit-text-stroke:0;text-shadow:none}
+.vs-edge .video-sub-tag{visibility:hidden}
+@keyframes video-sub-in{from{opacity:0;transform:translateY(.16em)}}
+@media(prefers-reduced-motion:reduce){.video-sub{animation:none}.video-subs{transition:none}}
+/* 영상만 전체 화면일 때는 위의 글자가 보이지 않아 브라우저 자막을 씀(main.js applyCaption). 같은 모양에 가깝게:
+   검은 띠 없이 굵은 흰 글자, 테두리는 그림자를 여러 방향으로 겹쳐 냄, 핵심어 연두, 화면 글자 설명은 연한 노랑(딱지는 못 그림) */
+.video-frame video::cue{background:transparent;color:#fff;font-family:"Pretendard Variable","Pretendard Std Variable","Pretendard","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;font-weight:800;
+  text-shadow:.07em 0 0 #081810,-.07em 0 0 #081810,0 .07em 0 #081810,0 -.07em 0 #081810,.05em .05em 0 #081810,-.05em .05em 0 #081810,.05em -.05em 0 #081810,-.05em -.05em 0 #081810,0 0 .1em #081810,0 .1em .28em rgba(0,0,0,.45)}
+.video-frame video::cue(.hl){color:#d4f29a}
+.video-frame video::cue(.note){color:#fff0b8;font-weight:700}
 .video-cover{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;gap:12px;width:100%;padding:20px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:800;cursor:pointer}
 .video-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .video-cover .play-circle,.video-cover-label{position:relative;transition:transform .2s}
