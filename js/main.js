@@ -587,7 +587,8 @@
   // 처음에는 칸 안에서 재생하고, 재생 중 영상 오른쪽 위의 단추로 크기를 바꿈(넓은 화면만, play · renderVideoTools)
   //  - 크게 보기: 영상 칸(표지 · 영상)과 자막 단추 줄을 이 창으로 옮김. 폭은 화면의 약 3/4(최대 1080px)
   //    칸을 통째로 옮기므로 자막 · 표정 · 학습 기록 코드는 그대로 쓰고, 보던 장면에서 이어서 재생
-  //  - 창의 '기본 보기' · ✕ · Esc · 바깥 누르기: 칸으로 돌아가 이어서 재생
+  //  - 창의 '기본 보기': 칸으로 돌아가 이어서 재생(작게 줄여 계속 볼 때)
+  //  - ✕ · Esc · 바깥 누르기: 창을 닫고 일시정지(그만 볼 때). 칸에는 멈춘 장면이 남아 재생 단추로 그 자리부터 이어 봄
   //  - 전체 화면: 영상만 화면 가득(영상 조작 막대의 전체 화면 단추와 같음)
   //  - 끝까지 보면 창을 닫고 칸에 '다시 보기'
   //  - 1000px 이하(휴대폰 · 세로 태블릿)는 칸이 화면 폭에 가까워 단추 없이 칸 안에서 재생(전체 화면은 조작 막대로)
@@ -629,6 +630,11 @@
       var frame = bigDialog._frame;
       if (!frame) return;
       bigDialog._frame = null;
+      // '기본 보기'로 닫았으면 계속 재생, 그 밖(✕ · Esc · 바깥 누르기)은 멈춤. 옮기기 전에 멈춰야 moveFrame이 다시 틀지 않음
+      var keep = bigDialog._keepPlaying;
+      bigDialog._keepPlaying = false;
+      var player = frame.querySelector("video");
+      if (player && !keep) player.pause();
       frame.classList.remove("is-cheer");
       moveFrame(frame, function () {
         frame._home.replaceWith(frame);
@@ -814,7 +820,7 @@
       '<svg class="i-normal" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10h-6V4M4 14h6v6M14 10l7-7M10 14l-7 7"/></svg><span></span></button>' +
       '<button type="button" data-video-full><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span></span></button>';
     tools.querySelector("[data-video-size]").addEventListener("click", function () {
-      if (isBig(frame)) bigDialog.close(); else openBig(frame);
+      if (isBig(frame)) { bigDialog._keepPlaying = true; bigDialog.close(); } else openBig(frame);
     });
     tools.querySelector("[data-video-full]").addEventListener("click", function () {
       var full = player.requestFullscreen || player.webkitRequestFullscreen || player.webkitEnterFullscreen;
