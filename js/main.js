@@ -578,17 +578,22 @@
 
   // 분리배출 영상 칸: 이 사이트의 영상 파일을 재생 (YouTube 광고 없음)
   //  - 누르기 전에는 대표 그림과 재생 버튼만 보이고, 영상 파일은 누를 때 처음 받음(데이터·GitHub 전송량 절약)
-  //  - 자막: 4개 언어 자막 파일을 붙이고, 사이트 언어에 맞는 자막만 켬. 언어를 바꾸면 재생 중에도 자막이 바뀜
+  //  - 자막: 4개 언어 자막 파일을 붙이고, 처음에는 사이트 언어에 맞는 자막을 켬. 언어를 바꾸면 재생 중에도 자막이 바뀜
+  //    영상 칸 아래 '자막' 단추 줄로 다른 언어 자막을 고르거나 끌 수 있음(renderCaptionBar)
   //  - 거의 끝까지(90%) 보면 학습 띠의 영상 단계에 기록
+  var captionLang = null; // 자막 단추 줄을 마지막으로 그린 사이트 언어(언어가 바뀌면 고른 자막을 지우고 새 언어를 따름)
   function renderVideos() {
+    var langChanged = captionLang !== current;
+    captionLang = current;
     videoList().forEach(function (v) {
       var frame = document.querySelector('[data-video-index="' + v.index + '"]');
       if (!frame) return;
       var title = frame.closest(".video-card").querySelector("h3").textContent;
+      if (langChanged) delete frame.dataset.cap;
+      renderCaptionBar(frame, v);
       var player = frame.querySelector("video");
-      if (player) { // 이미 재생을 시작한 칸: 자막 언어와 이름만 맞춤
+      if (player) { // 이미 재생을 시작한 칸: 이름만 맞춤(자막 언어는 renderCaptionBar가 맞춤)
         player.setAttribute("aria-label", title);
-        showCaption(player);
         return;
       }
       var cover = frame.querySelector(".video-cover");
@@ -651,6 +656,7 @@
     source.type = "video/mp4";
     player.appendChild(source);
     var caps = v.cfg.captions || {};
+    var choice = captionChoice(frame);
     LANGS.forEach(function (lang) {
       var src = sameSite(caps[lang]);
       if (!src) return;
@@ -659,11 +665,22 @@
       track.srclang = lang;
       track.label = CAPTION_LABEL[lang];
       track.src = src;
-      track.default = lang === current; // 브라우저가 스스로 다른 언어 자막을 고르지 않게 사이트 언어를 기본으로
+      track.default = lang === choice; // 브라우저가 스스로 다른 언어 자막을 고르지 않게 고른 자막(기본은 사이트 언어)을 기본으로
       player.appendChild(track);
     });
     // 브라우저가 영상 정보를 읽은 뒤 자막을 다시 고르는 경우가 있어 그때 한 번 더 맞춤
-    player.addEventListener("loadedmetadata", function () { showCaption(player); });
+    player.addEventListener("loadedmetadata", function () { applyCaption(frame); });
+    // 영상 조작 막대의 자막 메뉴로 바꾼 것도 아래 단추 줄에 반영(재생을 시작한 뒤부터: 그 전에 브라우저가 스스로 고르는 것은 따르지 않음)
+    var started = false;
+    player.addEventListener("playing", function () { started = true; });
+    player.textTracks.addEventListener("change", function () {
+      if (!started || !player.isConnected) return;
+      var showing = Array.prototype.filter.call(player.textTracks, function (track) { return track.mode === "showing"; })[0];
+      var now = showing ? showing.language : "off";
+      if (now === shownCaption(frame, v)) return;
+      frame.dataset.cap = now;
+      applyCaption(frame);
+    });
     var counted = false;
     player.addEventListener("timeupdate", function () {
       if (!counted && player.duration && player.currentTime / player.duration >= 0.9) {
@@ -683,15 +700,73 @@
     });
     cover.hidden = true;
     frame.appendChild(player);
-    showCaption(player);
+    applyCaption(frame);
     player.play().catch(function () { /* 자동 재생이 막히면 재생 버튼으로 직접 시작 */ });
     player.focus();
   }
 
-  // 사이트 언어의 자막만 보이게 (그 언어 자막이 없으면 모두 끔)
-  function showCaption(player) {
+  // ---- 자막 고르기 ----
+  // 영상 칸 바로 아래의 단추 줄: 자막  [한국어] [中文] [English] [Tiếng Việt] [끔]
+  //  - 고르지 않았으면 사이트 언어의 자막(예전과 같음). 단추를 누르면 그 언어 자막으로, 재생 중에도 바로 바뀜
+  //  - 고른 값은 칸(frame.dataset.cap)에 남아 다시 볼 때도 쓰고, 사이트 언어를 바꾸면 지워져 새 언어를 따름(renderVideos)
+  //  - 영상의 화면 글자는 한국어 그대로이고, 중국어·영어·베트남어 자막에는 화면 글자 설명이 함께 들어 있음(media/ep1.*.vtt의 <c.note>)
+  function captionLangs(v) {
+    var caps = v.cfg.captions || {};
+    return LANGS.filter(function (lang) { return sameSite(caps[lang]); });
+  }
+  // 고른 자막: 언어 값 또는 "off" (고르지 않았으면 사이트 언어)
+  function captionChoice(frame) { return frame.dataset.cap || current; }
+  // 실제로 보이는 자막: 고른 언어의 자막 파일이 없으면 꺼진 것으로 봄
+  function shownCaption(frame, v) {
+    var choice = captionChoice(frame);
+    return captionLangs(v).indexOf(choice) > -1 ? choice : "off";
+  }
+  function renderCaptionBar(frame, v) {
+    var card = frame.closest(".video-card");
+    var bar = card.querySelector(".video-caps");
+    var langs = captionLangs(v);
+    if (!langs.length) { if (bar) bar.remove(); return; } // 자막 파일이 없는 영상은 단추 줄도 없음
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.className = "video-caps";
+      bar.setAttribute("role", "group");
+      var label = document.createElement("span");
+      label.className = "video-caps-label";
+      bar.appendChild(label);
+      langs.concat("off").forEach(function (key) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.cap = key;
+        if (key !== "off") { // 언어 이름은 그 언어로 적음(사이트 언어와 관계없이 찾을 수 있게)
+          btn.textContent = CAPTION_LABEL[key];
+          btn.lang = HTML_LANG[key];
+        }
+        btn.addEventListener("click", function () {
+          frame.dataset.cap = key;
+          applyCaption(frame);
+        });
+        bar.appendChild(btn);
+      });
+      bar._video = v;
+      frame.insertAdjacentElement("afterend", bar);
+    }
+    bar.setAttribute("aria-label", t("video.caption"));
+    bar.querySelector(".video-caps-label").textContent = t("video.caption");
+    bar.querySelector('[data-cap="off"]').textContent = t("video.caption.off");
+    applyCaption(frame);
+  }
+  // 단추 줄의 눌림 표시와 재생 중인 영상의 자막을 고른 값에 맞춤
+  function applyCaption(frame) {
+    var bar = frame.closest(".video-card").querySelector(".video-caps");
+    if (!bar) return;
+    var shown = shownCaption(frame, bar._video);
+    bar.querySelectorAll("button").forEach(function (btn) {
+      btn.setAttribute("aria-pressed", String(btn.dataset.cap === shown));
+    });
+    var player = frame.querySelector("video");
+    if (!player) return;
     Array.prototype.forEach.call(player.textTracks, function (track) {
-      track.mode = track.language === current ? "showing" : "disabled";
+      track.mode = track.language === shown ? "showing" : "disabled";
     });
   }
 

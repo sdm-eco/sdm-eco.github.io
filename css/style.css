@@ -413,6 +413,9 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 /* 이 사이트 영상: 누르기 전 대표 그림 + 재생 버튼(main.js renderVideos), 누르면 영상 플레이어 */
 .video-frame video{position:absolute;inset:0;z-index:2;width:100%;height:100%;background:#000}
+/* 자막 글자: 화면 글자 설명(자막 파일의 <c.note>, [On screen] …)은 연한 노랑으로 내레이션 자막과 구분 */
+.video-frame video::cue{background:rgba(0,0,0,.74);color:#fff}
+.video-frame video::cue(.note){color:#ffe58a}
 .video-cover{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:flex-start;gap:12px;width:100%;padding:20px;border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:800;cursor:pointer}
 .video-cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .video-cover .play-circle,.video-cover-label{position:relative;transition:transform .2s}
@@ -424,6 +427,13 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .play-circle{display:block;width:64px;height:64px;border-radius:50%;background:center/contain no-repeat;box-shadow:0 6px 18px color-mix(in srgb,#000 18%,transparent)}
 .ep-1 .play-circle{background-image:url("../img/play-green.webp?v=20261121a")}
 .ep-2 .play-circle{background-image:url("../img/play-orange.webp?v=20261121a")}
+/* 자막 고르기(main.js renderCaptionBar): 영상 칸 바로 아래 단추 줄. 지금 보이는 자막 단추가 채워짐 */
+.video-caps{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:12px 4px 0}
+.video-caps-label{margin-right:3px;color:var(--ink-2);font-size:13.5px;font-weight:800}
+.video-caps button{min-height:34px;padding:4px 11px;border:1.5px solid var(--card-line);border-radius:999px;background:var(--white);color:var(--ink-2);font:inherit;font-size:13.5px;font-weight:700;line-height:1.4;white-space:nowrap;cursor:pointer}
+.video-caps button:hover{border-color:var(--fresh-strong)}
+.video-caps button[aria-pressed="true"]{border-color:var(--fresh-strong);background:var(--fresh-strong);color:var(--white)}
+.video-caps button:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:2px}
 .video-card h3{margin:18px 8px 6px;font-size:24px;line-height:1.35;letter-spacing:-.6px} /* 두 줄이 될 때 줄 사이가 벌어지지 않게(본문 1.7보다 좁게) */
 .video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
 /* 주제 태그는 한 줄로: 칸보다 길면(좁은 화면·긴 언어) 옆으로 밀어서 봄, 넘칠 때만 오른쪽 끝을 흐려 더 있음을 알림(main.js setupTagRows) */
