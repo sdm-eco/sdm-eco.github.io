@@ -14,7 +14,9 @@ window.SITE_CONFIG = {
     // 소리는 완성본의 70%로 줄여 넣음(-3.1dB, 예전 파일과 같게). 파일을 바꾸면 ?v= 값을 올릴 것(브라우저가 예전 파일을 쓰지 않게)
     { src: "media/ep1.mp4?v=20261123c", poster: "",
       captions: { ko: "media/ep1.ko.vtt?v=20261123c", zh: "media/ep1.zh.vtt?v=20261123c", en: "media/ep1.en.vtt?v=20261123c", vi: "media/ep1.vi.vtt?v=20261123c" } },
-    { src: "", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
+    // 2편 실전편(11/24 초안): 720p · 3분 12초 · 17MB. 봉투는 아직 예전 디자인(영상 담당이 새 봉투로 바꾸는 중), 자막 파일은 아직 없음
+    //   소리는 1편과 같은 크기로 3dB 줄여 넣음(-16.4 → -19.5 LUFS), 영상은 받은 파일 그대로
+    { src: "media/ep2.mp4?v=20261124a", poster: "", captions: { ko: "", zh: "", en: "", vi: "" } }
   ],
   game: {
     // 게임 주소: 지금은 팀원이 올려 둔 시연판(다른 사이트). 이 사이트 안(/game/)으로 옮기면 "/game/"으로 바꿀 것
