@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261123e">
+<link rel="stylesheet" href="css/style.css?v=20261124a">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -218,13 +218,13 @@
 
   <section class="section" id="game">
     <div class="wrap">
-      <!-- 게임: 문구 · 캐릭터 · 큰 시작 버튼 (팀원 사이트 sdm-eco.vercel.app 구성 참고). 게임이 열리면 이 칸 자리에 게임이 뜸(main.js setupGame) -->
+      <!-- 게임: 문구 · 캐릭터 · 큰 시작 버튼 (팀원 사이트 sdm-eco.vercel.app 구성 참고). 시작 버튼 → 게임 고르기 창(#game-pick) → 고른 게임이 새 창에서 열림(main.js setupGame) -->
       <div class="game-stage" id="game-stage">
         <div class="game-hero">
           <div class="game-copy">
             <span class="eyebrow" aria-hidden="true" data-i18n="nav.game">게임</span>
             <h2><span class="h2-light" data-i18n="game.sub">배운 내용,</span> <span class="h2-bold" data-i18n="game.head">게임으로 확인해요</span></h2>
-            <p class="game-desc" data-i18n="game.desc">쓰레기를 알맞은 통으로 끌어다 놓으세요. 게임을 통과하면 분리배출 히어로!</p>
+            <p class="game-desc" data-i18n="game.desc">쓰레기를 알맞은 수거함으로 끌어다 놓으세요. 게임을 통과하면 분리배출 히어로!</p>
           </div>
           <!-- 캐릭터: 눈 깜빡임(data-blink, main.js setupBlink) + 표정 바꿈 그림(.alt)과 말풍선(main.js setupGameChars)
                .alt 그림은 기준 그림과 같은 크기 · 같은 몸통 자리로 만들어 겹쳐 둠 -->
@@ -237,7 +237,7 @@
             <span class="game-say say-girl" data-i18n="game.say.ok">정답!</span>
           </div>
           <div class="game-cta">
-            <button type="button" class="game-start" id="game-play"><span data-i18n="game.play">게임 시작</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+            <button type="button" class="game-start" id="game-play" aria-haspopup="dialog" aria-controls="game-pick"><span data-i18n="game.play">게임 시작</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
             <p class="game-status" id="game-status" role="status" hidden data-i18n="common.soon">준비 중</p>
           </div>
         </div>
@@ -625,6 +625,28 @@
   </div>
 </dialog>
 
+<!-- 게임 고르기 창(main.js setupGame): '게임 시작'을 누르면 열림. 두 게임 중 하나를 누르면 그 게임이 새 창에서 바로 시작
+     주소 = config.js 의 game.url + ?mode=rush|story&lang=지금 언어 (게임 폴더: game/ — 시안 A 러시 · 시안 C 새내기 일주일만 올림) -->
+<dialog class="game-pick" id="game-pick" aria-labelledby="game-pick-title">
+  <div class="game-pick-panel">
+    <button type="button" class="eco-close" data-game-pick-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
+    <h2 class="game-pick-title" id="game-pick-title" data-i18n="game.pick">어떤 게임을 할까요?</h2>
+    <p class="game-pick-lead" data-i18n="game.pick.lead">하나를 고르면 새 창에서 게임이 열려요.</p>
+    <div class="game-pick-list">
+      <a class="game-pick-card is-rush" data-game-mode="rush" href="game/?mode=rush" target="_blank" rel="noopener">
+        <span class="game-pick-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="27" r="15"/><path d="M24 18v9l6 4M19 6h10M24 6v6M37 13l3-3"/></svg></span>
+        <span class="game-pick-text"><strong data-i18n="game.rush">분리배출 러시</strong><small data-i18n="game.rush.d">움직이는 쓰레기를 알맞은 수거함으로! 콤보를 이어 가는 90초 도전</small></span>
+        <svg class="game-pick-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+      <a class="game-pick-card is-story" data-game-mode="story" href="game/?mode=story" target="_blank" rel="noopener">
+        <span class="game-pick-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="7" y="10" width="34" height="30" rx="4"/><path d="M7 18h34M16 6v8M32 6v8M18 28l4 4 8-8"/></svg></span>
+        <span class="game-pick-text"><strong data-i18n="game.story">서대문 새내기 일주일</strong><small data-i18n="game.story.d">이사 온 날부터 미수거 스티커까지, 하루씩 배워 가는 6일</small></span>
+        <svg class="game-pick-go" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</dialog>
+
 <footer class="footer">
   <div class="wrap footer-inner">
     <div>
@@ -649,9 +671,9 @@
 <!-- 맨 위로(main.js setupToTop): 조금 내려가면 화면 오른쪽 아래에 나타남 -->
 <button type="button" class="to-top" data-i18n-attr="aria-label:top.label" aria-label="맨 위로" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
-<script src="js/config.js?v=20261124a"></script>
-<script src="js/i18n.js?v=20261123c"></script>
-<script src="js/main.js?v=20261123f"></script>
+<script src="js/config.js?v=20261124b"></script>
+<script src="js/i18n.js?v=20261124a"></script>
+<script src="js/main.js?v=20261124a"></script>
 <script type="module" src="js/eco3d.js?v=20261121a"></script>
 </body>
 </html>
