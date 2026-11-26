@@ -4,9 +4,11 @@
   // 수거함 그림의 이름표 자리(원본 픽셀, 홈페이지 meta.json 값): [x, y, w, h, 원본 폭, 원본 높이]
   // 공식 분리배출 표시가 있는 통은 표시만, 없는 통은 이름만 씀(홈페이지 수거함 이름표와 같은 원칙)
   // color: 맞혔을 때 튀는 조각 색(그림 속 수거함 · 봉투 색)
+  // 종량제 봉투: 서대문구 통일 디자인(2025, 구청 11/24 의견). 홈페이지 img/scene/common 과 같은 파일, ?v 는 예전 그림이 캐시에 남지 않게
+  const BAG = (n) => `item/common/bag-${n}.webp?v=20261124`;
   const DEST = {
-    general:   { img: "item/common/bag-general.webp", grp: "general", color: "#8b78d6" },
-    food:      { img: "item/common/bag-food.webp", grp: "food", color: "#f5cf3a" },
+    general:   { img: BAG("general"), grp: "general", color: "#8b78d6" },
+    food:      { img: BAG("food"), grp: "food", color: "#f5cf3a" },
     pet:       { img: "item/pet/bin.webp", grp: "recycle", color: "#6fae58", mark: "pet", plate: [140, 139, 162, 87, 362, 440] },
     can:       { img: "item/can/bin.webp", grp: "recycle", color: "#3fa9e0", mark: "can", plate: [140, 141, 162, 86, 365, 440] },
     carton:    { img: "item/carton/bin.webp", grp: "recycle", color: "#f5bf3a", mark: "carton", plate: [139, 140, 161, 86, 361, 440] },
@@ -54,8 +56,8 @@
     fan:         { img: "item/appliance/fan.webp", dest: "appliance", w: 125 },
     // 이야기 전용
     trash:       { img: "item/general/tissue.webp", dest: "general", w: 130, name: "item.trash" },
-    bagfull:     { img: "item/common/bag-general.webp", dest: null, w: 150, name: "item.bagfull" },
-    bagmixed:    { img: "item/common/bag-general.webp", dest: null, w: 150, name: "item.bagmixed" }
+    bagfull:     { img: BAG("general"), dest: null, w: 150, name: "item.bagfull" },
+    bagmixed:    { img: BAG("general"), dest: null, w: 150, name: "item.bagmixed" }
   };
 
   // 도구 아이콘: 그림이 있는 것은 홈페이지 그림, 없는 것은 선 그림(SVG)
