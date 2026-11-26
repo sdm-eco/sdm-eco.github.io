@@ -57,7 +57,12 @@
     house: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 22L24 8l18 14"/><path d="M10 20v20h28V20"/><path d="M20 40V28h8v12"/></svg>',
     tree: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="18" r="11"/><path d="M24 29v13M16 42h16"/></svg>',
     door: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="6" width="24" height="36" rx="2"/><circle cx="30" cy="25" r="1.6" fill="currentColor"/><path d="M6 42h36"/></svg>',
-    cal: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="10" width="34" height="30" rx="4"/><path d="M7 18h34M16 6v8M32 6v8"/><path d="M18 28l4 4 8-8"/></svg>'
+    cal: '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="10" width="34" height="30" rx="4"/><path d="M7 18h34M16 6v8M32 6v8"/><path d="M18 28l4 4 8-8"/></svg>',
+    // 머리 막대 칩(휴대폰에서는 글자 없이 그림만): 점수 = 별, 콤보 = 번개
+    star: '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="#f2b632" stroke="#c98a00" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+    bolt: '<svg viewBox="0 0 24 24"><path d="M13.5 2L5 13.5h6L9.8 22 19 10h-6.2z" fill="#ff8a3d" stroke="#c45a12" stroke-width="1.4" stroke-linejoin="round"/></svg>',
+    hand: '<svg viewBox="0 0 24 24" fill="#fff" stroke="#3d2f00" stroke-width="1.6" stroke-linejoin="round"><path d="M9 11V4.5a1.5 1.5 0 013 0V10l.1-1.2a1.5 1.5 0 013 .1V11l.1-.6a1.4 1.4 0 012.8.3V15c0 3.6-2.4 6-5.8 6h-.4c-2.1 0-3.6-.9-4.8-2.6L4.4 14.2a1.4 1.4 0 012.2-1.7z"/></svg>',
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
   };
   G.star = (on) => `<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="${on ? "#f2b632" : "#e3ebe5"}" stroke="${on ? "#c98a00" : "#cfdbd2"}" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
   G.stars = (n, of) => Array.from({ length: of || 3 }, (_, i) => G.star(i < n)).join("");
@@ -65,28 +70,88 @@
   // ---------- 소리(파일 없이 짧은 신호음) ----------
   let actx = null;
   G.soundOn = store.sound !== false;
-  G.toggleSound = function () { G.soundOn = !G.soundOn; store.sound = G.soundOn; G.save(); return G.soundOn; };
-  function tone(freq, start, dur, type, vol) {
-    const o = actx.createOscillator(), g = actx.createGain();
-    o.type = type || "sine"; o.frequency.setValueAtTime(freq, actx.currentTime + start);
-    g.gain.setValueAtTime(0.0001, actx.currentTime + start);
-    g.gain.exponentialRampToValueAtTime(vol || 0.12, actx.currentTime + start + 0.015);
-    g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + start + dur);
-    o.connect(g); g.connect(actx.destination); o.start(actx.currentTime + start); o.stop(actx.currentTime + start + dur + 0.02);
+  G.toggleSound = function () {
+    G.soundOn = !G.soundOn; store.sound = G.soundOn; G.save();
+    if (G.soundOn) G.music.resume(); else G.music.stop(true);
+    return G.soundOn;
+  };
+  G.pitch = 1;   // 러시 피버 때 효과음을 높임
+  G.REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function ac() {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === "suspended") actx.resume();
+    return actx;
+  }
+  function tone(freq, start, dur, type, vol, out) {
+    const t = actx.currentTime + start, o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || "sine"; o.frequency.setValueAtTime(freq * G.pitch, t);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.12, t + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(out || actx.destination); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise(start, dur, vol, filter, freq, out) {
+    const t = actx.currentTime + start, n = Math.max(1, Math.floor(actx.sampleRate * dur));
+    const buf = actx.createBuffer(1, n, actx.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n);
+    const s = actx.createBufferSource(), f = actx.createBiquadFilter(), g = actx.createGain();
+    s.buffer = buf; f.type = filter || "lowpass"; f.frequency.value = freq || 1200; g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(out || actx.destination); s.start(t);
   }
   G.sfx = function (kind) {
     if (!G.soundOn) return;
     try {
-      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-      if (actx.state === "suspended") actx.resume();
+      ac();
       if (kind === "ok") { tone(660, 0, 0.12, "triangle"); tone(990, 0.08, 0.16, "triangle"); }
       else if (kind === "no") { tone(220, 0, 0.18, "square", 0.05); tone(180, 0.1, 0.22, "square", 0.05); }
       else if (kind === "tap") tone(520, 0, 0.06, "triangle", 0.08);
       else if (kind === "step") { tone(560, 0, 0.08, "triangle"); tone(700, 0.06, 0.1, "triangle"); }
       else if (kind === "combo") [660, 830, 990, 1320].forEach((f, i) => tone(f, i * 0.06, 0.14, "triangle", 0.09));
       else if (kind === "win") [523, 659, 784, 1047].forEach((f, i) => tone(f, i * 0.12, 0.3, "triangle", 0.1));
+      else if (kind === "go") { tone(784, 0, 0.12, "triangle", 0.12); tone(1175, 0.1, 0.28, "triangle", 0.12); }
+      else if (kind === "tick") tone(1480, 0, 0.05, "square", 0.025);
+      else if (kind === "slap") { noise(0, 0.12, 0.5, "lowpass", 1400); tone(120, 0, 0.2, "sine", 0.3); }   // 스티커가 '찰싹'
+      else if (kind === "drop") { tone(330, 0, 0.07, "sine", 0.12); noise(0, 0.05, 0.12, "highpass", 2500); }  // 수거함에 '툭'
     } catch (e) {}
   };
+
+  // ---------- 배경 음악(러시): 파일 없이 짧은 반복 · 피버 때 빨라짐 · 소리를 끄면 멈춤 ----------
+  G.music = (function () {
+    const PROG = [[48, 52, 55, 60], [45, 48, 52, 57], [41, 45, 48, 53], [43, 47, 50, 55]];   // 도 · 라단조 · 파 · 솔 (MIDI 음 번호)
+    const ARP = [0, 2, 1, 3, 2, 1, 3, 2];
+    const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+    let timer = 0, step = 0, next = 0, bus = null, fast = false, want = false;
+    function play(s, t) {
+      const ch = PROG[Math.floor(s / 16) % 4], i = s % 16, at = t - actx.currentTime, p = G.pitch;
+      G.pitch = 1;
+      if (i % 4 === 0) tone(hz(ch[0] - 12 + (i % 8 ? 12 : 0)), at, 0.2, "triangle", 0.5, bus);    // 베이스(통통)
+      if (i % 2 === 0) tone(hz(ch[ARP[(i / 2) % 8]] + 12), at, 0.13, "triangle", 0.2, bus);         // 아르페지오
+      if (i === 0 || i === 8) tone(70, at, 0.16, "sine", 0.6, bus);                                // 북
+      if (i % 4 === 2) noise(at, 0.04, 0.12, "highpass", 6000, bus);                               // 찰랑
+      G.pitch = p;
+    }
+    function tick() {
+      if (!actx || !bus) return;
+      if (next < actx.currentTime - 0.05) next = actx.currentTime + 0.02;   // 탭이 가려졌다 돌아오면 밀린 음을 한꺼번에 내지 않음
+      while (next < actx.currentTime + 0.12) { play(step, next); next += 60 / (fast ? 156 : 132) / 4; step++; }
+    }
+    function start() {
+      if (timer || !G.soundOn) return;
+      try { ac(); } catch (e) { return; }
+      bus = actx.createGain(); bus.gain.value = 0.07; bus.connect(actx.destination);
+      next = actx.currentTime + 0.06; timer = setInterval(tick, 25); tick();
+    }
+    function stop(keep) {
+      if (!keep) want = false;
+      clearInterval(timer); timer = 0;
+      if (bus) { const b = bus; bus = null; try { b.gain.setTargetAtTime(0.0001, actx.currentTime, 0.05); setTimeout(() => b.disconnect(), 400); } catch (e) {} }
+    }
+    return {
+      play() { want = true; step = 0; start(); },
+      stop, resume() { if (want) start(); },
+      fast(f) { fast = !!f; }
+    };
+  })();
 
   // ---------- 도감 ----------
   G.bookAdd = function (id) { if (ITEMS[id] && ITEMS[id].dest && !store.book[id]) { store.book[id] = 1; G.save(); } };
@@ -182,6 +247,7 @@
   // ---------- 말풍선 ----------
   const FACE = { girl: "char/girl-smile.webp", "girl-laugh": "char/girl-laugh.webp", "girl-worry": "char/girl-worry.webp",
     boy: "char/boy-smile.webp", "boy-stop": "char/boy-stop.webp", "boy-surprise": "char/boy-surprise.webp" };
+  G.face = (who) => G.img(FACE[who] || FACE.girl);
   G.talk = function (field, who, html, opt) {
     opt = opt || {};
     let el = field.querySelector(".talk");
@@ -284,6 +350,91 @@
     setTimeout(() => f.remove(), 950);
   };
   G.flash = function (el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(() => el.classList.remove(cls), 600); };
+  // 숫자가 올라가며 세어짐
+  G.countTo = function (el, to, ms) {
+    const from = +el.dataset.n || 0, t0 = performance.now(); el.dataset.n = to;
+    cancelAnimationFrame(el._cu);
+    if (G.REDUCED || from === to) { el.textContent = to; return; }
+    const f = function (now) { const k = Math.min(1, (now - t0) / (ms || 400)); el.textContent = Math.round(from + (to - from) * (1 - Math.pow(1 - k, 3))); if (k < 1) el._cu = requestAnimationFrame(f); };
+    el._cu = requestAnimationFrame(f);
+  };
+
+  // ---------- 맞혔을 때: 품목이 포물선을 그리며 받는 곳으로 날아 들어감 → 받는 곳이 툭 튀고 그 색 조각이 튐 ----------
+  G.flyTo = function (from, src, target, color, done) {
+    const land = function () { G.flash(target, "ok"); G.burst(target, color); G.sfx("drop"); if (done) done(); };
+    const fig = target.querySelector(".fig") || target, tr = fig.getBoundingClientRect();
+    if (G.REDUCED || !from || !from.width || !tr.width) { land(); return; }
+    const sz = Math.min(from.width, from.height, 180), sx = from.left + from.width / 2, sy = from.top + from.height / 2;
+    const el = G.h(`<img class="fly" src="${src}" alt="">`);
+    Object.assign(el.style, { width: sz + "px", height: sz + "px", left: sx - sz / 2 + "px", top: sy - sz / 2 + "px" });
+    G.ghostLayer.appendChild(el);
+    const dx = tr.left + tr.width / 2 - sx, dy = tr.top + tr.height * 0.28 - sy;
+    const lift = Math.max(50, Math.min(220, Math.abs(dx) * 0.35 + Math.max(0, -dy) * 0.4));
+    const kf = [];
+    for (let i = 0; i <= 12; i++) {
+      const t = i / 12;
+      kf.push({ transform: `translate(${(dx * t).toFixed(1)}px, ${(dy * t - lift * 4 * t * (1 - t)).toFixed(1)}px) rotate(${(t * 220 * (dx < 0 ? -1 : 1)).toFixed(0)}deg) scale(${(1 - 0.62 * t).toFixed(3)})`, opacity: t > 0.88 ? 0.3 : 1 });
+    }
+    const a = el.animate(kf, { duration: 430, easing: "linear" });
+    a.onfinish = function () { el.remove(); land(); };
+  };
+  G.burst = function (target, color) {
+    if (G.REDUCED) return;
+    const fig = target.querySelector(".fig") || target, r = fig.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * 0.2;
+    for (let i = 0; i < 14; i++) {
+      const p = G.h(`<i class="bit"></i>`), big = i % 4 === 0;
+      p.style.background = i % 3 === 2 ? "#fff" : color; p.style.left = cx + "px"; p.style.top = cy + "px";
+      if (big) { p.style.width = p.style.height = "12px"; }
+      G.ghostLayer.appendChild(p);
+      const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, d = 46 + Math.random() * 70;
+      p.animate([{ transform: "translate(-50%, -50%) rotate(0deg)", opacity: 1 },
+        { transform: `translate(calc(-50% + ${(Math.cos(ang) * d).toFixed(0)}px), calc(-50% + ${(Math.sin(ang) * d + 36).toFixed(0)}px)) rotate(${(Math.random() * 540).toFixed(0)}deg) scale(.5)`, opacity: 0 }],
+        { duration: 620 + Math.random() * 260, easing: "cubic-bezier(.2,.7,.4,1)" }).onfinish = () => p.remove();
+    }
+  };
+
+  // ---------- 바닥에 놓기: 그림 속 물건의 실제 자리(투명 여백을 뺀 곳)를 재서 발 밑에 그림자를 깖 ----------
+  const FOOT = {}, FOOT0 = { l: 0.1, r: 0.9, b: 0.95 };
+  G.footOf = function (src, cb) {
+    if (FOOT[src]) { cb(FOOT[src]); return; }
+    const im = new Image();
+    im.onload = function () {
+      let r = FOOT0;
+      try {
+        const W = im.naturalWidth, H = im.naturalHeight, k = 64 / Math.max(W, H), w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
+        const c = document.createElement("canvas"); c.width = w; c.height = h;
+        const x = c.getContext("2d"); x.drawImage(im, 0, 0, w, h);
+        const d = x.getImageData(0, 0, w, h).data, m = Math.max(w, h);
+        let l = w, rr = -1, b = -1;
+        for (let y = 0; y < h; y++) for (let i = 0; i < w; i++) if (d[(y * w + i) * 4 + 3] > 40) { if (i < l) l = i; if (i > rr) rr = i; b = y; }
+        if (rr >= 0) r = { l: ((m - w) / 2 + l) / m, r: ((m - w) / 2 + rr + 1) / m, b: ((m - h) / 2 + b + 1) / m };
+      } catch (e) {}
+      FOOT[src] = r; cb(r);
+    };
+    im.onerror = () => cb(FOOT0);
+    im.src = src;
+  };
+  G.ground = function (el) {
+    const img = el.querySelector("img"); el.classList.add("grounded");
+    el.style.transform = "translate(-50%, calc(var(--fb, .95) * -100%))";
+    const set = () => G.footOf(img.src, function (r) { el.style.setProperty("--fl", r.l.toFixed(3)); el.style.setProperty("--fr", r.r.toFixed(3)); el.style.setProperty("--fb", r.b.toFixed(3)); });
+    set();
+    if (!el._gObs && window.MutationObserver) { el._gObs = new MutationObserver(set); el._gObs.observe(img, { attributes: true, attributeFilter: ["src"] }); }   // 손질로 그림이 바뀌면 다시 잼
+  };
+  // 이야기 배경(1344×768): 아래 맞춤으로 바닥을 넓게 보여 줌. 세로로 긴 놀이판은 150% 크기(바닥이 놀이판 아래쪽 절반쯤)
+  const PORTRAIT_ZOOM = 1.5;
+  G.fitScene = function (field) {
+    field.classList.add("scene");
+    const fit = () => { field.querySelector(".bg").style.backgroundSize = field.clientHeight >= field.clientWidth ? `auto ${PORTRAIT_ZOOM * 100}%` : "cover"; };
+    fit(); G.onFieldResize(field, fit);
+  };
+  // 배경 그림 높이의 g(0~1) 지점이 놀이판 위에서 몇 px 인지
+  G.groundY = function (field, g) {
+    const W = field.clientWidth, H = field.clientHeight;
+    const dh = H >= W ? H * PORTRAIT_ZOOM : 768 * Math.max(W / 1344, H / 768);
+    return H - dh + g * dh;
+  };
 
   // ---------- 끌어다 놓기 (+ 눌러서 고르고 눌러서 놓기) ----------
   // src: { el, kind: "item"|"tool"|"card", onDrop(targetEl), onTap() , can() }
@@ -326,12 +477,12 @@
     });
     function end(e) {
       if (!start || (e && e.pointerId !== pid)) return;
-      const wasDrag = !!ghost;
+      const wasDrag = !!ghost, gr = ghost ? ghost.getBoundingClientRect() : null;   // 놓은 자리(날아 들어가는 연출의 출발점)
       if (ghost) { ghost.remove(); ghost = null; el.classList.remove("dragging"); }
       if (hot) hot.classList.remove("hot", "tool-hot");
       const t = wasDrag && e ? targetAt(e.clientX, e.clientY, src.kind, el) : null;
       hot = null; start = null;
-      if (wasDrag) { if (t) src.onDrop(t); }
+      if (wasDrag) { if (t) src.onDrop(t, gr); }
       else if (e && e.type === "pointerup") tap();
     }
     function tap() {
@@ -382,9 +533,11 @@
       const el = G.itemEl(id, { tag: opt.tags !== false, src: opt.srcOf && opt.srcOf(id), w: st.w0 });
       el.style.transform = "translate(-50%,-50%)";
       el.classList.add("drop-target"); el.dataset.accept = "tool";
-      if (st.need && opt.tools) el.appendChild(G.h(`<span class="badge">${st.need}</span>`));
+      // 준비할 단계: '준비' 글자 + 단계 수만큼 점(한 단계 끝날 때마다 하나씩 채움)
+      if (st.need && opt.tools) el.appendChild(G.h(`<span class="badge prep" title="${G.esc(G.t("ui.prep"))} ${st.need}"><em>${G.esc(G.t("ui.prep"))}</em>${"<i></i>".repeat(st.need)}</span>`));
       field.appendChild(el); st.el = el; ctx.els.push(st);
-      G.draggable({ el: el, kind: "item", onDrop: (target) => dropItem(st, target), can: () => !ctx.done });
+      if (opt.ground != null) G.ground(el);
+      G.draggable({ el: el, kind: "item", onDrop: (target, from) => dropItem(st, target, from), can: () => !ctx.done });
       G.dropTarget(el);
       if (opt.decorate) opt.decorate(st);
     });
@@ -407,6 +560,7 @@
       const u = G.unit(field);
       const all = ctx.els, n = all.length; if (!n) return;
       const tagH = opt.tags !== false ? 22 : 0;
+      if (opt.ground != null) return groundLayout(top, left, right, bottom, u, tagH);
       // 줄 수: 품목이 가장 크게 보이는 칸 나누기를 고름
       const bestCols = (H) => { let bc = 1, bs = -1; for (let c = 1; c <= (opt.area ? 1 : n); c++) { const rr = Math.ceil(n / c);
         const sz = Math.min((right - left) / c * 0.86, (H / rr - tagH) * 0.9); if (sz > bs + 0.5) { bs = sz; bc = c; } } return [bc, bs]; };
@@ -433,6 +587,30 @@
         st.el.style.left = (x / f.width * 100).toFixed(2) + "%"; st.el.style.top = (y / f.height * 100).toFixed(2) + "%";
       });
     }
+    // 바닥에 놓기: 품목의 발(그림 아래 끝)이 배경의 바닥(opt.ground) 아래에 오게. 줄이 여럿이면 뒷줄은 조금 작게, 앞줄이 앞에 보이게
+    function groundLayout(top, left, right, bottom, u, tagH) {
+      const all = ctx.els, n = all.length, f = field.getBoundingClientRect();
+      const gY = G.groundY(field, opt.ground);
+      const feetBot = bottom - tagH - 6, feetTop = Math.min(Math.max(gY + 8, top + 40), feetBot - 20);
+      const maxW = Math.max.apply(null, all.map((s) => s.w0)) * u;
+      let best = null;
+      // 한 줄에 둘 이상(한 줄로 세로로 쌓으면 서로 겹쳐 보임), 줄 사이가 좁으면 품목을 줄여 앞뒤 줄이 크게 겹치지 않게
+      for (let c = Math.min(2, n); c <= n; c++) {
+        const r = Math.ceil(n / c), cw = (right - left) / c, gap = r > 1 ? (feetBot - feetTop) / (r - 1) : 0;
+        const s = Math.min(cw * 0.86, (feetTop - top) / 0.95, r > 1 ? gap * 1.4 : Infinity, maxW * 1.5);
+        if (!best || s > best.s + 0.5) best = { s, c, r, cw, gap };
+      }
+      const k = best.s / maxW, c = best.c, r = best.r;
+      all.forEach(function (st, i) {
+        const ri = Math.floor(i / c), ci = i % c, inRow = Math.min(c, n - ri * c);
+        const depth = r > 1 ? 0.86 + 0.14 * ri / (r - 1) : 1;
+        const wk = Math.max(st.w0 * k * depth, 46 / u); st.el.style.setProperty("--w", wk.toFixed(1));
+        const x = left + best.cw * (ci + 0.5 + (c - inRow) / 2) + st.j[0] * best.cw * 0.05;
+        const y = r > 1 ? feetTop + best.gap * ri : feetTop + (feetBot - feetTop) * 0.6;
+        st.el.style.left = (x / f.width * 100).toFixed(2) + "%"; st.el.style.top = (y / f.height * 100).toFixed(2) + "%";
+        st.el.style.zIndex = 2 + ri;
+      });
+    }
     G.onFieldResize(field, layout);
     layout(); setTimeout(layout, 350);
     function stOf(el) { return ctx.els.find((s) => s.el === el); }
@@ -445,7 +623,7 @@
         if (it.states) st.el.querySelector("img").src = G.img(it.states[st.step]);
         if (tid === "report") st.el.appendChild(G.h(`<span class="fix-sticker">${G.t("plate.sticker")}</span>`));
         const b = st.el.querySelector(".badge");
-        if (b) { if (st.step >= st.need) b.remove(); else b.textContent = st.need - st.step; }
+        if (b) { if (st.step >= st.need) b.remove(); else b.querySelectorAll("i").forEach((d, j) => d.classList.toggle("on", j < st.step)); }
         G.flash(st.el, "ok"); G.sfx("step");
         G.float(field, r.left - fr.left + r.width / 2, r.top - fr.top, "✓ " + G.esc(G.t("tool." + tid)));
         if (opt.onStep) opt.onStep(st, tid);
@@ -459,11 +637,12 @@
       G.talk(field, "boy-stop", G.esc(reason), { stop: true, ms: 3600 });
       if (opt.onWrong) opt.onWrong(st.id, reason);
     }
-    function dropItem(st, target) {
+    function dropItem(st, target, from) {
       if (!target.classList.contains("dest")) return;
       const did = target.dataset.dest, it = ITEMS[st.id];
       if (did === it.dest && st.step >= st.need) {
-        st.gone = true; st.el.classList.add("gone"); G.flash(target, "ok"); G.sfx("ok"); G.bookAdd(st.id);
+        G.flyTo(from || st.el.getBoundingClientRect(), st.el.querySelector("img").src, target, DEST[did].color);
+        st.gone = true; st.el.classList.add("gone"); G.sfx("ok"); G.bookAdd(st.id);
         G.talk(field, Math.random() < .5 ? "girl-laugh" : "boy", `<b>${G.t("ui.great")}</b> ${G.esc(G.t("why." + st.id))}`, { ms: 3200 });
         if (opt.onCorrect) opt.onCorrect(st.id);
         ctx.left--;
@@ -473,7 +652,6 @@
       ctx.mistakes++; G.sfx("no"); G.flash(target, "no"); G.flash(st.el, "shake");
       let reason;
       if (did === it.dest) reason = G.t("ui.needPrep", { step: G.t("tool." + it.prep[st.step]) });
-      else if (did === "other") reason = G.t("why.other");
       else reason = G.t("why." + st.id);
       G.talk(field, "boy-stop", G.esc(reason), { stop: true, ms: 4200 });
       if (opt.onWrong) opt.onWrong(st.id, reason);

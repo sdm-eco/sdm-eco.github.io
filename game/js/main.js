@@ -1,5 +1,19 @@
 // 첫 화면: 놀이 방식 고르기(1 분리배출 러시 = 시안 A · 2 서대문 새내기 일주일 = 시안 C) · 언어 · 소리
 (function () {
+  // 미리보기 그림(놀이 화면을 줄여 그린 것): 러시 = 골목 + 벨트 위 품목, 새내기 일주일 = 방 + 두 캐릭터 + 바닥의 쓰레기
+  const PREVIEW = {
+    rush: () => `<span class="pv-bg" style="background-image:url(${G.img("bg/alley.webp")})"></span>
+      <span class="belt"><i class="belt-top"></i><i class="belt-face"></i></span>
+      <span class="pv-it" style="left:16%"><img src="${G.img("item/new/banana.webp")}" alt=""></span>
+      <span class="pv-it tall" style="left:44%"><img src="${G.img("item/pet/bottle-full.webp")}" alt=""><span class="badge tap">${G.ICON.hand}</span></span>
+      <span class="pv-it tall" style="left:72%"><img src="${G.img("item/can/can.webp")}" alt=""></span>
+      <span class="pv-combo"><b>8</b>${G.esc(G.t("ui.combo"))}</span>`,
+    story: () => `<span class="pv-bg" style="background-image:url(${G.img("bg/room.webp")})"></span>
+      <span class="pv-it low" style="left:14%"><img src="${G.img("item/food/bone.webp")}" alt=""></span>
+      <span class="pv-it low" style="left:30%"><img src="${G.img("item/new/banana.webp")}" alt=""></span>
+      <span class="pv-chars"><img src="${G.img("char/girl-smile.webp")}" alt=""><img src="${G.img("char/boy-smile.webp")}" alt=""></span>
+      <span class="pv-days">${[1, 2, 3, 4, 5, 6].map((n) => `<i>${n}</i>`).join("")}<i class="q">Q</i></span>`
+  };
   G.screens.title = function () {
     const modes = [["rush", "1"], ["story", "2"]];
     const el = G.h(`<div class="title-screen">
@@ -12,8 +26,8 @@
       </div>
       <div class="modes" aria-label="${G.t("app.pick")}">
         <h2 style="font-size:1em;color:var(--muted);font-weight:800">${G.t("app.pick")}</h2>
-        ${modes.map(([m, k]) => `<button class="mode-card" data-m="${m}"><span class="mk">${k}</span>
-          <span><h3>${G.esc(G.t("mode." + m))}</h3><p>${G.esc(G.t("mode." + m + ".d"))}</p></span><span class="go">${G.ICON.go}</span></button>`).join("")}
+        <div class="mode-tiles">${modes.map(([m, k]) => `<button class="mode-card" data-m="${m}"><span class="pv" aria-hidden="true">${PREVIEW[m]()}</span>
+          <span class="mt"><span class="mk">${k}</span><span><h3>${G.esc(G.t("mode." + m))}</h3><p>${G.esc(G.t("mode." + m + ".d"))}</p></span><span class="go">${G.ICON.go}</span></span></button>`).join("")}</div>
       </div></div>`);
     const foot = G.h(`<footer class="title-foot"><span style="display:flex;align-items:center;gap:8px"><img src="${G.img("brand/logo.png")}" alt="">${G.esc(G.t("app.sub"))}</span>
       <span style="display:flex;gap:8px"><button class="icon-btn" data-a="book" aria-label="${G.t("ui.book")}">${G.ICON.book}</button>
