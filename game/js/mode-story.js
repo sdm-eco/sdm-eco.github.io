@@ -1,10 +1,11 @@
 // 시안 C · 서대문 새내기 일주일 — 봉투 · 시간 · 장소 · 미수거와 음식물 · 재활용 · 깨진 유리 · 약 · 대형 · 가전을 하루씩
 (function () {
   const { ITEMS } = window.GAMEDATA;
+  // 1일째: 다른 구 봉투도 쓸 수 있음(1편 영상 v14 · 구청 11/24 의견) → 봉투 고르기는 '일반 쓰레기 = 종량제 봉투, 음식물 = 음식물 전용 봉투'로
   const DAYS = [
     { n: 1, bg: "bg/alley.webp", steps: [
       { talk: [["girl", "d1.l1"], ["boy-surprise", "d1.l2"], ["girl", "d1.l3"]] },
-      { board: { prompt: "d1.p1", items: ["trash"], dests: ["general", "other", "food"] } },
+      { board: { prompt: "d1.p1", items: ["trash", "leftover"], dests: ["general", "food"] } },
       { choice: { prompt: "d1.p2", token: "bagfull", cards: [
         { icon: "tree", t: "d1.c1", p: "d1.c1p", why: "d1.w1" }, { icon: "house", t: "d1.c2", p: "d1.c2p", ok: true }, { icon: "door", t: "d1.c3", p: "d1.c3p", why: "d1.w3" }] } },
       { rule: "d1.r" }] },
@@ -33,6 +34,8 @@
     { n: 7, quiz: true, bg: "bg/alley.webp", steps: [{ quiz: [["q1", true], ["q2", false], ["q3", false], ["q4", false], ["q5", true]] }] }
   ];
   const starsFor = (m) => (m === 0 ? 3 : m <= 2 ? 2 : 1);
+  // 배경 그림에서 바닥이 시작하는 높이(0~1): 방은 벽과 마루가 만나는 선 아래, 골목은 대문 앞 길
+  const GROUND = { "bg/room.webp": 0.72, "bg/alley.webp": 0.81 };
 
   G.screens.story = function (dayIndex) {
     if (dayIndex === undefined) return map();
@@ -40,24 +43,42 @@
     const title = D.quiz ? G.t("story.quiz") : `${G.t("story.day", { n: D.n })} · ${G.t("d" + D.n + ".t")}`;
     const fr = G.frame(G.t("mode.story"), `<span class="chip"><b>${G.esc(title)}</b></span>`, { bg: D.bg });
     const field = fr.field;
+    G.fitScene(field);
     let mistakes = 0, si = 0;
     if (D.sticker) field.appendChild(G.h(`<div class="miss-sticker"><b>${G.t("d6.s")}</b>${G.t("d6.sp")}</div>`));
     next();
     return {};
 
+    function hideTalk() { const tk = field.querySelector(".talk"); if (tk) { clearTimeout(tk._t); tk.classList.add("hide"); } }
     function next() {
       if (si >= D.steps.length) return finish();
       const s = D.steps[si++];
-      fr.dests.innerHTML = ""; field.querySelectorAll(".item, .tools, .cards, .statement, .prompt").forEach((e) => e.remove());
-      if (s.talk) dialog(s.talk, next);
+      fr.dests.innerHTML = ""; field.querySelectorAll(".item, .prop, .tools, .cards, .statement, .prompt").forEach((e) => e.remove());
+      if (s.talk) { if (D.sticker) bagProp(); dialog(s.talk, next); }
       else if (s.board) {
         G.prompt(field, G.t(s.board.prompt));
         G.board({ field, dests: fr.dests, items: s.board.items, destIds: G.shuffle(s.board.dests), tools: s.board.tools ? G.shuffle(s.board.tools) : null,
-          srcOf: (id) => s.board.src && s.board.src[id], onDone: (m) => { mistakes += m; next(); } });
+          ground: GROUND[D.bg], srcOf: (id) => s.board.src && s.board.src[id], onDone: (m) => { mistakes += m; next(); } });
       }
       else if (s.choice) choice(s.choice, next);
-      else if (s.rule) { G.sfx("ok"); G.panel(`<h2>${G.esc(title)}</h2><div class="rule-card">${G.t(s.rule)}</div>`, [{ label: G.t("ui.ok"), primary: true, on: next }]); }
+      // 규칙 카드: 앞 장면 말풍선("좋아요!" 등)이 카드 뒤에 남지 않게 먼저 닫음
+      else if (s.rule) { hideTalk(); G.sfx("ok"); G.panel(`<h2>${G.esc(title)}</h2><div class="rule-card">${G.t(s.rule)}</div>`, [{ label: G.t("ui.ok"), primary: true, on: next }]); }
       else if (s.quiz) quiz(s.quiz, 0, next);
+    }
+    // 6일째 대화: 어제 내놓은 봉투(미수거 스티커가 붙은 채)를 골목 바닥에 보여 줌
+    function bagProp() {
+      const p = G.itemEl("bagmixed", { w: 150 });
+      p.className = "prop"; ["role", "tabindex", "aria-label"].forEach((a) => p.removeAttribute(a)); p.setAttribute("aria-hidden", "true");
+      p.appendChild(G.h(`<span class="fix-sticker">${G.esc(G.t("d6.s"))}</span>`));
+      field.appendChild(p); G.ground(p);
+      const place = function () {
+        if (!p.isConnected) return;
+        const P = field.clientHeight >= field.clientWidth, tk = field.querySelector(".talk:not(.hide)");
+        let y = G.groundY(field, GROUND[D.bg] + 0.05);
+        if (P && tk) y = Math.min(y, tk.offsetTop - 12);   // 세로 화면: 말풍선 위에
+        p.style.left = P ? "34%" : "72%"; p.style.top = y.toFixed(1) + "px";
+      };
+      place(); G.onFieldResize(field, place); setTimeout(place, 80);
     }
     // 대화: 말풍선 + 다음 단추
     function dialog(lines, done) {
@@ -148,31 +169,48 @@
       G.onFieldResize(field, lay); lay(); setTimeout(lay, 300);
     }
     function finish() {
+      hideTalk();
       const s = starsFor(mistakes);
       G.store.story[D.n] = Math.max(G.store.story[D.n] || 0, s); G.save(); G.sfx("win");
       const last = dayIndex === DAYS.length - 1;
       if (last) {
-        G.panel(`<div class="cert"><img class="logo" src="${G.img("brand/title.webp")}" alt="서대문구 분리배출 교육">
-          <div class="medal" style="color:#1d7a43">${G.RECYCLE_SVG("#2a9d55")}</div>
-          <h3>${G.t("story.cert")}</h3><p>${G.t("story.certP")}</p><div class="stars-big">${G.stars(s)}</div></div>
+        // 인증서: 학생이 캡처해서 보여 주고 싶은 '증서' — 캐릭터 둘 · 별 · 모은 별 · 날짜
+        const total = DAYS.reduce((a, d) => a + (G.store.story[d.n] || 0), 0);
+        let date = "";
+        try { date = new Date().toLocaleDateString({ ko: "ko-KR", en: "en-US", zh: "zh-CN", vi: "vi-VN" }[G.lang], { year: "numeric", month: "long", day: "numeric" }); } catch (e) { date = new Date().toISOString().slice(0, 10); }
+        G.panel(`<div class="cert"><div class="cert-in">
+          <img class="logo" src="${G.img("brand/title.webp")}" alt="서대문구 분리배출 교육">
+          <h3>${G.t("story.cert")}</h3><p class="cert-p">${G.t("story.certP")}</p>
+          <div class="cert-row"><img class="ch" src="${G.img("char/girl-laugh.webp")}" alt="">
+            <div class="seal"><span class="medal">${G.RECYCLE_SVG("#2a9d55")}</span><div class="stars-big">${G.stars(s)}</div></div>
+            <img class="ch" src="${G.img("char/boy-smile.webp")}" alt=""></div>
+          <div class="cert-meta"><span>${G.ICON.star}${G.t("story.certStars", { n: total, t: DAYS.length * 3 })}</span><span>${G.esc(date)}</span></div>
+          <div class="cert-by"><img src="${G.img("brand/logo.png")}" alt="">${G.t("story.certBy")}</div></div></div>
           <p class="lead"><b>${G.t("story.closing")}</b></p>`,
           [{ label: G.t("ui.home"), primary: true, on: () => G.go("title") }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }]);
         return;
       }
-      G.panel(`<h2>${G.esc(title)}</h2><div class="stars-big">${G.stars(s)}</div>`,
+      // 하루 끝: 별 + 캐릭터 표정 · 한마디
+      G.panel(`<h2>${G.esc(title)}</h2><div class="day-end"><span class="res-face"><img src="${G.face(s === 3 ? "girl-laugh" : s === 2 ? "boy" : "girl")}" alt=""></span>
+        <div><div class="stars-big">${G.stars(s)}</div><p class="res-say">${G.t("story.s" + s)}</p></div></div>`,
         [{ label: G.t("ui.next"), primary: true, on: () => G.go("story", dayIndex + 1) }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }, { label: G.t("ui.home"), on: () => G.go("title") }]);
     }
   };
 
+  // 날짜 고르기: 1일째 → 6일째 → 마지막 퀴즈로 이어지는 길. 끝낸 날은 ✓와 별, 다음 차례는 표시(아무 날이나 골라도 됨)
   function map() {
     G.frame(G.t("mode.story"), "", { bg: "bg/alley.webp" });
-    const cards = DAYS.map(function (D, i) {
+    const nextI = DAYS.findIndex((D) => !G.store.story[D.n]);
+    const nodes = DAYS.map(function (D, i) {
       const s = G.store.story[D.n] || 0;
-      const t = D.quiz ? G.t("story.quiz") : G.t("d" + D.n + ".t");
-      return `<button class="day" data-i="${i}"><span class="n">${D.quiz ? "Q" : G.t("story.day", { n: D.n })}</span><b>${G.esc(t)}</b><span class="st">${G.stars(s)}</span></button>`;
+      const cls = [s ? "done" : "", i === nextI ? "next" : "", D.quiz ? "quiz" : ""].join(" ").trim();
+      return `<li class="${cls}"><button class="day" data-i="${i}"><span class="dot">${s ? G.ICON.check : D.quiz ? "Q" : D.n}</span>
+        <span class="txt"><span class="n">${D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n })}</span>${D.quiz ? "" : `<b>${G.esc(G.t("d" + D.n + ".t"))}</b>`}<span class="st">${G.stars(s)}</span></span>
+        ${i === nextI ? `<em class="next-tag">${G.t("story.next")}</em>` : ""}</button></li>`;
     }).join("");
-    const ov = G.panel(`<h2>${G.t("mode.story")}</h2><p class="lead">${G.t("story.how")}</p><div class="day-map">${cards}</div>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
+    const ov = G.panel(`<h2>${G.t("mode.story")}</h2><p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
     ov.querySelectorAll(".day").forEach((b) => b.addEventListener("click", () => { G.sfx("tap"); G.go("story", +b.dataset.i); }));
+    const nb = ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
     return {};
   }
 })();

@@ -3,58 +3,61 @@
 (function () {
   // 수거함 그림의 이름표 자리(원본 픽셀, 홈페이지 meta.json 값): [x, y, w, h, 원본 폭, 원본 높이]
   // 공식 분리배출 표시가 있는 통은 표시만, 없는 통은 이름만 씀(홈페이지 수거함 이름표와 같은 원칙)
+  // color: 맞혔을 때 튀는 조각 색(그림 속 수거함 · 봉투 색)
+  // 종량제 봉투: 서대문구 통일 디자인(2025, 구청 11/24 의견). 홈페이지 img/scene/common 과 같은 파일, ?v 는 예전 그림이 캐시에 남지 않게
+  const BAG = (n) => `item/common/bag-${n}.webp?v=20261124`;
   const DEST = {
-    general:   { img: "item/common/bag-general.webp", grp: "general" },
-    food:      { img: "item/common/bag-food.webp", grp: "food" },
-    other:     { img: "item/new/bag-other.webp", grp: "general" },
-    pet:       { img: "item/pet/bin.webp", grp: "recycle", mark: "pet", plate: [140, 139, 162, 87, 362, 440] },
-    can:       { img: "item/can/bin.webp", grp: "recycle", mark: "can", plate: [140, 141, 162, 86, 365, 440] },
-    carton:    { img: "item/carton/bin.webp", grp: "recycle", mark: "carton", plate: [139, 140, 161, 86, 361, 440] },
-    glass:     { img: "item/glass/bin.webp", grp: "recycle", mark: "glass", plate: [140, 140, 159, 86, 361, 440] },
-    sack:      { img: "item/new/ppsack.webp", grp: "special", text: "plate.sack", plate: [80, 170, 190, 110, 343, 440] },
-    medicine:  { img: "item/medicine/bin.webp", grp: "special", text: "plate.medicine", plate: [113, 198, 146, 78, 300, 480] },
-    battery:   { img: "item/battery/bin.webp", grp: "special" },
-    clothes:   { img: "item/new/clothesbin.webp", grp: "special", text: "plate.clothes", plate: [101, 179, 130, 89, 271, 440] },
-    bulky:     { img: "cat/bulky.webp", grp: "special", sticker: true },
-    appliance: { phone: true, grp: "special" }
+    general:   { img: BAG("general"), grp: "general", color: "#8b78d6" },
+    food:      { img: BAG("food"), grp: "food", color: "#f5cf3a" },
+    pet:       { img: "item/pet/bin.webp", grp: "recycle", color: "#6fae58", mark: "pet", plate: [140, 139, 162, 87, 362, 440] },
+    can:       { img: "item/can/bin.webp", grp: "recycle", color: "#3fa9e0", mark: "can", plate: [140, 141, 162, 86, 365, 440] },
+    carton:    { img: "item/carton/bin.webp", grp: "recycle", color: "#f5bf3a", mark: "carton", plate: [139, 140, 161, 86, 361, 440] },
+    glass:     { img: "item/glass/bin.webp", grp: "recycle", color: "#6fae58", mark: "glass", plate: [140, 140, 159, 86, 361, 440] },
+    sack:      { img: "item/new/ppsack.webp", grp: "special", color: "#9ba7ad", text: "plate.sack", plate: [80, 170, 190, 110, 343, 440] },
+    medicine:  { img: "item/medicine/bin.webp", grp: "special", color: "#3c8a4a", text: "plate.medicine", plate: [113, 198, 146, 78, 300, 480] },
+    battery:   { img: "item/battery/bin.webp", grp: "special", color: "#e0558f" },
+    clothes:   { img: "item/new/clothesbin.webp", grp: "special", color: "#4f9a6a", text: "plate.clothes", plate: [101, 179, 130, 89, 271, 440] },
+    bulky:     { img: "cat/bulky.webp", grp: "special", color: "#c25a5a", sticker: true },
+    appliance: { phone: true, grp: "special", color: "#e0558f" }
   };
 
   // 품목: dest = 맞는 곳, prep = 손질 순서(도구 이름), states = 손질 단계마다 바뀌는 그림, w = 놀이판 크기(설계 px)
+  // w 는 실제 크기 비율에 가깝게(복숭아 씨 < 바나나 껍질, 선풍기 < 의자 < 냉장고). 러시는 작은 품목도 누르기 쉽게 따로 키움
   const ITEMS = {
     banana:      { img: "item/new/banana.webp", dest: "food", w: 120 },
-    tangerine:   { img: "item/new/tangerine.webp", dest: "food", w: 120 },
-    leftover:    { img: "item/food/mound.webp", dest: "food", w: 120 },
-    bone:        { img: "item/food/bone.webp", dest: "general", w: 116 },
-    pit:         { img: "item/food/pit.webp", dest: "general", w: 84 },
-    egg:         { img: "item/food/egg.webp", dest: "general", w: 104 },
-    shell:       { img: "item/food/shell.webp", dest: "general", w: 110 },
-    pineapple:   { img: "item/new/pineapple.webp", dest: "general", w: 126 },
-    tissue:      { img: "item/general/tissue.webp", dest: "general", w: 104 },
-    receipt:     { img: "item/confuse/receipt.webp", dest: "general", w: 96 },
+    tangerine:   { img: "item/new/tangerine.webp", dest: "food", w: 106 },
+    leftover:    { img: "item/food/mound.webp", dest: "food", w: 124 },
+    bone:        { img: "item/food/bone.webp", dest: "general", w: 112 },
+    pit:         { img: "item/food/pit.webp", dest: "general", w: 56 },
+    egg:         { img: "item/food/egg.webp", dest: "general", w: 92 },
+    shell:       { img: "item/food/shell.webp", dest: "general", w: 96 },
+    pineapple:   { img: "item/new/pineapple.webp", dest: "general", w: 140 },
+    tissue:      { img: "item/general/tissue.webp", dest: "general", w: 100 },
+    receipt:     { img: "item/confuse/receipt.webp", dest: "general", w: 90 },
     chopsticks:  { img: "item/confuse/chopsticks.webp", dest: "general", w: 116 },
-    toothbrush:  { img: "item/confuse/toothbrush.webp", dest: "general", w: 110 },
+    toothbrush:  { img: "item/confuse/toothbrush.webp", dest: "general", w: 108 },
     // 페트병: 뚜껑은 마지막 '뚜껑 닫기'에서만 생김 (찌그러뜨린 뒤 = 뚜껑 없는 crushed-open, 뚜껑 닫은 뒤 = crushed)
     pet:         { img: "item/pet/bottle-full.webp", dest: "pet", prep: ["empty", "label", "crush", "cap"], w: 130,
                    states: ["item/pet/bottle-full.webp", "item/pet/bottle-empty.webp", "item/pet/bottle-bare.webp", "item/pet/crushed-open.webp", "item/pet/crushed.webp"] },
-    can:         { img: "item/can/can.webp", dest: "can", prep: ["empty", "rinse", "crush"], w: 104,
+    can:         { img: "item/can/can.webp", dest: "can", prep: ["empty", "rinse", "crush"], w: 100,
                    states: ["item/can/can.webp", "item/can/can.webp", "item/can/can.webp", "item/can/crushed.webp"] },
     carton:      { img: "item/carton/carton.webp", dest: "carton", prep: ["empty", "rinse", "flatten"], w: 112,
                    states: ["item/carton/carton.webp", "item/carton/carton.webp", "item/carton/carton.webp", "item/carton/flat.webp"] },
     brokenglass: { img: "item/new/brokenglass.webp", dest: "sack", prep: ["wrap"], w: 138,
                    states: ["item/new/brokenglass.webp", "item/new/wrapped.webp"] },
     butane:      { img: "item/new/butane.webp", dest: "can", prep: ["gas"], trapTool: "punch", w: 116 },
-    pills:       { img: "item/medicine/blister.webp", dest: "medicine", w: 96 },
+    pills:       { img: "item/medicine/blister.webp", dest: "medicine", w: 92 },
     syrup:       { img: "item/medicine/syrup.webp", dest: "medicine", w: 96 },
     battery:     { img: "item/battery/cell.webp", dest: "battery", w: 70 },
     clothes:     { img: "item/new/clothes.webp", dest: "clothes", w: 140 },
-    blanket:     { img: "item/new/blanket.webp", dest: "bulky", prep: ["report"], w: 150 },
-    chair:       { img: "item/bulky/chair.webp", dest: "bulky", prep: ["report"], w: 130 },
-    fridge:      { img: "item/appliance/fridge.webp", dest: "appliance", w: 150 },
-    fan:         { img: "item/appliance/fan.webp", dest: "appliance", w: 130 },
+    blanket:     { img: "item/new/blanket.webp", dest: "bulky", prep: ["report"], w: 170 },
+    chair:       { img: "item/bulky/chair.webp", dest: "bulky", prep: ["report"], w: 165 },
+    fridge:      { img: "item/appliance/fridge.webp", dest: "appliance", w: 215 },
+    fan:         { img: "item/appliance/fan.webp", dest: "appliance", w: 125 },
     // 이야기 전용
     trash:       { img: "item/general/tissue.webp", dest: "general", w: 130, name: "item.trash" },
-    bagfull:     { img: "item/common/bag-general.webp", dest: null, w: 150, name: "item.bagfull" },
-    bagmixed:    { img: "item/common/bag-general.webp", dest: null, w: 150, name: "item.bagmixed" }
+    bagfull:     { img: BAG("general"), dest: null, w: 150, name: "item.bagfull" },
+    bagmixed:    { img: BAG("general"), dest: null, w: 150, name: "item.bagmixed" }
   };
 
   // 도구 아이콘: 그림이 있는 것은 홈페이지 그림, 없는 것은 선 그림(SVG)
