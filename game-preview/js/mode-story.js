@@ -1,0 +1,216 @@
+// 시안 C · 서대문 새내기 일주일 — 봉투 · 시간 · 장소 · 미수거와 음식물 · 재활용 · 깨진 유리 · 약 · 대형 · 가전을 하루씩
+(function () {
+  const { ITEMS } = window.GAMEDATA;
+  // 1일째: 다른 구 봉투도 쓸 수 있음(1편 영상 v14 · 구청 11/24 의견) → 봉투 고르기는 '일반 쓰레기 = 종량제 봉투, 음식물 = 음식물 전용 봉투'로
+  const DAYS = [
+    { n: 1, bg: "bg/alley.webp", steps: [
+      { talk: [["girl", "d1.l1"], ["boy-surprise", "d1.l2"], ["girl", "d1.l3"]] },
+      { board: { prompt: "d1.p1", items: ["trash", "leftover"], dests: ["general", "food"] } },
+      { choice: { prompt: "d1.p2", token: "bagfull", cards: [
+        { icon: "tree", t: "d1.c1", p: "d1.c1p", why: "d1.w1" }, { icon: "house", t: "d1.c2", p: "d1.c2p", ok: true }, { icon: "door", t: "d1.c3", p: "d1.c3p", why: "d1.w3" }] } },
+      { rule: "d1.r" }] },
+    { n: 2, bg: "bg/room.webp", steps: [
+      { talk: [["girl-worry", "d2.l1"], ["boy-stop", "d2.l2"]] },
+      { board: { prompt: "d2.p", items: ["bone", "banana", "pit", "tangerine", "egg", "pineapple", "shell", "tissue"], dests: ["food", "general"] } },
+      { rule: "d2.r" }] },
+    { n: 3, bg: "bg/room.webp", steps: [
+      { talk: [["girl", "d3.l1"], ["boy", "d3.l2"]] },
+      { board: { prompt: "d3.p", items: ["pet", "carton", "can"], dests: ["pet", "can", "carton", "general"], tools: ["empty", "rinse", "label", "crush", "cap", "flatten"] } },
+      { rule: "d3.r" }] },
+    { n: 4, bg: "bg/room.webp", steps: [
+      { talk: [["boy-surprise", "d4.l1"], ["girl", "d4.l2"]] },
+      { board: { prompt: "d4.p", items: ["brokenglass", "butane", "pills", "syrup"], dests: ["sack", "glass", "can", "medicine", "general"], tools: ["wrap", "gas", "punch", "crush"] } },
+      { rule: "d4.r" }] },
+    { n: 5, bg: "bg/alley.webp", steps: [
+      { talk: [["boy", "d5.l1"], ["girl", "d5.l2"]] },
+      { board: { prompt: "d5.p", items: ["clothes", "blanket", "chair", "fridge", "fan"], dests: ["clothes", "bulky", "appliance", "general"], tools: ["report"] } },
+      { rule: "d5.r" }] },
+    { n: 6, bg: "bg/alley.webp", sticker: true, steps: [
+      { talk: [["girl-worry", "d6.l1"], ["boy", "d6.l2"]] },
+      { board: { prompt: "d6.p1", items: ["pet"], dests: ["pet", "general"], src: { pet: "item/pet/crushed.webp" } } },
+      { choice: { prompt: "d6.p2", token: "bagmixed", cards: [
+        { icon: "clock", t: "d6.c1", p: "d6.c1p", why: "d6.w" }, { icon: "cal", t: "d6.c2", p: "d6.c2p", ok: true }, { icon: "clock", t: "d6.c3", p: "d6.c3p", why: "d6.w" }] } },
+      { rule: "d6.r" }] },
+    { n: 7, quiz: true, bg: "bg/alley.webp", steps: [{ quiz: [["q1", true], ["q2", false], ["q3", false], ["q4", false], ["q5", true]] }] }
+  ];
+  const starsFor = (m) => (m === 0 ? 3 : m <= 2 ? 2 : 1);
+  // 배경 그림에서 바닥이 시작하는 높이(0~1): 방은 벽과 마루가 만나는 선 아래, 골목은 대문 앞 길
+  const GROUND = { "bg/room.webp": 0.72, "bg/alley.webp": 0.81 };
+
+  G.screens.story = function (dayIndex) {
+    if (dayIndex === undefined) return map();
+    const D = DAYS[dayIndex];
+    const title = D.quiz ? G.t("story.quiz") : `${G.t("story.day", { n: D.n })} · ${G.t("d" + D.n + ".t")}`;
+    const fr = G.frame(G.t("mode.story"), `<span class="chip"><b>${G.esc(title)}</b></span>`, { bg: D.bg });
+    const field = fr.field;
+    G.fitScene(field);
+    let mistakes = 0, si = 0;
+    if (D.sticker) field.appendChild(G.h(`<div class="miss-sticker"><b>${G.t("d6.s")}</b>${G.t("d6.sp")}</div>`));
+    next();
+    return {};
+
+    function hideTalk() { const tk = field.querySelector(".talk"); if (tk) { clearTimeout(tk._t); tk.classList.add("hide"); } }
+    function next() {
+      if (si >= D.steps.length) return finish();
+      const s = D.steps[si++];
+      fr.dests.innerHTML = ""; field.querySelectorAll(".item, .prop, .tools, .cards, .statement, .prompt").forEach((e) => e.remove());
+      if (s.talk) { if (D.sticker) bagProp(); dialog(s.talk, next); }
+      else if (s.board) {
+        G.prompt(field, G.t(s.board.prompt));
+        G.board({ field, dests: fr.dests, items: s.board.items, destIds: G.shuffle(s.board.dests), tools: s.board.tools ? G.shuffle(s.board.tools) : null,
+          ground: GROUND[D.bg], srcOf: (id) => s.board.src && s.board.src[id], onDone: (m) => { mistakes += m; next(); } });
+      }
+      else if (s.choice) choice(s.choice, next);
+      // 규칙 카드: 앞 장면 말풍선("좋아요!" 등)이 카드 뒤에 남지 않게 먼저 닫음
+      else if (s.rule) { hideTalk(); G.sfx("ok"); G.panel(`<h2>${G.esc(title)}</h2><div class="rule-card">${G.t(s.rule)}</div>`, [{ label: G.t("ui.ok"), primary: true, on: next }]); }
+      else if (s.quiz) quiz(s.quiz, 0, next);
+    }
+    // 6일째 대화: 어제 내놓은 봉투(미수거 스티커가 붙은 채)를 골목 바닥에 보여 줌
+    function bagProp() {
+      const p = G.itemEl("bagmixed", { w: 150 });
+      p.className = "prop"; ["role", "tabindex", "aria-label"].forEach((a) => p.removeAttribute(a)); p.setAttribute("aria-hidden", "true");
+      p.appendChild(G.h(`<span class="fix-sticker">${G.esc(G.t("d6.s"))}</span>`));
+      field.appendChild(p); G.ground(p);
+      const place = function () {
+        if (!p.isConnected) return;
+        const P = field.clientHeight >= field.clientWidth, tk = field.querySelector(".talk:not(.hide)");
+        let y = G.groundY(field, GROUND[D.bg] + 0.05);
+        if (P && tk) y = Math.min(y, tk.offsetTop - 12);   // 세로 화면: 말풍선 위에
+        p.style.left = P ? "34%" : "72%"; p.style.top = y.toFixed(1) + "px";
+      };
+      place(); G.onFieldResize(field, place); setTimeout(place, 80);
+    }
+    // 대화: 말풍선 + 다음 단추
+    function dialog(lines, done) {
+      let k = 0;
+      const btn = G.h(`<button class="btn" style="position:absolute;right:2%;bottom:4%;z-index:7">${G.t("ui.next")} ${G.ICON.go}</button>`);
+      field.appendChild(btn);
+      // 다음 단추가 말풍선과 겹치면(세로 화면) 말풍선 위로 올림
+      const fit = () => { if (!btn.isConnected) return; btn.style.bottom = "4%"; const tk = field.querySelector(".talk"); if (!tk) return;
+        const a = btn.getBoundingClientRect(), b = tk.getBoundingClientRect(), f = field.getBoundingClientRect();
+        if (a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top) btn.style.bottom = (f.bottom - b.top + 8) + "px"; };
+      const show = () => { const [who, key] = lines[k]; G.talk(field, who, G.esc(G.t(key)), { stop: who === "boy-stop" }); fit(); };
+      G.onFieldResize(field, fit);
+      show();
+      btn.addEventListener("click", function () {
+        G.sfx("tap"); k++;
+        if (k < lines.length) return show();
+        btn.remove(); field.querySelector(".talk").classList.add("hide"); done();
+      });
+      btn.focus();
+    }
+    // 고르기: 품목 하나를 알맞은 카드에
+    function choice(c, done) {
+      const tk = field.querySelector(".talk"); if (tk) tk.classList.add("hide");   // 앞 단계 말풍선이 카드를 가리지 않게
+      G.prompt(field, G.t(c.prompt));
+      const tok = G.itemEl(c.token, { tag: true });
+      tok.style.left = "50%"; tok.style.top = "36%"; tok.style.transform = "translate(-50%,-50%)"; tok.dataset.w0 = tok.style.getPropertyValue("--w");
+      if (c.token === "bagmixed") tok.appendChild(G.h(`<span class="fix-sticker">${G.t("d6.s")}</span>`));
+      field.appendChild(tok);
+      const cards = G.h(`<div class="cards"></div>`);
+      c.cards.forEach(function (cd, i) {
+        const el = G.h(`<div class="card-drop drop-target" data-accept="item" data-i="${i}" role="button" tabindex="0">${G.ICON[cd.icon]}<span class="t">${G.t(cd.t)}</span><span class="p">${G.t(cd.p)}</span></div>`);
+        cards.appendChild(el); G.dropTarget(el);
+      });
+      field.appendChild(cards);
+      stack(tok, cards);
+      let finished = false;
+      G.draggable({ el: tok, kind: "item", can: () => !finished, onDrop: function (t) {
+        const cd = c.cards[+t.dataset.i]; if (!cd) return;
+        if (cd.ok) { finished = true; G.flash(t, "ok"); G.sfx("ok"); tok.classList.add("gone"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b>`, { ms: 1800 }); setTimeout(done, 1200); }
+        else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t(cd.why)), { stop: true, ms: 4000 }); }
+      } });
+    }
+    // O/X 퀴즈: 문장 카드를 O 또는 X로
+    function quiz(list, k, done) {
+      field.querySelectorAll(".statement, .cards").forEach((e) => e.remove());
+      if (k >= list.length) return done();
+      const [key, truth] = list[k];
+      G.prompt(field, `${G.t("q.p")} (${k + 1} / ${list.length})`);
+      const card = G.h(`<div class="statement" role="button" tabindex="0"><span class="q">Q${k + 1}</span>${G.esc(G.t(key))}</div>`);
+      field.appendChild(card);
+      const cards = G.h(`<div class="cards"><div class="card-drop ox drop-target" data-accept="card" data-v="1" role="button" tabindex="0">O</div><div class="card-drop ox drop-target" data-accept="card" data-v="0" role="button" tabindex="0">X</div></div>`);
+      field.appendChild(cards); cards.querySelectorAll(".card-drop").forEach((e) => G.dropTarget(e));
+      stack(card, cards);
+      let over = false;
+      G.draggable({ el: card, kind: "card", can: () => !over, onDrop: function (t) {
+        const said = t.dataset.v === "1";
+        over = true;
+        if (said === truth) { G.flash(t, "ok"); G.sfx("ok"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b> ${G.esc(G.t(key + "w"))}`, { ms: 2600 }); }
+        else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t(key + "w")), { stop: true, ms: 3200 }); }
+        card.classList.add("gone");
+        setTimeout(() => quiz(list, k + 1, done), 1700);
+      } });
+    }
+    // 고르기 · 퀴즈 배치: 카드 줄은 아래, 고를 것은 안내문과 카드 사이 가운데. 높이가 넉넉하면 맨 아래에 말풍선 자리를 비움
+    function stack(mid, cards) {
+      const lay = function () {
+        if (!mid.isConnected) return;
+        const f = field.getBoundingClientRect(), u = G.unit(field), m = Math.max(8, u * 14);
+        const pr = field.querySelector(".prompt"), stk = field.querySelector(".miss-sticker");
+        let top = pr ? pr.getBoundingClientRect().bottom - f.top + 8 : m;
+        if (stk && innerHeight >= innerWidth) top = Math.max(top, stk.getBoundingClientRect().bottom - f.top + 8);   // 세로 화면: 미수거 스티커 아래부터
+        cards.style.bottom = m + "px";
+        const ch = cards.getBoundingClientRect().height, isItem = mid.classList.contains("item");
+        const w0 = isItem ? +mid.dataset.w0 || 120 : 0;
+        const midH = isItem ? Math.min(w0 * u, 150) + 24 : mid.offsetHeight;
+        const band = G.talkBand(field);
+        const off = f.height - top - ch - m - band - 12 >= midH ? band + m : m;
+        cards.style.bottom = off + "px";
+        // 말풍선 자리를 못 비우는 낮은 가로 화면: 고를 것은 오른쪽, O · X 카드는 오른쪽으로 붙임
+        const side = off === m && innerWidth > innerHeight;
+        if (isItem) mid.style.left = side ? "76%" : "50%"; else cards.style.justifyContent = side ? "flex-end" : "";
+        const room = f.height - off - ch - 10 - top;
+        if (isItem) { const w = Math.max(46 / u, Math.min(w0, (room - 26) / u)); mid.style.setProperty("--w", w.toFixed(1)); }
+        const h = isItem ? mid.offsetHeight + 24 : mid.offsetHeight;
+        const y = top + Math.max(0, (room - h) / 2) + (isItem ? mid.offsetHeight / 2 : mid.offsetHeight / 2);
+        mid.style.top = y + "px";
+      };
+      G.onFieldResize(field, lay); lay(); setTimeout(lay, 300);
+    }
+    function finish() {
+      hideTalk();
+      const s = starsFor(mistakes);
+      G.store.story[D.n] = Math.max(G.store.story[D.n] || 0, s); G.save(); G.sfx("win");
+      const last = dayIndex === DAYS.length - 1;
+      if (last) {
+        // 인증서: 학생이 캡처해서 보여 주고 싶은 '증서' — 캐릭터 둘 · 별 · 모은 별 · 날짜
+        const total = DAYS.reduce((a, d) => a + (G.store.story[d.n] || 0), 0);
+        let date = "";
+        try { date = new Date().toLocaleDateString({ ko: "ko-KR", en: "en-US", zh: "zh-CN", vi: "vi-VN" }[G.lang], { year: "numeric", month: "long", day: "numeric" }); } catch (e) { date = new Date().toISOString().slice(0, 10); }
+        G.panel(`<div class="cert"><div class="cert-in">
+          <img class="logo" src="${G.img("brand/title.webp")}" alt="서대문구 분리배출 교육">
+          <h3>${G.t("story.cert")}</h3><p class="cert-p">${G.t("story.certP")}</p>
+          <div class="cert-row"><img class="ch" src="${G.img("char/girl-laugh.webp")}" alt="">
+            <div class="seal"><span class="medal">${G.RECYCLE_SVG("#2a9d55")}</span><div class="stars-big">${G.stars(s)}</div></div>
+            <img class="ch" src="${G.img("char/boy-smile.webp")}" alt=""></div>
+          <div class="cert-meta"><span>${G.ICON.star}${G.t("story.certStars", { n: total, t: DAYS.length * 3 })}</span><span>${G.esc(date)}</span></div>
+          <div class="cert-by"><img src="${G.img("brand/logo.png")}" alt="">${G.t("story.certBy")}</div></div></div>
+          <p class="lead"><b>${G.t("story.closing")}</b></p>`,
+          [{ label: G.t("ui.home"), primary: true, on: () => G.go("title") }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }]);
+        return;
+      }
+      // 하루 끝: 별 + 캐릭터 표정 · 한마디
+      G.panel(`<h2>${G.esc(title)}</h2><div class="day-end"><span class="res-face"><img src="${G.face(s === 3 ? "girl-laugh" : s === 2 ? "boy" : "girl")}" alt=""></span>
+        <div><div class="stars-big">${G.stars(s)}</div><p class="res-say">${G.t("story.s" + s)}</p></div></div>`,
+        [{ label: G.t("ui.next"), primary: true, on: () => G.go("story", dayIndex + 1) }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }, { label: G.t("ui.home"), on: () => G.go("title") }]);
+    }
+  };
+
+  // 날짜 고르기: 1일째 → 6일째 → 마지막 퀴즈로 이어지는 길. 끝낸 날은 ✓와 별, 다음 차례는 표시(아무 날이나 골라도 됨)
+  function map() {
+    G.frame(G.t("mode.story"), "", { bg: "bg/alley.webp" });
+    const nextI = DAYS.findIndex((D) => !G.store.story[D.n]);
+    const nodes = DAYS.map(function (D, i) {
+      const s = G.store.story[D.n] || 0;
+      const cls = [s ? "done" : "", i === nextI ? "next" : "", D.quiz ? "quiz" : ""].join(" ").trim();
+      return `<li class="${cls}"><button class="day" data-i="${i}"><span class="dot">${s ? G.ICON.check : D.quiz ? "Q" : D.n}</span>
+        <span class="txt"><span class="n">${D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n })}</span>${D.quiz ? "" : `<b>${G.esc(G.t("d" + D.n + ".t"))}</b>`}<span class="st">${G.stars(s)}</span></span>
+        ${i === nextI ? `<em class="next-tag">${G.t("story.next")}</em>` : ""}</button></li>`;
+    }).join("");
+    const ov = G.panel(`<h2>${G.t("mode.story")}</h2><p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
+    ov.querySelectorAll(".day").forEach((b) => b.addEventListener("click", () => { G.sfx("tap"); G.go("story", +b.dataset.i); }));
+    const nb = ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
+    return {};
+  }
+})();
