@@ -15,9 +15,11 @@ window.SITE_CONFIG = {
     { src: "media/ep1.mp4?v=20261126a", poster: "",
       captions: { ko: "media/ep1.ko.vtt?v=20261126a", zh: "media/ep1.zh.vtt?v=20261126a", en: "media/ep1.en.vtt?v=20261126a", vi: "media/ep1.vi.vtt?v=20261126a" } },
     // 2편 실전편(11/26 v16 — 새 봉투 디자인 · 페트병은 뚜껑 없이 찌그러뜨린 뒤 뚜껑 닫기 · 효과음 정리 · 0:19 여학생이 든 손을 바른 왼손으로): 720p · 3분 12초 · 29MB. 화면 글자는 한국어
-    //   자막은 한국어만(media/ep2.ko.vtt, 내레이션 37개, <c.hl> 핵심어). 중국어 · 영어 · 베트남어 자막은 번역 감수 뒤에 붙일 것(값을 비워 두면 그 언어 단추가 없음)
+    //   자막 4개 언어(media/ep2.*.vtt): 한국어는 내레이션 37개, 중국어 · 영어 · 베트남어는 내레이션 + 화면 글자 설명 8곳(42개, [On screen] …), <c.hl> 핵심어
+    //   중국어 · 영어 · 베트남어는 초안(원어민 감수 전, 11/26). 감수본이 오면 SRT를 고쳐 VTT를 다시 만들고 ?v= 값을 올릴 것
     //   소리는 1편과 같게 완성본의 70%(-3.1dB, -19.3 LUFS)
-    { src: "media/ep2.mp4?v=20261126c", poster: "", captions: { ko: "media/ep2.ko.vtt?v=20261126b", zh: "", en: "", vi: "" } }
+    { src: "media/ep2.mp4?v=20261126c", poster: "",
+      captions: { ko: "media/ep2.ko.vtt?v=20261126b", zh: "media/ep2.zh.vtt?v=20261126d", en: "media/ep2.en.vtt?v=20261126d", vi: "media/ep2.vi.vtt?v=20261126d" } }
   ],
   game: {
     // 게임 주소: 이 사이트 안의 game/ 폴더(분리배출 러시 · 서대문 새내기 일주일 두 가지)
