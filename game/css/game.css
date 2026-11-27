@@ -312,6 +312,14 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .how3 .pv-item { position: relative; display: block; height: 100%; padding-top: 10%; }
 .how3 .pv-item img { height: 100%; width: auto; }
 .how3 .pv-item .badge.tap { top: 0; font-size: .74em; }
+/* 2단계(페트병 → 찌그러진 병): 표시는 병 위, 병 왼쪽 끝에 맞춰 오른쪽으로 펼침 + 그림을 오른쪽으로 조금 밀어 왼쪽 위 단계 번호를 가리지 않게 */
+.how3 li:nth-child(2) .pic { padding-left: 16px; }
+.how3 li:nth-child(2) .pv-item .badge.tap { left: 0; translate: 0 0; }
+/* 2단계: 손가락을 병 몸통 위에(표시가 아니라 쓰레기를 누름), 누르는 동작을 짧게 반복 */
+.how3 .tap-hand { position: absolute; left: 58%; top: 52%; width: 34px; height: 34px; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3)); animation: howTap 1.2s ease-in-out infinite; pointer-events: none; }
+.how3 .tap-hand svg { width: 100%; height: 100%; display: block; }
+@keyframes howTap { 0%, 100% { transform: translate(0, 0) scale(1); } 45% { transform: translate(-2px, -3px) scale(.88); } }
+@media (prefers-reduced-motion: reduce) { .how3 .tap-hand { animation: none; } }
 .how3 .stk { gap: 6px; }
 .how3 .stk i { position: relative; width: 30px; height: 40px; border-radius: 5px; background: #ffd34d; box-shadow: inset 0 0 0 2px #c79a00, 0 3px 6px rgba(0, 0, 0, .15); }
 .how3 .stk i:nth-child(1) { rotate: -10deg; } .how3 .stk i:nth-child(2) { rotate: 3deg; } .how3 .stk i:nth-child(3) { rotate: 12deg; }
@@ -323,6 +331,8 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   .how3 li::before { left: 6px; top: 6px; }
   .how3 .pic { height: 64px; width: 96px; }
   .how3 .tx { text-align: left; }
+  .how3 .tap-hand { width: 22px; height: 22px; }
+  .how3 li:nth-child(2) .pic { padding-left: 14px; gap: 4px; } .how3 li:nth-child(2) .arw { width: 14px; }
 }
 
 /* 러시 결과: 칭호 · 캐릭터 · 점수 · 한마디 */

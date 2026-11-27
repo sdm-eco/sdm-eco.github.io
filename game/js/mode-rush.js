@@ -185,9 +185,10 @@
     function stop() { clearInterval(S.cd); running = false; paused = true; cancelAnimationFrame(S.raf); G.music.stop(); G.pitch = 1; }
     setHud();
     // 시작 안내: 그림으로 된 3단계(끌어다 놓기 → 노란 표시는 먼저 누르기 → 틀리면 스티커, 3장이면 끝)
+    //   2단계는 1단계처럼 결과까지: '눌러요' 붙은 페트병(손가락은 병 위) → 찌그러진 페트병. 표시가 아니라 쓰레기를 누른다는 것을 보여 줌
     G.panel(`<h2>${G.t("mode.rush")}</h2><ol class="how3">
       <li><span class="pic"><img src="${G.img(ITEMS.banana.img)}" alt=""><i class="arw"></i><img class="bin" src="${G.img(DEST.food.img)}" alt=""></span><span class="tx">${G.t("rush.how1")}</span></li>
-      <li><span class="pic"><span class="pv-item"><img src="${G.img(ITEMS.pet.img)}" alt="">${tapBadge()}</span></span><span class="tx">${G.t("rush.how2")}</span></li>
+      <li><span class="pic"><span class="pv-item"><img src="${G.img(ITEMS.pet.img)}" alt="">${tapBadge()}<span class="tap-hand" aria-hidden="true">${G.ICON.hand}</span></span><i class="arw"></i><img src="${G.img(TAP.pet)}" alt=""></span><span class="tx">${G.t("rush.how2")}</span></li>
       <li><span class="pic stk"><i></i><i></i><i></i></span><span class="tx">${G.t("rush.how3")}</span></li></ol>`,
       [{ label: G.t("ui.start"), primary: true, on: begin }]);
     return { stop };
