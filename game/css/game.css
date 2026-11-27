@@ -232,11 +232,22 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .title-foot { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 calc(var(--u)*56) calc(var(--u)*18); color: var(--muted); font-size: .8em; gap: 10px; }
 .title-foot img { height: 28px; width: auto; }
 @media (orientation: portrait) {
-  .title-screen { grid-template-columns: 1fr; align-content: start; overflow: auto; padding: calc(var(--u)*30) calc(var(--u)*36); }
-  .mode-tiles { grid-template-columns: 1fr; }
-  .mode-card .pv { aspect-ratio: 16 / 7; }
-  .title-chars { height: calc(var(--u)*300); }
-  .title-foot { padding: 0 calc(var(--u)*36) calc(var(--u)*24); }
+  /* 휴대폰: 제목 옆에 캐릭터를 작게 두고 게임 두 개를 나란히 → 스크롤하지 않아도 두 게임이 한 화면에 보임(구청 11/27 의견) */
+  .title-screen { grid-template-columns: 1fr; align-content: start; overflow: auto; gap: calc(var(--u)*22); padding: calc(var(--u)*26) calc(var(--u)*32) calc(var(--u)*14); }
+  .title-left { grid-template-columns: minmax(0, 1fr) auto; gap: calc(var(--u)*10) 8px; align-items: end; }
+  .title-left .brand-title, .title-left h1 { grid-column: 1; }
+  .title-left h1 { font-size: max(24px, calc(var(--u)*48)); word-break: keep-all; }
+  .title-left p, .title-left .langs { grid-column: 1 / -1; }
+  .title-chars { grid-column: 2; grid-row: 1 / span 2; align-self: end; height: max(84px, calc(var(--u)*190)); }
+  .modes { gap: calc(var(--u)*10); }
+  .mode-tiles { grid-template-columns: 1fr 1fr; gap: calc(var(--u)*16); }
+  .mode-card { border-radius: 18px; }
+  .mode-card .pv { aspect-ratio: 4 / 3; }
+  .mode-card .mt { grid-template-columns: 1fr; align-content: start; gap: 2px; padding: 9px 10px 12px; }
+  .mode-card .mt .mk, .mode-card .mt .go { display: none; }
+  .mode-card h3 { font-size: 1em; line-height: 1.25; word-break: keep-all; }
+  .mode-card p { font-size: .8em; line-height: 1.4; }
+  .title-foot { padding: 0 calc(var(--u)*32) calc(var(--u)*16); }
 }
 
 /* ---------- 러시: 컨베이어(배경은 선명하게, 벨트는 수거함 바로 위) ---------- */
@@ -380,7 +391,7 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 @keyframes nextPulse { 50% { box-shadow: 0 0 0 8px rgba(212, 242, 154, .55), 0 6px 14px rgba(29, 122, 67, .35); } }
 .week .txt { display: grid; gap: 2px; justify-items: center; }
 .week .n { font-size: .74em; font-weight: 900; color: var(--fresh-strong); }
-.week b { font-size: .86em; color: var(--forest); line-height: 1.25; }
+.week b { font-size: .86em; color: var(--forest); line-height: 1.25; text-wrap: balance; }
 .week .st { display: flex; gap: 1px; }
 .week .st svg { width: 13px; height: 13px; }
 .next-tag { font-style: normal; font-size: .7em; font-weight: 900; color: #fff; background: var(--fresh-strong); padding: .1em .65em; border-radius: 99px; white-space: nowrap; }
@@ -408,6 +419,13 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .statement { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 4; width: min(80%, calc(var(--u)*640)); padding: 1em 1.3em; border-radius: 22px; background: #fff;
   box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 2px var(--line); font-weight: 800; font-size: 1.12em; line-height: 1.45; text-align: center; cursor: grab; touch-action: none; word-break: keep-all; }
 .statement .q { display: block; font-size: .72em; color: var(--fresh-strong); margin-bottom: .2em; }
+/* 답한 뒤: 문제 대신 '정답 O/X + 풀이'(맞으면 초록, 틀리면 빨강 테두리) */
+.statement.answered { cursor: default; animation: pop .4s var(--ease); }
+.statement.answered .q { font-size: .8em; }
+.statement.answered .q b { margin-left: .15em; font-size: 1.6em; vertical-align: -.08em; }
+.statement.answered.right { background: #f2fbf4; box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 3px var(--fresh); }
+.statement.answered.wrong { background: #fff6f4; box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 3px #f3a9a0; }
+.statement.answered.wrong .q { color: var(--danger); }
 .miss-sticker { position: absolute; z-index: 4; left: 3%; top: 16%; transform: rotate(-3deg); max-width: 34%; padding: .55em .9em; border-radius: 10px; background: #ffd34d; color: #3d2f00; font-weight: 800;
   box-shadow: 0 6px 14px rgba(0, 0, 0, .2); text-align: center; line-height: 1.4; max-width: 80%; }
 .miss-sticker b { display: block; font-size: 1.05em; }
@@ -530,4 +548,4 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 /* 낮은 화면: 겹창 안 목록을 촘촘하게 */
 @media (max-height: 520px) { .level img { height: 44px; } .book .pg img { height: 40px; } .week .day { padding: 4px 2px; } .panel h2 { font-size: 1.25em; } .stars-big svg { width: 1.8em; height: 1.8em; }
   .seal .medal { width: 60px; height: 60px; } .cert img.logo { height: 36px; } .cert-row .ch { height: 80px; } .how3 .pic { height: 56px; } .res-face { width: 64px; height: 64px; } }
-@media (orientation: portrait) and (max-height: 700px) { .title-chars { height: calc(var(--u)*230); } .title-left .brand-title { height: 40px; } }
+@media (orientation: portrait) and (max-height: 700px) { .title-left .brand-title { height: 40px; } .title-left p { font-size: .92em; line-height: 1.45; } }

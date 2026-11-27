@@ -131,15 +131,19 @@
       field.appendChild(card);
       const cards = G.h(`<div class="cards"><div class="card-drop ox drop-target" data-accept="card" data-v="1" role="button" tabindex="0">O</div><div class="card-drop ox drop-target" data-accept="card" data-v="0" role="button" tabindex="0">X</div></div>`);
       field.appendChild(cards); cards.querySelectorAll(".card-drop").forEach((e) => G.dropTarget(e));
-      stack(card, cards);
+      const lay = stack(card, cards);
       let over = false;
       G.draggable({ el: card, kind: "card", can: () => !over, onDrop: function (t) {
         const said = t.dataset.v === "1";
         over = true;
-        if (said === truth) { G.flash(t, "ok"); G.sfx("ok"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b> ${G.esc(G.t(key + "w"))}`, { ms: 2600 }); }
-        else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t(key + "w")), { stop: true, ms: 3200 }); }
-        card.classList.add("gone");
-        setTimeout(() => quiz(list, k + 1, done), 1700);
+        const ok = said === truth;
+        if (ok) { G.flash(t, "ok"); G.sfx("ok"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b>`, { ms: 1400 }); }
+        else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t("q.again")), { stop: true, ms: 2400 }); }
+        // 답하면 문제 카드를 바로 '정답 O/X + 풀이'로 바꿈(전에는 답한 뒤에도 같은 문제가 2초쯤 그대로 남아 있었음)
+        card.classList.add("answered", ok ? "right" : "wrong"); card.removeAttribute("role"); card.removeAttribute("tabindex");
+        card.innerHTML = `<span class="q">${G.esc(G.t("ui.correct"))} <b>${truth ? "O" : "X"}</b></span>${G.esc(G.t(key + "w"))}`;
+        lay();
+        setTimeout(() => quiz(list, k + 1, done), ok ? 1500 : 2600);
       } });
     }
     // 고르기 · 퀴즈 배치: 카드 줄은 아래, 고를 것은 안내문과 카드 사이 가운데. 높이가 넉넉하면 맨 아래에 말풍선 자리를 비움
@@ -167,6 +171,7 @@
         mid.style.top = y + "px";
       };
       G.onFieldResize(field, lay); lay(); setTimeout(lay, 300);
+      return lay;
     }
     function finish() {
       hideTalk();

@@ -27,6 +27,9 @@
   };
   G.itemName = (id) => G.t((ITEMS[id] && ITEMS[id].name) || "item." + id);
   G.destName = (id) => G.t("dest." + id);
+  // 맞는 곳: dest 하나 + also(함께 맞는 곳. 예: 깨진 유리 = 특수규격봉투 또는 종량제 봉투)
+  G.fits = (id, did) => did === ITEMS[id].dest || (ITEMS[id].also || []).includes(did);
+  G.destNames = (id) => [ITEMS[id].dest].concat(ITEMS[id].also || []).map(G.destName).join(" · ");
   G.LANGS = LANGS;
   G.LANG_LABEL = { ko: "한국어", en: "EN", zh: "中文", vi: "VI" };
 
@@ -162,7 +165,7 @@
     const got = G.BOOK_ORDER.filter((id) => store.book[id]).length;
     const pages = G.BOOK_ORDER.map(function (id) {
       const on = !!store.book[id], d = DEST[ITEMS[id].dest];
-      return `<div class="pg ${on ? "" : "locked"}" data-grp="${d.grp}"><img src="${G.img(ITEMS[id].img)}" alt=""><b>${on ? G.esc(G.itemName(id)) : "?"}</b>${on ? `<em>${G.esc(G.destName(ITEMS[id].dest))}</em>` : ""}</div>`;
+      return `<div class="pg ${on ? "" : "locked"}" data-grp="${d.grp}"><img src="${G.img(ITEMS[id].img)}" alt=""><b>${on ? G.esc(G.itemName(id)) : "?"}</b>${on ? `<em>${G.esc(G.destNames(id))}</em>` : ""}</div>`;
     }).join("");
     G.panel(`<h2>${G.t("ui.book")}</h2><p class="lead">${G.t("ui.bookLead")} ${G.t("ui.got", { n: got, t: G.BOOK_ORDER.length })}</p><div class="book">${pages}</div>`,
       [{ label: G.t("ui.close"), primary: true }]);
@@ -593,13 +596,16 @@
       const gY = G.groundY(field, opt.ground);
       const feetBot = bottom - tagH - 6, feetTop = Math.min(Math.max(gY + 8, top + 40), feetBot - 20);
       const maxW = Math.max.apply(null, all.map((s) => s.w0)) * u;
-      let best = null;
+      let best = null; const cand = [];
       // 한 줄에 둘 이상(한 줄로 세로로 쌓으면 서로 겹쳐 보임), 줄 사이가 좁으면 품목을 줄여 앞뒤 줄이 크게 겹치지 않게
       for (let c = Math.min(2, n); c <= n; c++) {
         const r = Math.ceil(n / c), cw = (right - left) / c, gap = r > 1 ? (feetBot - feetTop) / (r - 1) : 0;
         const s = Math.min(cw * 0.86, (feetTop - top) / 0.95, r > 1 ? gap * 1.4 : Infinity, maxW * 1.5);
-        if (!best || s > best.s + 0.5) best = { s, c, r, cw, gap };
+        cand.push({ s, c, r, cw, gap });
       }
+      // 크기가 비슷하면(가장 큰 것의 80% 이상) 줄 수가 적은 쪽: 앞줄 물건이 뒷줄 물건과 이름표를 가리지 않게
+      const top80 = Math.max.apply(null, cand.map((x) => x.s)) * 0.8;
+      cand.filter((x) => x.s >= top80).forEach(function (x) { if (!best || x.r < best.r || (x.r === best.r && x.s > best.s)) best = x; });
       const k = best.s / maxW, c = best.c, r = best.r;
       all.forEach(function (st, i) {
         const ri = Math.floor(i / c), ci = i % c, inRow = Math.min(c, n - ri * c);
@@ -640,7 +646,7 @@
     function dropItem(st, target, from) {
       if (!target.classList.contains("dest")) return;
       const did = target.dataset.dest, it = ITEMS[st.id];
-      if (did === it.dest && st.step >= st.need) {
+      if (G.fits(st.id, did) && st.step >= st.need) {
         G.flyTo(from || st.el.getBoundingClientRect(), st.el.querySelector("img").src, target, DEST[did].color);
         st.gone = true; st.el.classList.add("gone"); G.sfx("ok"); G.bookAdd(st.id);
         G.talk(field, Math.random() < .5 ? "girl-laugh" : "boy", `<b>${G.t("ui.great")}</b> ${G.esc(G.t("why." + st.id))}`, { ms: 3200 });
@@ -651,7 +657,7 @@
       }
       ctx.mistakes++; G.sfx("no"); G.flash(target, "no"); G.flash(st.el, "shake");
       let reason;
-      if (did === it.dest) reason = G.t("ui.needPrep", { step: G.t("tool." + it.prep[st.step]) });
+      if (G.fits(st.id, did)) reason = G.t("ui.needPrep", { step: G.t("tool." + it.prep[st.step]) });
       else reason = G.t("why." + st.id);
       G.talk(field, "boy-stop", G.esc(reason), { stop: true, ms: 4200 });
       if (opt.onWrong) opt.onWrong(st.id, reason);

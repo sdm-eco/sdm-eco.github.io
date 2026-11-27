@@ -43,11 +43,12 @@
                    states: ["item/can/can.webp", "item/can/can.webp", "item/can/can.webp", "item/can/crushed.webp"] },
     carton:      { img: "item/carton/carton.webp", dest: "carton", prep: ["empty", "rinse", "flatten"], w: 112,
                    states: ["item/carton/carton.webp", "item/carton/carton.webp", "item/carton/carton.webp", "item/carton/flat.webp"] },
-    brokenglass: { img: "item/new/brokenglass.webp", dest: "sack", prep: ["wrap"], w: 138,
+    // 깨진 유리: 신문지로 싼 뒤 종량제 봉투 또는 특수규격봉투(PP마대) 둘 다 됨(시놉시스 11/27) → also = 함께 맞는 곳
+    brokenglass: { img: "item/new/brokenglass.webp", dest: "sack", also: ["general"], prep: ["wrap"], w: 138,
                    states: ["item/new/brokenglass.webp", "item/new/wrapped.webp"] },
     butane:      { img: "item/new/butane.webp", dest: "can", prep: ["gas"], trapTool: "punch", w: 116 },
     pills:       { img: "item/medicine/blister.webp", dest: "medicine", w: 92 },
-    syrup:       { img: "item/medicine/syrup.webp", dest: "medicine", w: 96 },
+    syrup:       { img: "item/medicine/syrup-capped.webp", dest: "medicine", w: 104 },   // 뚜껑을 닫은 약병(구청 11/27 의견)
     battery:     { img: "item/battery/cell.webp", dest: "battery", w: 70 },
     clothes:     { img: "item/new/clothes.webp", dest: "clothes", w: 140 },
     blanket:     { img: "item/new/blanket.webp", dest: "bulky", prep: ["report"], w: 170 },

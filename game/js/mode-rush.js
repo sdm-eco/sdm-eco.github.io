@@ -75,7 +75,7 @@
       const it = ITEMS[st.id], did = target.dataset.dest;
       const r = target.getBoundingClientRect(), f = field.getBoundingClientRect();
       const fx = r.left - f.left + r.width / 2;
-      if (did === it.dest && st.prepped) {
+      if (G.fits(st.id, did) && st.prepped) {
         st.gone = true;
         G.flyTo(from || st.el.getBoundingClientRect(), st.el.querySelector("img").src, target, DEST[did].color);
         st.el.classList.add("gone"); setTimeout(() => st.el.remove(), 300);
@@ -89,7 +89,7 @@
         if (S.combo % 10 === 0) G.talk(field, "girl-laugh", `<b>${S.combo} ${G.t("ui.combo")}!</b> ${G.t("ui.great")}`, { ms: 1600 });
       } else {
         S.bad++; S.combo = 0; S.stickers++; setFever(false);
-        const reason = did === it.dest ? G.t("ui.needPrep", { step: (it.prep || []).map((p) => G.t("tool." + p)).join(" → ") }) : G.t("why." + st.id);
+        const reason = G.fits(st.id, did) ? G.t("ui.needPrep", { step: (it.prep || []).map((p) => G.t("tool." + p)).join(" → ") }) : G.t("why." + st.id);
         S.review.push({ id: st.id, why: reason });
         G.flash(target, "no"); G.sfx("no");
         eject(st);   // 틀린 품목은 벨트에서 튕겨 나감(같은 품목으로 스티커가 연달아 붙지 않게)
@@ -168,7 +168,7 @@
       const rec = isNew && prev > 0 ? `<p class="record new">${G.ICON.star}<b>${G.t("rush.newBest")}</b><span>${G.t("rush.prevBest", { n: prev })}</span></p>`
         : !isNew ? `<p class="record">${G.t("rush.best")} <b>${G.store.rushBest}</b> ${G.t("ui.pts")}</p>` : "";
       const seen = {}, rev = S.review.filter((r) => !seen[r.id] && (seen[r.id] = 1)).slice(0, 6);
-      const revHtml = rev.length ? `<ul class="review">${rev.map((r) => `<li><img src="${G.img(ITEMS[r.id].img)}" alt=""><div><b>${G.esc(G.itemName(r.id))} → ${G.esc(G.destName(ITEMS[r.id].dest))}</b><span>${G.esc(r.why)}</span></div></li>`).join("")}</ul>`
+      const revHtml = rev.length ? `<ul class="review">${rev.map((r) => `<li><img src="${G.img(ITEMS[r.id].img)}" alt=""><div><b>${G.esc(G.itemName(r.id))} → ${G.esc(G.destNames(r.id))}</b><span>${G.esc(r.why)}</span></div></li>`).join("")}</ul>`
         : `<p class="lead">${G.t("rush.noReview")}</p>`;
       const ov = G.panel(`<h2>${G.t("mode.rush")}</h2>
         <div class="result g-${g.k}"><span class="res-face"><img src="${G.face(g.face)}" alt=""></span>
