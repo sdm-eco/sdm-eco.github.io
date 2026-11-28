@@ -362,6 +362,59 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) { .rush-sky .cloud, .rush-sky .lamp { animation: none; } }
 /* 놀이가 멈춘 동안(시작 전 · 카운트다운 · 멈춤 · 결과, mode-rush.js halt): 벨트 · 구름 · 가로등 · 피버 빛도 멈춤 */
 .field.rush.halt .belt-top, .field.rush.halt .rush-sky .cloud, .field.rush.halt .rush-sky .lamp, .field.rush.halt::after, .field.rush.halt .fever-banner { animation-play-state: paused; }
+
+/* ---------- 새내기 일주일 움직임(engine.js G.alleySky · G.roomLight · G.board ground · G.toolFx, mode-story.js) ---------- */
+/* 방: 오른쪽 벽 햇빛이 천천히 밝아졌다 흐려짐(--sun 날마다 세기), 창문 빛줄기 속 먼지 */
+.room-light { position: absolute; inset: 0; overflow: hidden; pointer-events: none; --sun: 1; }
+.room-light .sky-map { position: absolute; }
+.room-light .sun { position: absolute; left: 60%; top: 18%; width: 42%; height: 46%; border-radius: 40%;
+  background: radial-gradient(closest-side, rgba(255, 222, 160, .55), rgba(255, 210, 140, 0)); mix-blend-mode: soft-light;
+  opacity: calc(var(--sun) * .9); animation: sunBreath 7s ease-in-out infinite; }
+@keyframes sunBreath { 0%, 100% { transform: scale(.96); opacity: calc(var(--sun) * .55); } 50% { transform: scale(1.04); opacity: var(--sun); } }
+.room-light .beam { position: absolute; left: 12%; top: 12%; width: 48%; height: 80%; transform-origin: 0 0; transform: skewX(28deg);
+  background: linear-gradient(180deg, rgba(255, 236, 190, .22), rgba(255, 236, 190, 0) 85%); mix-blend-mode: screen; opacity: calc(var(--sun) * .8); }
+.room-light .mote { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 246, 220, .9); box-shadow: 0 0 6px rgba(255, 236, 190, .9);
+  opacity: 0; animation: moteFloat 9s ease-in-out infinite; animation-delay: var(--md, 0s); will-change: transform; }
+@keyframes moteFloat { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .8; } 80% { opacity: .6; } 100% { transform: translate(var(--mx, 10px), -46px); opacity: 0; } }
+
+/* 물건: 하나씩 위에서 떨어져 자리 잡음(--di = 순서) → 그 뒤 발 밑을 축으로 아주 살짝 흔들림 */
+.field.scene .item.drop { animation: itemDrop .55s cubic-bezier(.3, 1.4, .5, 1) backwards; animation-delay: calc(.15s + var(--di, 0) * .09s); }
+@keyframes itemDrop { from { translate: 0 -70px; opacity: 0; } 60% { opacity: 1; } }
+.field.scene .item.grounded img { transform-origin: 50% calc(var(--fb, .95) * 100%); animation: itemSway 4.6s ease-in-out infinite; animation-delay: calc(var(--di, 0) * -.83s); }
+@keyframes itemSway { 0%, 100% { rotate: -1.2deg; } 50% { rotate: 1.2deg; } }
+
+/* 하루 시작 띠: 위에서 내려와 잠깐 머물다 사라짐 */
+.day-banner { position: absolute; left: 50%; top: 22%; z-index: 6; max-width: calc(100% - 32px); box-sizing: border-box; display: grid; justify-items: center; gap: .1em; padding: .5em 1.6em .55em; border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(238, 248, 241, .96)); box-shadow: 0 12px 28px rgba(11, 46, 34, .22), inset 0 0 0 2px #cfe5d7;
+  color: var(--forest); text-align: center; pointer-events: none; translate: -50% 0; opacity: 0; animation: dayBanner 2.2s var(--ease) forwards; }
+.day-banner b { font-size: 1.5em; font-weight: 900; color: var(--fresh-strong); }
+.day-banner span { font-weight: 800; word-break: keep-all; }
+@keyframes dayBanner { 0% { opacity: 0; translate: -50% -24px; scale: .9; } 18% { opacity: 1; translate: -50% 0; scale: 1; } 78% { opacity: 1; translate: -50% 0; } 100% { opacity: 0; translate: -50% -10px; } }
+
+/* 도구 동작 조각(G.toolFx, #ghost-layer 위) */
+.drop-fx { position: fixed; width: 7px; height: 10px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: linear-gradient(180deg, #bfe8ff, #4aa8e0); pointer-events: none; }
+.label-fx { position: fixed; width: 34px; height: 18px; border-radius: 3px; background: linear-gradient(90deg, #fff, #e7f1ff); box-shadow: inset 0 0 0 2px #5b9bd5, 0 2px 4px rgba(0, 0, 0, .18); pointer-events: none; }
+.paper-fx { position: fixed; border-radius: 4px; pointer-events: none;
+  background: repeating-linear-gradient(180deg, #f4f1e8 0 7px, #d9d4c6 7px 8px), #f4f1e8; box-shadow: 0 4px 10px rgba(0, 0, 0, .2); }
+.puff-fx { position: fixed; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 255, 255, .95), rgba(220, 230, 235, 0)); pointer-events: none; }
+.bit.star { width: 16px; height: 16px; border-radius: 0; background: none; }
+.bit.star svg { width: 100%; height: 100%; display: block; }
+
+/* 통 반응: 물건을 골라 놓으면 받을 수 있는 통이 살짝 들썩이며 기다림 · 맞으면 통이 뛰어오름 · 틀리면 움찔 */
+.dest.sel-target .fig { animation: binWait 1s ease-in-out infinite; }
+@keyframes binWait { 0%, 100% { translate: 0 0; } 50% { translate: 0 -4px; } }
+.dest.ok .fig { animation: binHop .5s cubic-bezier(.3, 1.6, .5, 1); }
+@keyframes binHop { 0% { translate: 0 0; scale: 1 1; } 30% { translate: 0 2px; scale: 1.08 .9; } 60% { translate: 0 -10px; scale: .96 1.06; } 100% { translate: 0 0; scale: 1 1; } }
+.dest.no .fig { animation: binFlinch .45s ease-out; transform-origin: 50% 100%; }
+@keyframes binFlinch { 0% { rotate: 0deg; } 25% { rotate: -6deg; scale: .96; } 60% { rotate: 3deg; } 100% { rotate: 0deg; scale: 1; } }
+
+/* 창(멈춤 · 규칙 · 하루 끝 등)이 떠 있는 동안 배경 움직임 · 물건 흔들림 · 기다리는 통은 멈춤 */
+#app:has(.overlay) .amb *, #app:has(.overlay) .field.scene .item.drop, #app:has(.overlay) .field.scene .item.grounded img, #app:has(.overlay) .dest.sel-target .fig, #app:has(.overlay) .day-banner { animation-play-state: paused; }
+/* 움직임 줄이기: 배경 · 흔들림 · 기다림 · 띠는 아예 없앰(아래 전역 규칙은 길이만 줄이므로 반복 동작을 따로 끔) */
+@media (prefers-reduced-motion: reduce) {
+  .room-light .sun, .room-light .mote, .field.scene .item.drop, .field.scene .item.grounded img, .dest.sel-target .fig, .dest.ok .fig, .dest.no .fig { animation: none; }
+  .room-light .mote, .day-banner { display: none; }
+}
 .belt { position: absolute; left: -1%; right: -1%; bottom: calc(var(--u)*10); height: calc(var(--u)*130); z-index: 1; pointer-events: none;
   filter: drop-shadow(0 calc(var(--u)*12) calc(var(--u)*10) rgba(11, 46, 34, .32)); }
 .belt i { position: absolute; left: 0; right: 0; display: block; }

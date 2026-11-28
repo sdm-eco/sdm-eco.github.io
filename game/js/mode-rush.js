@@ -59,27 +59,8 @@
     field.appendChild(G.h(`<div class="belt" aria-hidden="true"><i class="belt-top"></i><i class="belt-face"></i></div>`));
     // 배경 움직임(11/27): 구름이 천천히 흐르고, 가로등 빛무리가 숨 쉬듯, 90초 동안 노을 → 저녁(--dusk 0 → 1)
     //   시간이 갈수록 하늘이 어두워지고 창문 불이 하나씩 켜짐(남은 시간을 느끼게). 벨트 높이에서는 움직이는 것 없음
-    //   가로등 · 창문은 배경 그림(bg/alley.webp 1344×768, cover · 가운데) 위 자리에 맞춰 .sky-map을 그림과 같은 크기로 둠
-    const sky = (function () {
-      const IMG_W = 1344, IMG_H = 768;
-      const LAMPS = [[34.4, 32], [35.4, 52.3]];                                   // 가로등 머리 (그림 기준 %)
-      const WINS = [[75.6, 41, .3], [8.2, 34, .45], [96.6, 28.5, .6], [40.6, 56, .72], [93.5, 29, .84]];  // 창문 (x, y, 켜지는 때)
-      const el = G.h(`<div class="rush-sky" aria-hidden="true"><i class="cloud c1"></i><i class="cloud c2"></i><i class="dusk"></i>
-        <div class="sky-map">${LAMPS.map((p, i) => `<i class="lamp l${i + 1}" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}${WINS.map((p) => `<i class="win" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}</div></div>`);
-      field.querySelector(".bg").after(el);
-      const map = el.querySelector(".sky-map"), wins = [...el.querySelectorAll(".win")];
-      function fit() {
-        const W = field.clientWidth, H = field.clientHeight, s = Math.max(W / IMG_W, H / IMG_H);
-        const w = IMG_W * s, h = IMG_H * s;
-        map.style.cssText = `left:${(W - w) / 2}px;top:${(H - h) / 2}px;width:${w}px;height:${h}px`;
-      }
-      fit();
-      if (window.ResizeObserver) new ResizeObserver(fit).observe(field); else addEventListener("resize", fit);
-      return function set(d) {
-        el.style.setProperty("--dusk", d);
-        wins.forEach((w, i) => w.classList.toggle("on", d >= WINS[i][2]));
-      };
-    })();
+    //   가로등 · 창문은 배경 그림(bg/alley.webp, cover · 가운데) 위 자리에 맞춤. 새내기 일주일 골목과 같은 함수(engine.js G.alleySky)
+    const sky = G.alleySky(field, false);
     sky(0);
     const comboEl = G.h(`<div class="combo-pop" aria-hidden="true"><b></b><span>${G.esc(G.t("ui.combo"))}</span></div>`); field.appendChild(comboEl);
     DESTS.forEach(function (id) { const d = G.destEl(id); fr.dests.appendChild(d); G.dropTarget(d); });

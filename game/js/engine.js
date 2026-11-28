@@ -407,8 +407,10 @@
     const fig = target.querySelector(".fig") || target, r = fig.getBoundingClientRect();
     const cx = r.left + r.width / 2, cy = r.top + r.height * 0.2;
     for (let i = 0; i < 14; i++) {
-      const p = G.h(`<i class="bit"></i>`), big = i % 4 === 0;
-      p.style.background = i % 3 === 2 ? "#fff" : color; p.style.left = cx + "px"; p.style.top = cy + "px";
+      // 넷 중 하나는 노란 별(맞혔다는 느낌), 나머지는 받는 곳 색 · 흰 조각
+      const star = i % 4 === 1, p = G.h(star ? `<i class="bit star">${G.ICON.star}</i>` : `<i class="bit"></i>`), big = i % 4 === 0;
+      if (!star) p.style.background = i % 3 === 2 ? "#fff" : color;
+      p.style.left = cx + "px"; p.style.top = cy + "px";
       if (big) { p.style.width = p.style.height = "12px"; }
       G.ghostLayer.appendChild(p);
       const ang = -Math.PI / 2 + (Math.random() - 0.5) * 2.4, d = 46 + Math.random() * 70;
@@ -446,6 +448,68 @@
     set();
     if (!el._gObs && window.MutationObserver) { el._gObs = new MutationObserver(set); el._gObs.observe(img, { attributes: true, attributeFilter: ["src"] }); }   // 손질로 그림이 바뀌면 다시 잼
   };
+  // ---------- 배경 움직임(러시 · 새내기 일주일 공통) ----------
+  // 배경 그림(1344×768)이 놀이판에 그려진 자리와 같은 크기의 상자(.amb-map)를 두고, 그 안에 그림 기준 %로 움직이는 것을 놓음
+  //   scene: 새내기 일주일 배치(아래 맞춤, 세로 화면 150%), 아니면 러시 배치(cover · 가운데)
+  const BG_W = 1344, BG_H = 768;
+  function ambBox(field, scene) {
+    const W = field.clientWidth, H = field.clientHeight;
+    const h = scene ? (H >= W ? H * PORTRAIT_ZOOM : BG_H * Math.max(W / BG_W, H / BG_H)) : BG_H * Math.max(W / BG_W, H / BG_H), w = h * BG_W / BG_H;
+    return `left:${(W - w) / 2}px;top:${scene ? H - h : (H - h) / 2}px;width:${w}px;height:${h}px`;
+  }
+  // 골목: 흐르는 구름 · 숨 쉬는 가로등 빛 · 저녁 빛(--dusk 0 → 1)과 켜지는 창문. 돌려준 함수 set(d)로 저녁 정도를 바꿈
+  const LAMPS = [[34.4, 32], [35.4, 52.3]];                                                  // 가로등 머리(그림 기준 %)
+  const WINS = [[75.6, 41, .3], [8.2, 34, .45], [96.6, 28.5, .6], [40.6, 56, .72], [93.5, 29, .84]];   // 창문(x, y, 켜지는 저녁 정도)
+  G.alleySky = function (field, scene) {
+    const el = G.h(`<div class="rush-sky amb" aria-hidden="true"><i class="cloud c1"></i><i class="cloud c2"></i><i class="dusk"></i>
+      <div class="sky-map">${LAMPS.map((p, i) => `<i class="lamp l${i + 1}" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}${WINS.map((p) => `<i class="win" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}</div></div>`);
+    field.querySelector(".bg").after(el);
+    const map = el.querySelector(".sky-map"), wins = [...el.querySelectorAll(".win")];
+    const fit = () => { map.style.cssText = ambBox(field, scene); };
+    fit(); G.onFieldResize(field, fit);
+    return function set(d) { el.style.setProperty("--dusk", d); wins.forEach((w, i) => w.classList.toggle("on", d >= WINS[i][2])); };
+  };
+  // 방: 오른쪽 벽의 햇빛이 천천히 밝아졌다 흐려지고, 창문에서 들어오는 빛줄기 속에 먼지가 떠다님
+  G.roomLight = function (field) {
+    let dust = "";
+    for (let i = 0; i < 12; i++) dust += `<i class="mote" style="left:${(20 + Math.random() * 38).toFixed(1)}%;top:${(30 + Math.random() * 50).toFixed(1)}%;--md:${(-Math.random() * 9).toFixed(2)}s;--mx:${(Math.random() * 30 - 15).toFixed(0)}px"></i>`;
+    const el = G.h(`<div class="room-light amb" aria-hidden="true"><div class="sky-map"><i class="sun"></i><i class="beam"></i>${dust}</div></div>`);
+    field.querySelector(".bg").after(el);
+    const map = el.querySelector(".sky-map"), fit = () => { map.style.cssText = ambBox(field, true); };
+    fit(); G.onFieldResize(field, fit);
+    return el;
+  };
+
+  // ---------- 도구를 썼을 때 짧은 동작(새내기 일주일 손질): 헹구기 물방울 · 비우기 기울여 쏟기 · 찌그러뜨리기 눌림 · 라벨 벗겨짐 ·
+  //   뚜껑 톡 · 신문지 덮기 · 가스 빠짐 · 신고필증 찰싹. 움직임 줄이기 설정이면 하지 않음 ----------
+  G.toolFx = function (tid, el) {
+    if (G.REDUCED) return;
+    const img = el.querySelector("img"), r = el.getBoundingClientRect();
+    const bits = function (n, cls, make) {
+      for (let i = 0; i < n; i++) { const p = G.h(`<i class="${cls}"></i>`); G.ghostLayer.appendChild(p); make(p, i).onfinish = () => p.remove(); }
+    };
+    const at = (p, x, y) => { p.style.left = x + "px"; p.style.top = y + "px"; };
+    if (tid === "rinse") bits(9, "drop-fx", function (p, i) { at(p, r.left + r.width * (0.25 + Math.random() * 0.5), r.top + r.height * 0.05);
+      return p.animate([{ transform: "translateY(-10px)", opacity: 0 }, { opacity: 1, offset: .2 }, { transform: `translateY(${(r.height * (0.55 + Math.random() * 0.35)).toFixed(0)}px)`, opacity: 0 }],
+        { duration: 650, delay: i * 45, easing: "cubic-bezier(.5,0,.9,.6)", fill: "backwards" }); });
+    else if (tid === "empty") {
+      img.animate([{ rotate: "0deg" }, { rotate: "-32deg", offset: .35 }, { rotate: "-32deg", offset: .7 }, { rotate: "0deg" }], { duration: 750, easing: "ease-in-out" });
+      bits(6, "drop-fx", function (p, i) { at(p, r.left + r.width * 0.28, r.top + r.height * 0.3);
+        return p.animate([{ transform: "translate(0,0)", opacity: 1 }, { transform: `translate(${(-10 - Math.random() * 16).toFixed(0)}px, ${(r.height * 0.6).toFixed(0)}px)`, opacity: 0 }],
+          { duration: 500, delay: 220 + i * 50, easing: "cubic-bezier(.5,0,.9,.6)", fill: "backwards" }); });
+    }
+    else if (tid === "crush" || tid === "flatten") img.animate([{ scale: "1 1" }, { scale: "1.18 .62", offset: .35 }, { scale: ".96 1.04", offset: .7 }, { scale: "1 1" }], { duration: 520, easing: "ease-out" });
+    else if (tid === "label") bits(1, "label-fx", function (p) { at(p, r.left + r.width * 0.3, r.top + r.height * 0.45);
+      return p.animate([{ transform: "rotate(0deg)", opacity: 1 }, { transform: "translate(70px, -60px) rotate(120deg)", opacity: 0 }], { duration: 650, easing: "cubic-bezier(.2,.6,.4,1)" }); });
+    else if (tid === "cap") img.animate([{ scale: "1" }, { scale: "1.14", offset: .4 }, { scale: "1" }], { duration: 380, easing: "ease-out" });
+    else if (tid === "wrap") bits(1, "paper-fx", function (p) { Object.assign(p.style, { left: r.left + r.width * 0.12 + "px", top: r.top + r.height * 0.1 + "px", width: r.width * 0.76 + "px", height: r.height * 0.76 + "px" });
+      return p.animate([{ transform: "translateY(-40px) rotate(-12deg) scale(.6)", opacity: 0 }, { transform: "rotate(4deg) scale(1)", opacity: .95, offset: .55 }, { transform: "rotate(0deg) scale(.9)", opacity: 0 }], { duration: 760, easing: "ease-out" }); });
+    else if (tid === "gas") bits(6, "puff-fx", function (p, i) { at(p, r.left + r.width * (0.4 + Math.random() * 0.2), r.top + r.height * 0.08);
+      return p.animate([{ transform: "translate(-50%,-50%) scale(.4)", opacity: .8 }, { transform: `translate(calc(-50% + ${(Math.random() * 50 - 25).toFixed(0)}px), calc(-50% - ${(40 + Math.random() * 40).toFixed(0)}px)) scale(1.6)`, opacity: 0 }],
+        { duration: 900, delay: i * 90, easing: "ease-out", fill: "backwards" }); });
+    else if (tid === "report") { const s = el.querySelector(".fix-sticker"); if (s) s.animate([{ scale: "2.4", opacity: 0 }, { scale: "1", opacity: 1 }], { duration: 340, easing: "cubic-bezier(.2,1.5,.4,1)" }); }
+  };
+
   // 이야기 배경(1344×768): 아래 맞춤으로 바닥을 넓게 보여 줌. 세로로 긴 놀이판은 150% 크기(바닥이 놀이판 아래쪽 절반쯤)
   const PORTRAIT_ZOOM = 1.5;
   G.fitScene = function (field) {
@@ -551,11 +615,14 @@
       field.appendChild(tray);
     }
     // 품목 (자리와 크기는 layout 이 놀이판 크기를 재서 정함)
-    opt.items.forEach(function (id) {
+    opt.items.forEach(function (id, i) {
       const it = ITEMS[id];
       const st = { id: id, step: 0, need: opt.tools ? (it.prep || []).length : 0, w0: Math.round((it.w || 120) * (opt.scale || 1)), j: [(Math.random() - .5) * 2, (Math.random() - .5) * 2] };
       const el = G.itemEl(id, { tag: opt.tags !== false, src: opt.srcOf && opt.srcOf(id), w: st.w0 });
       el.style.transform = "translate(-50%,-50%)";
+      // 바닥에 놓는 판(새내기 일주일): 하나씩 위에서 떨어져 자리 잡고(drop), 그 뒤 시간 차를 두고 살짝 흔들림(css, --di = 순서)
+      //   떨어진 뒤 drop을 떼어야 틀렸을 때 흔들기(.shake)가 막히지 않고, 흔들기가 끝나도 다시 떨어지지 않음
+      if (opt.ground != null) { el.classList.add("drop"); el.style.setProperty("--di", i); el.addEventListener("animationend", function (e) { if (e.animationName === "itemDrop") el.classList.remove("drop"); }); }
       el.classList.add("drop-target"); el.dataset.accept = "tool";
       // 준비할 단계: '준비' 글자 + 단계 수만큼 점(한 단계 끝날 때마다 하나씩 채움)
       if (st.need && opt.tools) el.appendChild(G.h(`<span class="badge prep" title="${G.esc(G.t("ui.prep"))} ${st.need}"><em>${G.esc(G.t("ui.prep"))}</em>${"<i></i>".repeat(st.need)}</span>`));
@@ -649,6 +716,7 @@
         st.step++;
         if (it.states) st.el.querySelector("img").src = G.img(it.states[st.step]);
         if (tid === "report") st.el.appendChild(G.h(`<span class="fix-sticker">${G.t("plate.sticker")}</span>`));
+        G.toolFx(tid, st.el);
         const b = st.el.querySelector(".badge");
         if (b) { if (st.step >= st.need) b.remove(); else b.querySelectorAll("i").forEach((d, j) => d.classList.toggle("on", j < st.step)); }
         G.flash(st.el, "ok"); G.sfx("step");

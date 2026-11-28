@@ -36,6 +36,8 @@
   const starsFor = (m) => (m === 0 ? 3 : m <= 2 ? 2 : 1);
   // 배경 그림에서 바닥이 시작하는 높이(0~1): 방은 벽과 마루가 만나는 선 아래, 골목은 대문 앞 길
   const GROUND = { "bg/room.webp": 0.72, "bg/alley.webp": 0.81 };
+  // 날마다 다른 빛: 골목 저녁 정도(0 아침 ~ 1 밤, 창문 불은 .3부터 켜짐) · 방 햇빛 세기
+  const DUSK = { 1: 0, 5: .2, 6: .38, 7: .55 }, SUN = { 2: 1, 3: .8, 4: .6 };
 
   G.screens.story = function (dayIndex) {
     if (dayIndex === undefined) return map();
@@ -46,6 +48,12 @@
     fr.hud.querySelector("[data-days]").addEventListener("click", function () { if (G.app.querySelector(".week")) return; G.sfx("tap"); weekPanel(dayIndex); });
     const field = fr.field;
     G.fitScene(field);
+    // 배경 움직임: 골목은 구름 · 가로등 · 날마다 다른 하늘빛(아침 → 저녁), 방은 햇빛 · 떠다니는 먼지
+    if (D.bg === "bg/alley.webp") G.alleySky(field, true)(DUSK[D.n] || 0);
+    else G.roomLight(field).style.setProperty("--sun", SUN[D.n] || 1);
+    // 하루 시작 띠: 'N일째 · 제목'이 잠깐 떴다 사라짐(누르기 막지 않음)
+    const ban = G.h(`<div class="day-banner" aria-hidden="true"><b>${G.esc(D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n }))}</b>${D.quiz ? "" : `<span>${G.esc(G.t("d" + D.n + ".t"))}</span>`}</div>`);
+    field.appendChild(ban); ban.addEventListener("animationend", () => ban.remove());
     let mistakes = 0, si = 0;
     if (D.sticker) field.appendChild(G.h(`<div class="miss-sticker"><b>${G.t("d6.s")}</b>${G.t("d6.sp")}</div>`));
     next();
