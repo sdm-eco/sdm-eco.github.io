@@ -170,6 +170,9 @@
         else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t("q.again")), { stop: true, ms: 2400 }); }
         // 답하면 문제 카드를 바로 '정답 O/X + 풀이'로 바꿈(전에는 답한 뒤에도 같은 문제가 2초쯤 그대로 남아 있었음)
         card.classList.add("answered", ok ? "right" : "wrong"); card.removeAttribute("role"); card.removeAttribute("tabindex");
+        // 다음 문제까지(1.5 ~ 2.6초) 고른 카드만 맞음/틀림 테두리로 남기고 나머지는 흐리게 → 기다리는 중임이 보이게
+        cards.classList.add("done"); t.classList.add("picked", ok ? "right" : "wrong");
+        cards.querySelectorAll(".card-drop").forEach((c) => c.setAttribute("aria-disabled", "true"));
         card.innerHTML = `<span class="q">${G.esc(G.t("ui.correct"))} <b>${truth ? "O" : "X"}</b></span><span class="s">${G.esc(G.t(key + "w"))}</span>${dots(ok ? "ok" : "no")}`;
         res[k] = ok;
         lay();

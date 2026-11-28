@@ -606,6 +606,11 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   background: linear-gradient(160deg, #36aa64, #1d7a43); box-shadow: 0 6px 14px rgba(29, 122, 67, .35), inset 0 2px 0 rgba(255, 255, 255, .28); }
 .card-drop.ox.x .mk { background: linear-gradient(160deg, #f08b78, #d4503f); box-shadow: 0 6px 14px rgba(212, 80, 63, .32), inset 0 2px 0 rgba(255, 255, 255, .28); }
 .card-drop.ox.x.hot { box-shadow: 0 0 0 3px #e46a57, 0 14px 28px rgba(11, 46, 34, .2); }
+/* 답한 뒤 다음 문제까지: 고른 카드는 맞음(초록) · 틀림(산호) 테두리로 남고, 나머지는 흐리게 · 누를 수 없음 */
+.cards.done .card-drop { cursor: default; transition: opacity .25s var(--ease), filter .25s var(--ease), box-shadow .28s var(--ease); }
+.cards.done .card-drop:not(.picked) { opacity: .4; filter: saturate(.4); pointer-events: none; }
+.cards.done .card-drop.picked.right { box-shadow: 0 0 0 3px var(--fresh), 0 10px 24px rgba(11, 46, 34, .18); }
+.cards.done .card-drop.picked.wrong { box-shadow: 0 0 0 3px #e46a57, 0 10px 24px rgba(11, 46, 34, .18); }
 /* 문제 카드: 창과 같은 흰 → 연민트 카드, 'Q1'은 초록 알약 배지, 아래에 5칸 진행 점 */
 .statement { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 4; width: min(80%, calc(var(--u)*640)); padding: .85em 1.3em .8em; border-radius: 24px;
   background: linear-gradient(170deg, #ffffff 0%, #f4fbf6 55%, #e4f5ea 100%);
