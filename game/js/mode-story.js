@@ -41,7 +41,9 @@
     if (dayIndex === undefined) return map();
     const D = DAYS[dayIndex];
     const title = D.quiz ? G.t("story.quiz") : `${G.t("story.day", { n: D.n })} · ${G.t("d" + D.n + ".t")}`;
-    const fr = G.frame(G.t("mode.story"), `<span class="chip"><b>${G.esc(title)}</b></span>`, { bg: D.bg });
+    // 위쪽 날짜 표시 = 날짜 고르기 단추(달력 아이콘). 누르면 하던 날 위에 날짜 고르기 창(닫기로 돌아옴)
+    const fr = G.frame(G.t("mode.story"), `<button class="chip chip-btn" data-days aria-label="${G.esc(G.t("story.pick"))}: ${G.esc(title)}" title="${G.esc(G.t("story.pick"))}">${G.ICON.cal}<b>${G.esc(title)}</b></button>`, { bg: D.bg });
+    fr.hud.querySelector("[data-days]").addEventListener("click", function () { if (G.app.querySelector(".week")) return; G.sfx("tap"); weekPanel(dayIndex); });
     const field = fr.field;
     G.fitScene(field);
     let mistakes = 0, si = 0;
@@ -192,30 +194,39 @@
           <div class="cert-meta"><span>${G.ICON.star}${G.t("story.certStars", { n: total, t: DAYS.length * 3 })}</span><span>${G.esc(date)}</span></div>
           <div class="cert-by"><img src="${G.img("brand/logo.png")}" alt="">${G.t("story.certBy")}</div></div></div>
           <p class="lead"><b>${G.t("story.closing")}</b></p>`,
-          [{ label: G.t("ui.home"), primary: true, on: () => G.go("title") }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }]);
+          [{ label: G.t("ui.home"), primary: true, on: () => G.go("title") }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }, { label: G.t("story.pick"), on: () => G.go("story") }]);
         return;
       }
       // 하루 끝: 별 + 캐릭터 표정 · 한마디
       G.panel(`${G.ttl("cal", G.esc(title))}<div class="day-end"><span class="res-face"><img src="${G.face(s === 3 ? "girl-laugh" : s === 2 ? "boy" : "girl")}" alt=""></span>
         <div><div class="stars-big">${G.stars(s)}</div><p class="res-say">${G.t("story.s" + s)}</p></div></div>`,
-        [{ label: G.t("ui.next"), primary: true, on: () => G.go("story", dayIndex + 1) }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }, { label: G.t("ui.home"), on: () => G.go("title") }]);
+        [{ label: G.t("ui.next"), primary: true, on: () => G.go("story", dayIndex + 1) }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) },
+          { label: G.t("story.pick"), on: () => G.go("story") }, { label: G.t("ui.home"), on: () => G.go("title") }]);
     }
   };
 
   // 날짜 고르기: 1일째 → 6일째 → 마지막 퀴즈로 이어지는 길. 끝낸 날은 ✓와 별, 다음 차례는 표시(아무 날이나 골라도 됨)
-  function map() {
-    G.frame(G.t("mode.story"), "", { bg: "bg/alley.webp" });
+  //   cur: 하던 날 위에서 열었을 때 그 날(지금 표시 · '닫기'로 돌아감). 없으면 날짜 고르기 화면 자체(처음으로만)
+  function weekPanel(cur) {
+    const inDay = cur !== undefined;
     const nextI = DAYS.findIndex((D) => !G.store.story[D.n]);
     const nodes = DAYS.map(function (D, i) {
       const s = G.store.story[D.n] || 0;
-      const cls = [s ? "done" : "", i === nextI ? "next" : "", D.quiz ? "quiz" : ""].join(" ").trim();
-      return `<li class="${cls}"><button class="day" data-i="${i}"><span class="dot">${s ? G.ICON.check : D.quiz ? "Q" : D.n}</span>
+      const cls = [s ? "done" : "", i === nextI ? "next" : "", D.quiz ? "quiz" : "", i === cur ? "cur" : ""].join(" ").trim();
+      const tag = i === cur ? `<em class="next-tag now-tag">${G.t("story.now")}</em>` : i === nextI ? `<em class="next-tag">${G.t("story.next")}</em>` : "";
+      return `<li class="${cls}"><button class="day" data-i="${i}"${i === cur ? ' aria-current="step"' : ""}><span class="dot">${s ? G.ICON.check : D.quiz ? "Q" : D.n}</span>
         <span class="txt"><span class="n">${D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n })}</span>${D.quiz ? "" : `<b>${G.esc(G.t("d" + D.n + ".t"))}</b>`}<span class="st">${G.stars(s)}</span></span>
-        ${i === nextI ? `<em class="next-tag">${G.t("story.next")}</em>` : ""}</button></li>`;
+        ${tag}</button></li>`;
     }).join("");
-    const ov = G.panel(`${G.ttl("cal", G.t("mode.story"))}<p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
+    const btns = inDay ? [{ label: G.t("ui.close"), primary: true }, { label: G.t("ui.home"), on: () => G.go("title") }] : [{ label: G.t("ui.home"), on: () => G.go("title") }];
+    const ov = G.panel(`${G.ttl("cal", G.t("mode.story"))}<p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, btns);
     ov.querySelectorAll(".day").forEach((b) => b.addEventListener("click", () => { G.sfx("tap"); G.go("story", +b.dataset.i); }));
-    const nb = ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
+    const nb = inDay ? null : ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
+    return ov;
+  }
+  function map() {
+    G.frame(G.t("mode.story"), "", { bg: "bg/alley.webp" });
+    weekPanel();
     return {};
   }
 })();

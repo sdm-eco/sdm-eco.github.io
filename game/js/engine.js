@@ -199,6 +199,8 @@
       row.appendChild(btn);
     });
     (opt && opt.parent || G.app).appendChild(ov);
+    // 내용이 넘쳐 스크롤되는 창만 단추 줄 뒤를 막음(css .panel.scrolls). 한계: 연 뒤 화면 크기가 바뀌어도 다시 재지 않음
+    const pn = ov.querySelector(".panel"); if (pn.scrollHeight > pn.clientHeight + 4) pn.classList.add("scrolls");
     const first = row.querySelector(".btn:not(.ghost-btn)") || row.querySelector(".btn"); if (first) first.focus({ preventScroll: true }); ov.querySelector(".panel").scrollTop = 0;
     return ov;
   };

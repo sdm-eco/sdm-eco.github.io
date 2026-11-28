@@ -186,9 +186,10 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   background: linear-gradient(160deg, #36aa64, #1d7a43); box-shadow: 0 6px 14px rgba(29, 122, 67, .35), inset 0 2px 0 rgba(255, 255, 255, .28); }
 .ttl-ic svg { width: .78em; height: .78em; }
 .panel p.lead { color: var(--ink-2); line-height: 1.55; margin-bottom: 1em; word-break: keep-all; }
-/* 단추 줄: 스크롤해도 아래에 붙어 있고, 뒤 칸이 비치지 않게 카드 아래 색으로 막음 */
-.panel .row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 1em; position: sticky; bottom: calc(-1 * clamp(18px, 3vw, 34px)); padding: 10px 0 clamp(14px, 2.6vw, 30px);
-  background: linear-gradient(180deg, rgba(214, 240, 223, 0), var(--pnl-end) 34%); }
+/* 단추 줄: 스크롤해도 아래에 붙어 있음. 내용이 넘쳐 스크롤되는 창(.scrolls, engine.js G.panel이 붙임)만 뒤를 카드 색으로 막아
+   아래 칸이 비치지 않게 함(스크롤 없는 창은 바탕 없음: 있으면 연한 사각 띠가 보이고 풀숲이 가려짐) */
+.panel .row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-top: 1em; position: sticky; bottom: calc(-1 * clamp(18px, 3vw, 34px)); padding: 10px 0 clamp(14px, 2.6vw, 30px); }
+.panel.scrolls .row { background: var(--pnl-end); box-shadow: 0 -10px 14px -12px rgba(11, 46, 34, .18); }
 .panel .row .btn { min-height: 48px; }
 .panel .row .btn:not(.ghost-btn) { min-width: 9em; background: linear-gradient(180deg, #279a55, #1d7a43); box-shadow: 0 10px 22px rgba(29, 122, 67, .32), inset 0 2px 0 rgba(255, 255, 255, .22); }
 .panel .row .btn:not(.ghost-btn):hover { background: linear-gradient(180deg, #23904f, #186a3a); }
@@ -514,6 +515,13 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .week .st { display: flex; gap: 1px; }
 .week .st svg { width: 13px; height: 13px; }
 .next-tag { font-style: normal; font-size: .7em; font-weight: 900; color: #fff; background: var(--fresh-strong); padding: .1em .65em; border-radius: 99px; white-space: nowrap; }
+/* 하던 날 위에서 연 날짜 고르기: 지금 하는 날은 노란 테두리 + '지금' 표시 */
+.week li.cur .day { background: #fff; box-shadow: 0 4px 12px rgba(18, 60, 36, .08), inset 0 0 0 2px var(--glow); }
+.next-tag.now-tag { background: var(--glow); color: #3d2f00; }
+/* 새내기 일주일 위쪽 날짜 표시 = 날짜 고르기 단추(mode-story.js) */
+.chip-btn { cursor: pointer; transition: box-shadow .2s var(--ease); }
+.chip-btn svg { color: var(--fresh-strong); }
+.chip-btn:hover { box-shadow: 0 2px 6px rgba(18, 36, 27, .08), inset 0 0 0 2px var(--fresh); }
 @media (max-width: 640px) {
   .week { grid-template-columns: 1fr; gap: 0; }
   .week::before { left: calc(12px + var(--dot) / 2 - 2px); right: auto; top: 24px; bottom: 24px; width: 4px; height: auto; background: repeating-linear-gradient(180deg, var(--leaf) 0 8px, transparent 8px 13px); }
@@ -592,7 +600,7 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .book .pg.locked img { filter: brightness(0) opacity(.12); }   /* 못 모은 칸: 같은 모양의 그림자 */
 .book .pg.locked b { color: #b4c1b8; }
 /* 도감 창의 '닫기' 줄: 흰 바탕으로 막아 아래 칸이 비쳐 겹쳐 보이지 않게 */
-.book-ov .row { background: var(--pnl-end); box-shadow: 0 -10px 14px -12px rgba(11, 46, 34, .18); margin-top: 14px; padding-top: 12px; }
+.book-ov .row { margin-top: 14px; padding-top: 12px; }
 
 @keyframes pop { 0% { scale: 1; } 40% { scale: 1.12; } 100% { scale: 1; } }
 /* 흔들기 · 튀기기는 translate · scale 속성만 써서, 가운데 맞춤(transform)을 건드리지 않음 */
