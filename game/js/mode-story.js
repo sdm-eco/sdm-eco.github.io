@@ -62,7 +62,7 @@
       }
       else if (s.choice) choice(s.choice, next);
       // 규칙 카드: 앞 장면 말풍선("좋아요!" 등)이 카드 뒤에 남지 않게 먼저 닫음
-      else if (s.rule) { hideTalk(); G.sfx("ok"); G.panel(`<h2>${G.esc(title)}</h2><div class="rule-card">${G.t(s.rule)}</div>`, [{ label: G.t("ui.ok"), primary: true, on: next }]); }
+      else if (s.rule) { hideTalk(); G.sfx("ok"); G.panel(`${G.ttl("cal", G.esc(title))}<div class="rule-card">${G.t(s.rule)}</div>`, [{ label: G.t("ui.ok"), primary: true, on: next }]); }
       else if (s.quiz) quiz(s.quiz, 0, next);
     }
     // 6일째 대화: 어제 내놓은 봉투(미수거 스티커가 붙은 채)를 골목 바닥에 보여 줌
@@ -196,7 +196,7 @@
         return;
       }
       // 하루 끝: 별 + 캐릭터 표정 · 한마디
-      G.panel(`<h2>${G.esc(title)}</h2><div class="day-end"><span class="res-face"><img src="${G.face(s === 3 ? "girl-laugh" : s === 2 ? "boy" : "girl")}" alt=""></span>
+      G.panel(`${G.ttl("cal", G.esc(title))}<div class="day-end"><span class="res-face"><img src="${G.face(s === 3 ? "girl-laugh" : s === 2 ? "boy" : "girl")}" alt=""></span>
         <div><div class="stars-big">${G.stars(s)}</div><p class="res-say">${G.t("story.s" + s)}</p></div></div>`,
         [{ label: G.t("ui.next"), primary: true, on: () => G.go("story", dayIndex + 1) }, { label: G.t("ui.retry"), on: () => G.go("story", dayIndex) }, { label: G.t("ui.home"), on: () => G.go("title") }]);
     }
@@ -213,7 +213,7 @@
         <span class="txt"><span class="n">${D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n })}</span>${D.quiz ? "" : `<b>${G.esc(G.t("d" + D.n + ".t"))}</b>`}<span class="st">${G.stars(s)}</span></span>
         ${i === nextI ? `<em class="next-tag">${G.t("story.next")}</em>` : ""}</button></li>`;
     }).join("");
-    const ov = G.panel(`<h2>${G.t("mode.story")}</h2><p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
+    const ov = G.panel(`${G.ttl("cal", G.t("mode.story"))}<p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, [{ label: G.t("ui.home"), on: () => G.go("title") }]);
     ov.querySelectorAll(".day").forEach((b) => b.addEventListener("click", () => { G.sfx("tap"); G.go("story", +b.dataset.i); }));
     const nb = ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
     return {};

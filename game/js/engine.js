@@ -65,8 +65,13 @@
     star: '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="#f2b632" stroke="#c98a00" stroke-width="1.4" stroke-linejoin="round"/></svg>',
     bolt: '<svg viewBox="0 0 24 24"><path d="M13.5 2L5 13.5h6L9.8 22 19 10h-6.2z" fill="#ff8a3d" stroke="#c45a12" stroke-width="1.4" stroke-linejoin="round"/></svg>',
     hand: '<svg viewBox="0 0 24 24" fill="#fff" stroke="#3d2f00" stroke-width="1.6" stroke-linejoin="round"><path d="M9 11V4.5a1.5 1.5 0 013 0V10l.1-1.2a1.5 1.5 0 013 .1V11l.1-.6a1.4 1.4 0 012.8.3V15c0 3.6-2.4 6-5.8 6h-.4c-2.1 0-3.6-.9-4.8-2.6L4.4 14.2a1.4 1.4 0 012.2-1.7z"/></svg>',
-    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    // 멈춤 창 단추: 계속하기 = 재생, 다시 하기 = 돌아가는 화살표
+    play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a1 1 0 001.5.86l11-6.8a1 1 0 000-1.72l-11-6.8A1 1 0 008 5.2z"/></svg>',
+    retry: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 11-2.4-5.7"/><path d="M20 4v5h-5"/></svg>'
   };
+  // 겹창 제목: 앞에 초록 원 아이콘(모든 창 같은 틀, css .ttl-ic). html은 이미 이스케이프된 글자
+  G.ttl = (icon, html) => `<h2><span class="ttl-ic" aria-hidden="true">${G.ICON[icon]}</span><span>${html}</span></h2>`;
   G.star = (on) => `<svg viewBox="0 0 24 24"><path d="M12 2.8l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17.2l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="${on ? "#f2b632" : "#e3ebe5"}" stroke="${on ? "#c98a00" : "#cfdbd2"}" stroke-width="1.2" stroke-linejoin="round"/></svg>`;
   G.stars = (n, of) => Array.from({ length: of || 3 }, (_, i) => G.star(i < n)).join("");
 
@@ -161,19 +166,32 @@
   // 러시 · 새내기 일주일에서 맞힐 수 있는 품목만 (유리병 · 건전지는 두 놀이에 나오지 않아 도감에서 뺌)
   G.BOOK_ORDER = ["banana", "tangerine", "leftover", "bone", "pit", "egg", "shell", "pineapple", "tissue", "receipt", "chopsticks", "toothbrush",
     "pet", "can", "carton", "brokenglass", "butane", "pills", "syrup", "clothes", "blanket", "chair", "fridge", "fan"];
+  // 도감(11/28 정리): 분류(일반 · 음식물 · 재활용 · 대형·특수, 맞는 곳의 분류)별 묶음 + 묶음마다 모은 수
+  //   칸: 같은 크기의 그림 자리(그림은 칸 안에 맞춤) · 이름(최대 두 줄) · 버리는 곳은 한 곳씩 작은 표시로
+  //   아직 못 모은 칸: 같은 모양의 연한 그림자 실루엣 + ?
+  const BOOK_GRPS = ["general", "food", "recycle", "special"];
   G.openBook = function () {
     const got = G.BOOK_ORDER.filter((id) => store.book[id]).length;
-    const pages = G.BOOK_ORDER.map(function (id) {
-      const on = !!store.book[id], d = DEST[ITEMS[id].dest];
-      return `<div class="pg ${on ? "" : "locked"}" data-grp="${d.grp}"><img src="${G.img(ITEMS[id].img)}" alt=""><b>${on ? G.esc(G.itemName(id)) : "?"}</b>${on ? `<em>${G.esc(G.destNames(id))}</em>` : ""}</div>`;
+    const card = function (id) {
+      const on = !!store.book[id], it = ITEMS[id];
+      // 좁은 칸에서는 괄호 앞에서 줄을 바꿈(예: 특수규격봉투 / (PP마대))
+      const to = on ? [it.dest].concat(it.also || []).map((d) => `<em>${G.esc(G.destName(d)).replace(/\(/g, "<wbr>(")}</em>`).join("") : "";
+      return `<div class="pg${on ? "" : " locked"}"><span class="pic"><img src="${G.img(it.img)}" alt=""></span><b>${on ? G.esc(G.itemName(id)) : "?"}</b><span class="to">${to}</span></div>`;
+    };
+    const groups = BOOK_GRPS.map(function (g) {
+      const ids = G.BOOK_ORDER.filter((id) => DEST[ITEMS[id].dest].grp === g);
+      if (!ids.length) return "";
+      const n = ids.filter((id) => store.book[id]).length;
+      return `<section class="bk-grp" data-grp="${g}"><h3><i aria-hidden="true"></i>${G.t("grp." + g)}<span>${n} / ${ids.length}</span></h3><div class="book">${ids.map(card).join("")}</div></section>`;
     }).join("");
-    G.panel(`<h2>${G.t("ui.book")}</h2><p class="lead">${G.t("ui.bookLead")} ${G.t("ui.got", { n: got, t: G.BOOK_ORDER.length })}</p><div class="book">${pages}</div>`,
-      [{ label: G.t("ui.close"), primary: true }]);
+    G.panel(`${G.ttl("book", G.t("ui.book"))}<p class="lead">${G.t("ui.bookLead")} ${G.t("ui.got", { n: got, t: G.BOOK_ORDER.length })}</p>${groups}`,
+      [{ label: G.t("ui.close"), primary: true }], { cls: "book-ov" });
   };
 
   // ---------- 겹창 ----------
   G.panel = function (html, buttons, opt) {
-    const ov = G.h(`<div class="overlay" role="dialog" aria-modal="true"><div class="panel">${html}<div class="row"></div></div></div>`);
+    // opt.cls: 겹창에 붙일 꾸밈 이름(예: 멈춤 창 pause-ov)
+    const ov = G.h(`<div class="overlay${opt && opt.cls ? " " + opt.cls : ""}" role="dialog" aria-modal="true"><div class="panel">${html}<div class="row"></div></div></div>`);
     const row = ov.querySelector(".row");
     (buttons || []).forEach(function (b) {
       const btn = G.h(`<button class="btn ${b.primary ? "" : "ghost-btn"}">${b.label}</button>`);
@@ -202,7 +220,8 @@
       if (a === "sound") { b.setAttribute("aria-pressed", G.toggleSound()); G.sfx("tap"); }
       else if (a === "home") { G.sfx("tap"); if (opt.onLeave) opt.onLeave(); G.go("title"); }
       else if (a === "book") { if (opt.onPause) opt.onPause(true); G.openBook(); watchClose(opt); }
-      else if (a === "pause" && opt.onPause) { opt.onPause(true); G.panel(`<h2>${G.t("ui.pause")}</h2>`, [{ label: G.t("ui.resume"), primary: true, on: () => opt.onPause(false) }]); }
+      // 멈춤 창: 놀이가 따로 만들면(opt.pausePanel, 러시) 그것을, 없으면 기본 창
+      else if (a === "pause" && opt.onPause) { opt.onPause(true); if (opt.pausePanel) opt.pausePanel(); else G.panel(G.ttl("pause", G.t("ui.pause")), [{ label: G.t("ui.resume"), primary: true, on: () => opt.onPause(false) }]); }
     });
     return el;
   };

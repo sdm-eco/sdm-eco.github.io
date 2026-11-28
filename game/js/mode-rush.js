@@ -27,13 +27,34 @@
     const S = { score: 0, combo: 0, best: 0, ok: 0, bad: 0, stickers: 0, stkShown: 0, time: TIME, sec: TIME, fever: false, list: [], review: [], spawnIn: 0.4, raf: 0, last: 0, elapsed: 0, cd: 0 };
     // 멈춤 · 도감: 놀이 중이면 시간을 멈추고, 3 · 2 · 1 카운트다운 중이면 카운트다운을 멈췄다가 계속할 때 3부터 다시 셈
     //   (예전에는 카운트다운 중 멈춤이 무시돼 멈춤 창이 떠 있는데 게임이 시작됨)
-    const fr = G.frame(G.t("mode.rush"), chips, { pause: true, bg: "bg/alley.webp", onLeave: () => stop(),
-      onPause: (p) => {
-        if (counting && p) { clearInterval(S.cd); counting = false; cdHeld = true; const c = field.querySelector(".countdown"); if (c) c.remove(); return; }
-        if (cdHeld && !p) { cdHeld = false; begin(); return; }
-        if (running) { paused = p; if (!p) S.last = performance.now(); if (p) G.music.stop(true); else G.music.resume(); }
-      } });
-    const field = fr.field, hud = fr.hud; field.classList.add("rush"); fr.dests.classList.add("rush-dests");
+    function onPause(p) {
+      if (counting && p) { clearInterval(S.cd); counting = false; cdHeld = true; const c = field.querySelector(".countdown"); if (c) c.remove(); return; }
+      if (cdHeld && !p) { cdHeld = false; begin(); return; }
+      if (running) { paused = p; field.classList.toggle("halt", p); if (!p) S.last = performance.now(); if (p) G.music.stop(true); else G.music.resume(); }
+    }
+    // 멈춤 창(11/28, ChatGPT 시안): '잠깐 멈춤' · 지금 상태 4칸(점수 · 콤보 · 남은 시간 · 미수거 스티커) · 캐릭터 팁 · 계속하기 크게
+    //   팁: 이번 판에 틀린 품목이 있으면 마지막으로 틀린 것, 없으면 러시에 나오는 품목 하나의 버리는 법(why.*)
+    function pausePanel() {
+      const tip = S.review.length ? S.review[S.review.length - 1].id : POOL[Math.floor(Math.random() * POOL.length)][0];
+      const stk = Array.from({ length: MAX_STICKERS }, (_, i) => `<i class="${i < S.stickers ? "on" : ""}"></i>`).join("");
+      const num = (n) => n.toLocaleString(G.lang === "zh" ? "zh-CN" : G.lang);
+      G.panel(`<img class="pz-face" src="${G.face("girl-laugh")}" alt="">
+        ${G.ttl("pause", G.t("ui.paused"))}
+        <div class="pz-stats">
+          <div><span class="ic">${G.ICON.star}</span><span class="k">${G.t("ui.score")}</span><b>${num(S.score)}</b></div>
+          <div><span class="ic">${G.ICON.bolt}</span><span class="k">${G.t("ui.combo")}</span><b>${S.combo}</b></div>
+          <div><span class="ic t">${G.ICON.clock}</span><span class="k">${G.t("ui.time")}</span><b>${Math.max(0, Math.ceil(S.time))}<small>${G.t("ui.sec")}</small></b></div>
+          <div><span class="stickers" aria-hidden="true">${stk}</span><span class="k">${G.t("ui.stickers")}</span><b>${S.stickers}<small>/${MAX_STICKERS}</small></b></div>
+        </div>
+        <p class="pz-tip"><b>${G.t("ui.dyk")}</b> ${G.esc(G.t("why." + tip))}</p>`,
+        [{ label: `${G.ICON.play}<span>${G.t("ui.resume")}</span>`, primary: true, on: () => onPause(false) },
+          { label: `${G.ICON.retry}<span>${G.t("ui.retry")}</span>`, on: () => { stop(); G.go("rush"); } },
+          { label: `${G.ICON.home}<span>${G.t("ui.home")}</span>`, on: () => { stop(); G.go("title"); } }],
+        { cls: "pause-ov" });
+    }
+    const fr = G.frame(G.t("mode.rush"), chips, { pause: true, bg: "bg/alley.webp", onLeave: () => stop(), onPause, pausePanel });
+    // halt: 벨트 · 구름 · 가로등 · 피버 빛의 움직임을 멈춤(css). 놀이가 실제로 돌 때만 움직임(시작 전 · 카운트다운 · 멈춤 · 결과는 멈춤)
+    const field = fr.field, hud = fr.hud; field.classList.add("rush", "halt"); fr.dests.classList.add("rush-dests");
     // 컨베이어: 고무 벨트(움직이는 마디) + 롤러가 달린 앞판. 수거함 바로 위에 두어 끌어다 놓는 거리를 줄임
     field.appendChild(G.h(`<div class="belt" aria-hidden="true"><i class="belt-top"></i><i class="belt-face"></i></div>`));
     // 배경 움직임(11/27): 구름이 천천히 흐르고, 가로등 빛무리가 숨 쉬듯, 90초 동안 노을 → 저녁(--dusk 0 → 1)
@@ -184,12 +205,12 @@
         n--;
         if (n > 0) return show(n);
         clearInterval(S.cd); counting = false; show(G.esc(G.t("rush.go")), true); setTimeout(() => cd.remove(), 650);
-        running = true; paused = false; S.last = performance.now(); S.raf = requestAnimationFrame(loop); G.music.play();
+        running = true; paused = false; field.classList.remove("halt"); S.last = performance.now(); S.raf = requestAnimationFrame(loop); G.music.play();
         G.talk(field, "girl", G.esc(G.t("ui.tapItem")), { ms: 5000 });
       }, 700);
     }
     function finish() {
-      if (!running) return; running = false; paused = true; cancelAnimationFrame(S.raf); setFever(false); G.clearSelected(); G.music.stop();
+      if (!running) return; running = false; paused = true; field.classList.add("halt"); cancelAnimationFrame(S.raf); setFever(false); G.clearSelected(); G.music.stop();
       S.list.forEach((s) => s.el.remove()); field.querySelectorAll(".slap").forEach((e) => e.remove());
       S.stkShown = S.stickers; setHud();
       const acc = S.ok + S.bad ? Math.round(S.ok / (S.ok + S.bad) * 100) : 0;
@@ -202,7 +223,7 @@
       const seen = {}, rev = S.review.filter((r) => !seen[r.id] && (seen[r.id] = 1)).slice(0, 6);
       const revHtml = rev.length ? `<ul class="review">${rev.map((r) => `<li><img src="${G.img(ITEMS[r.id].img)}" alt=""><div><b>${G.esc(G.itemName(r.id))} → ${G.esc(G.destNames(r.id))}</b><span>${G.esc(r.why)}</span></div></li>`).join("")}</ul>`
         : `<p class="lead">${G.t("rush.noReview")}</p>`;
-      const ov = G.panel(`<h2>${G.t("mode.rush")}</h2>
+      const ov = G.panel(`${G.ttl("clock", G.t("mode.rush"))}
         <div class="result g-${g.k}"><span class="res-face"><img src="${G.face(g.face)}" alt=""></span>
           <div class="res-main"><span class="res-grade">${G.t("rush." + g.k)}</span>
             <b class="res-score"><span>0</span><small>${G.t("ui.pts")}</small></b>
@@ -218,7 +239,7 @@
     setHud();
     // 시작 안내: 그림으로 된 3단계(끌어다 놓기 → 노란 표시는 먼저 누르기 → 틀리면 스티커, 3장이면 끝)
     //   2단계는 1단계처럼 결과까지: '눌러요' 붙은 페트병(손가락은 병 위) → 찌그러진 페트병. 표시가 아니라 쓰레기를 누른다는 것을 보여 줌
-    G.panel(`<h2>${G.t("mode.rush")}</h2><ol class="how3">
+    G.panel(`${G.ttl("clock", G.t("mode.rush"))}<ol class="how3">
       <li><span class="pic"><img src="${G.img(ITEMS.banana.img)}" alt=""><i class="arw"></i><img class="bin" src="${G.img(DEST.food.img)}" alt=""></span><span class="tx">${G.t("rush.how1")}</span></li>
       <li><span class="pic"><span class="pv-item"><img src="${G.img(ITEMS.pet.img)}" alt="">${tapBadge()}<span class="tap-hand" aria-hidden="true">${G.ICON.hand}</span></span><i class="arw"></i><img src="${G.img(TAP.pet)}" alt=""></span><span class="tx">${G.t("rush.how2")}</span></li>
       <li><span class="pic stk"><i></i><i></i><i></i></span><span class="tx">${G.t("rush.how3")}</span></li></ol>`,
