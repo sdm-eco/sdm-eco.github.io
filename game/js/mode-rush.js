@@ -23,10 +23,16 @@
       <span class="chip" title="${G.t("ui.combo")}">${G.ICON.bolt}<span class="k">${G.t("ui.combo")}</span><b data-v="combo">0</b></span>
       <span class="chip" data-c="time" title="${G.t("ui.time")}">${G.ICON.clock}<b data-v="time">${TIME}</b></span>
       <span class="chip" title="${G.t("ui.stickers")}"><span class="k">${G.t("ui.stickers")}</span><span class="stickers" data-v="stk">${"<i></i>".repeat(MAX_STICKERS)}</span></span>`;
-    let paused = true, running = false;
+    let paused = true, running = false, counting = false, cdHeld = false;
     const S = { score: 0, combo: 0, best: 0, ok: 0, bad: 0, stickers: 0, stkShown: 0, time: TIME, sec: TIME, fever: false, list: [], review: [], spawnIn: 0.4, raf: 0, last: 0, elapsed: 0, cd: 0 };
+    // 멈춤 · 도감: 놀이 중이면 시간을 멈추고, 3 · 2 · 1 카운트다운 중이면 카운트다운을 멈췄다가 계속할 때 3부터 다시 셈
+    //   (예전에는 카운트다운 중 멈춤이 무시돼 멈춤 창이 떠 있는데 게임이 시작됨)
     const fr = G.frame(G.t("mode.rush"), chips, { pause: true, bg: "bg/alley.webp", onLeave: () => stop(),
-      onPause: (p) => { if (running) { paused = p; if (!p) S.last = performance.now(); if (p) G.music.stop(true); else G.music.resume(); } } });
+      onPause: (p) => {
+        if (counting && p) { clearInterval(S.cd); counting = false; cdHeld = true; const c = field.querySelector(".countdown"); if (c) c.remove(); return; }
+        if (cdHeld && !p) { cdHeld = false; begin(); return; }
+        if (running) { paused = p; if (!p) S.last = performance.now(); if (p) G.music.stop(true); else G.music.resume(); }
+      } });
     const field = fr.field, hud = fr.hud; field.classList.add("rush"); fr.dests.classList.add("rush-dests");
     // 컨베이어: 고무 벨트(움직이는 마디) + 롤러가 달린 앞판. 수거함 바로 위에 두어 끌어다 놓는 거리를 줄임
     field.appendChild(G.h(`<div class="belt" aria-hidden="true"><i class="belt-top"></i><i class="belt-face"></i></div>`));
@@ -173,11 +179,11 @@
     function begin() {
       const cd = G.h(`<div class="countdown" aria-hidden="true"></div>`); field.appendChild(cd);
       const show = (txt, go) => { cd.innerHTML = `<b class="${go ? "go" : ""}">${txt}</b>`; G.sfx(go ? "go" : "tap"); };
-      let n = 3; show(n);
+      let n = 3; show(n); counting = true;
       S.cd = setInterval(function () {
         n--;
         if (n > 0) return show(n);
-        clearInterval(S.cd); show(G.esc(G.t("rush.go")), true); setTimeout(() => cd.remove(), 650);
+        clearInterval(S.cd); counting = false; show(G.esc(G.t("rush.go")), true); setTimeout(() => cd.remove(), 650);
         running = true; paused = false; S.last = performance.now(); S.raf = requestAnimationFrame(loop); G.music.play();
         G.talk(field, "girl", G.esc(G.t("ui.tapItem")), { ms: 5000 });
       }, 700);
@@ -208,7 +214,7 @@
         [{ label: G.t("ui.retry"), primary: true, on: () => G.go("rush") }, { label: G.t("ui.home"), on: () => G.go("title") }]);
       G.countTo(ov.querySelector(".res-score span"), S.score, 900);
     }
-    function stop() { clearInterval(S.cd); running = false; paused = true; cancelAnimationFrame(S.raf); G.music.stop(); G.pitch = 1; }
+    function stop() { clearInterval(S.cd); counting = false; cdHeld = false; running = false; paused = true; cancelAnimationFrame(S.raf); G.music.stop(); G.pitch = 1; }
     setHud();
     // 시작 안내: 그림으로 된 3단계(끌어다 놓기 → 노란 표시는 먼저 누르기 → 틀리면 스티커, 3장이면 끝)
     //   2단계는 1단계처럼 결과까지: '눌러요' 붙은 페트병(손가락은 병 위) → 찌그러진 페트병. 표시가 아니라 쓰레기를 누른다는 것을 보여 줌
