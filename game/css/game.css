@@ -182,28 +182,35 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .rule-card b { color: var(--fresh-strong); }
 
 /* ---------- 첫 화면 ---------- */
-.title-screen { flex: 1; display: grid; grid-template-columns: 1fr 1.35fr; align-items: center; gap: calc(var(--u)*30); padding: calc(var(--u)*24) calc(var(--u)*56) calc(var(--u)*30); min-height: 0; }
-.title-left { display: grid; gap: calc(var(--u)*14); justify-items: start; }
-.title-left .brand-title { height: max(46px, calc(var(--u)*92)); width: auto; }
-.title-left h1 { font-size: max(28px, calc(var(--u)*58)); line-height: 1.08; color: var(--forest); font-weight: 900; letter-spacing: -.01em; }
+/* 화면 모양과 상관없이 한 가지 배치: 위에 제목(오른쪽에 캐릭터 작게) · 아래에 게임 두 개를 큰 타일로 나란히
+   (예전에는 가로 화면이면 왼쪽 제목 · 오른쪽 작은 카드 → 창 모양에 따라 첫 화면이 달라 보였음)
+   - 넓은 화면은 폭을 1180px로 묶어 가운데에. 미리보기 높이는 남은 높이에 맞춤(.mode-tiles 높이 = 100cqh) */
+.title-screen { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); align-content: start; gap: calc(var(--u)*22);
+  width: 100%; max-width: 1180px; margin: 0 auto; padding: calc(var(--u)*26) calc(var(--u)*32) calc(var(--u)*14); min-height: 0; overflow: auto; }
+.title-left { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: calc(var(--u)*10) 8px; align-items: end; justify-items: start; }
+.title-left .brand-title { grid-column: 1; height: max(46px, calc(var(--u)*92)); width: auto; }
+.title-left h1 { grid-column: 1; font-size: max(24px, calc(var(--u)*48)); line-height: 1.08; color: var(--forest); font-weight: 900; letter-spacing: -.01em; word-break: keep-all; }
 .title-left h1 em { font-style: normal; color: var(--fresh); }
-.title-left p { color: var(--ink-2); line-height: 1.55; max-width: 30em; word-break: keep-all; }
-.title-chars { display: flex; align-items: flex-end; height: max(120px, calc(var(--u)*230)); }
+.title-left p { grid-column: 1 / -1; color: var(--ink-2); line-height: 1.55; max-width: 30em; word-break: keep-all; }
+.title-left .langs { grid-column: 1 / -1; }
+.title-chars { grid-column: 2; grid-row: 1 / span 2; align-self: end; display: flex; align-items: flex-end; height: max(84px, calc(var(--u)*190)); }
 .title-chars img { height: 100%; width: auto; }
 .title-chars img + img { margin-left: -6%; }
 .langs { display: flex; gap: 6px; flex-wrap: wrap; }
 .langs button { min-height: 44px; min-width: 44px; padding: .3em .9em; border-radius: 99px; background: #fff; font-weight: 800; box-shadow: inset 0 0 0 1.5px var(--line); }
 .langs button[aria-pressed="true"] { background: var(--forest); color: #fff; box-shadow: none; }
-.modes { display: grid; gap: calc(var(--u)*14); }
-/* 게임 두 개: 미리보기 그림이 들어간 큰 타일 */
-.mode-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: calc(var(--u)*18); }
-.mode-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: #fff; text-align: left; container-type: inline-size;
+.modes { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: calc(var(--u)*10); min-height: 0; }
+/* 게임 두 개: 미리보기 그림이 들어간 큰 타일. 타일 칸의 높이(100cqh)를 미리보기 높이 계산에 씀 */
+.mode-tiles { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: calc(var(--u)*16); min-height: 0; container-type: size; }
+.mode-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 18px; background: #fff; text-align: left; container-type: inline-size;
   box-shadow: 0 6px 18px rgba(18, 36, 27, .09), inset 0 0 0 1.5px var(--line); transition: transform .28s var(--ease), box-shadow .28s var(--ease); }
 .mode-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(18, 36, 27, .14), inset 0 0 0 2px var(--fresh); }
-.mode-card .mt { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: calc(var(--u)*14); padding: calc(var(--u)*16) calc(var(--u)*18); }
-.mode-card .mt .mk { width: max(44px, calc(var(--u)*56)); height: max(44px, calc(var(--u)*56)); border-radius: 14px; font-size: 1.25em; }
-.mode-card .mt .go { width: 40px; height: 40px; }
-.mode-card .pv { --u: calc(100cqw / 520); position: relative; display: block; aspect-ratio: 16 / 11; overflow: hidden; background: var(--mint); box-shadow: inset 0 -1.5px 0 var(--line); }
+.mode-card .mt { display: grid; grid-template-columns: 1fr; align-content: start; gap: 2px; padding: 9px 12px 12px; }
+.mode-card .mt .mk, .mode-card .mt .go { display: none; }
+/* 미리보기 높이: 타일 칸 높이 - 이름 · 설명 자리(4.6em), 폭의 0.42배(벨트 위 물건이 잘리지 않는 최소) ~ 0.75배(4:3) 사이
+   한계: 이름 · 설명이 세 줄 넘게 늘면 타일이 칸보다 커져 첫 화면이 조금 스크롤됨 */
+.mode-card .pv { --u: calc(100cqw / 520); position: relative; display: block; height: clamp(calc(100cqw * .42), calc(100cqh - 4.6em), calc(100cqw * .75));
+  overflow: hidden; background: var(--mint); box-shadow: inset 0 -1.5px 0 var(--line); }
 .pv-bg { position: absolute; inset: 0; background-size: cover; background-position: center bottom; }
 .pv .belt { bottom: calc(var(--u)*10); height: calc(var(--u)*110); }
 .pv .belt-top { height: calc(var(--u)*70); }
@@ -225,29 +232,19 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .pv-days i.q { background: var(--glow); color: #3d2f00; }
 .mode-card .mk { width: max(52px, calc(var(--u)*76)); height: max(52px, calc(var(--u)*76)); border-radius: 18px; display: grid; place-items: center; font-weight: 900; font-size: 1.5em; color: #fff; background: var(--fresh-strong); }
 .mode-card[data-m="rush"] .mk { background: #2f6fb8; }
-.mode-card h3 { font-size: 1.15em; color: var(--forest); }
-.mode-card p { color: var(--ink-2); font-size: .9em; line-height: 1.45; margin-top: 2px; word-break: keep-all; }
+.mode-card h3 { font-size: 1em; line-height: 1.25; color: var(--forest); word-break: keep-all; }
+.mode-card p { color: var(--ink-2); font-size: .8em; line-height: 1.4; margin-top: 2px; word-break: keep-all; }
 .mode-card .go { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--mint); color: var(--fresh-strong); }
 .mode-card .go svg { width: 22px; height: 22px; }
-.title-foot { flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 calc(var(--u)*56) calc(var(--u)*18); color: var(--muted); font-size: .8em; gap: 10px; }
+.title-foot { flex: none; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1180px; margin: 0 auto;
+  padding: 0 calc(var(--u)*32) calc(var(--u)*16); color: var(--muted); font-size: .8em; gap: 10px; }
 .title-foot img { height: 28px; width: auto; }
-@media (orientation: portrait) {
-  /* 휴대폰: 제목 옆에 캐릭터를 작게 두고 게임 두 개를 나란히 → 스크롤하지 않아도 두 게임이 한 화면에 보임(구청 11/27 의견) */
-  .title-screen { grid-template-columns: 1fr; align-content: start; overflow: auto; gap: calc(var(--u)*22); padding: calc(var(--u)*26) calc(var(--u)*32) calc(var(--u)*14); }
-  .title-left { grid-template-columns: minmax(0, 1fr) auto; gap: calc(var(--u)*10) 8px; align-items: end; }
-  .title-left .brand-title, .title-left h1 { grid-column: 1; }
-  .title-left h1 { font-size: max(24px, calc(var(--u)*48)); word-break: keep-all; }
-  .title-left p, .title-left .langs { grid-column: 1 / -1; }
-  .title-chars { grid-column: 2; grid-row: 1 / span 2; align-self: end; height: max(84px, calc(var(--u)*190)); }
-  .modes { gap: calc(var(--u)*10); }
-  .mode-tiles { grid-template-columns: 1fr 1fr; gap: calc(var(--u)*16); }
-  .mode-card { border-radius: 18px; }
-  .mode-card .pv { aspect-ratio: 4 / 3; }
-  .mode-card .mt { grid-template-columns: 1fr; align-content: start; gap: 2px; padding: 9px 10px 12px; }
-  .mode-card .mt .mk, .mode-card .mt .go { display: none; }
-  .mode-card h3 { font-size: 1em; line-height: 1.25; word-break: keep-all; }
-  .mode-card p { font-size: .8em; line-height: 1.4; }
-  .title-foot { padding: 0 calc(var(--u)*32) calc(var(--u)*16); }
+/* 휴대폰 세로: 제목 옆 캐릭터 작게 · 게임 두 개 나란히 → 스크롤 없이 두 게임이 한 화면에(구청 11/27 의견). 지금은 모든 화면이 같은 배치 */
+/* 가로 화면: 높이가 모자라므로 제목 칸(로고 · 캐릭터)을 조금 줄여 미리보기에 높이를 줌(1280×720에서 넘치지 않게) */
+@media (orientation: landscape) {
+  .title-screen { gap: calc(var(--u)*16); }
+  .title-left .brand-title { height: max(40px, calc(var(--u)*74)); }
+  .title-chars { height: max(84px, calc(var(--u)*150)); }
 }
 
 /* ---------- 러시: 컨베이어(배경은 선명하게, 벨트는 수거함 바로 위) ---------- */
@@ -552,13 +549,12 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   .title-left .brand-title { height: 34px; }
   .title-left h1 { font-size: 24px; }
   .title-left p { display: none; }
-  .title-chars { height: 84px; }
+  .title-chars { height: 72px; }
   .modes { gap: 6px; }
   .mode-tiles { gap: 8px; }
   .mode-card { border-radius: 16px; }
-  .mode-card .pv { aspect-ratio: 16 / 6; }
-  .mode-card .mt { padding: 6px 10px; gap: 10px; }
-  .mode-card .mk { width: 44px; height: 44px; border-radius: 12px; font-size: 1.2em; }
+  .mode-card .pv { height: clamp(calc(100cqw * .3), calc(100cqh - 3.4em), calc(100cqw * .5)); }
+  .mode-card .mt { padding: 5px 10px 7px; }
   .title-foot { padding: 0 24px 6px; }
   .card-drop { min-height: 76px; padding: 6px; gap: 2px; }
   .card-drop svg { width: 1.6em; height: 1.6em; }
