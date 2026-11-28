@@ -216,7 +216,7 @@ zh: {
   "rush.best": "最高分", "rush.newBest": "刷新最高纪录！", "rush.prevBest": "之前最高 {n}分", "ui.pts": "分",
   "rush.noReview": "没有分错的物品，太棒了！",
   "prep.done": "整理好了！放到正确的地方吧", "ui.prep": "整理",
-  "story.how": "跟着故事每天完成一个任务，学会垃圾分类规则。", "story.next": "下一个", "story.pick": "选择天数", "story.now": "当前",
+  "story.how": "跟着故事每天完成一个任务，学会垃圾分类规则。", "story.next": "下一个", "story.pick": "选择日期", "story.now": "当前",
   "story.day": "第{n}天", "story.quiz": "最后的测验", "story.cert": "分类英雄证书",
   "story.certP": "你完成了在西大门的六天生活。", "story.certStars": "获得星星 {n} / {t}", "story.certBy": "西大门区",
   "story.s3": "完美！一次都没错。", "story.s2": "做得好！下次挑战三颗星吧。", "story.s1": "没关系，再来一次会做得更好！",

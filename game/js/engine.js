@@ -85,6 +85,18 @@
   };
   G.pitch = 1;   // 러시 피버 때 효과음을 높임
   G.REDUCED = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  // 하는 중에 '동작 줄이기'를 바꿔도 따라감: 켜면 날고 있는 조각 · 도구 동작(스크립트 애니메이션)은 바로 끝내고,
+  //   떨어지는 중인 물건 · 하루 시작 띠는 끝난 상태로(안 그러면 다시 끌 때 뒤늦게 움직임)
+  if (window.matchMedia) {
+    const mq = matchMedia("(prefers-reduced-motion: reduce)"), on = function (e) {
+      G.REDUCED = e.matches; if (!e.matches) return;
+      document.getAnimations().forEach((a) => { if (!(window.CSSAnimation && a instanceof CSSAnimation) && !(window.CSSTransition && a instanceof CSSTransition)) a.finish(); });
+      document.querySelectorAll(".item.drop").forEach((el) => el.classList.remove("drop"));
+      document.querySelectorAll(".day-banner").forEach((el) => el.remove());
+    };
+    if (mq.addEventListener) mq.addEventListener("change", on); else if (mq.addListener) mq.addListener(on);
+    G._motionMQ = mq;   // 참조를 붙잡아 둠(지역 변수로만 두면 MediaQueryList가 수거되어 change가 오지 않을 수 있음)
+  }
   function ac() {
     actx = actx || new (window.AudioContext || window.webkitAudioContext)();
     if (actx.state === "suspended") actx.resume();
@@ -189,6 +201,11 @@
   };
 
   // ---------- 겹창 ----------
+  let panelN = 0;
+  function syncInert(parent) {   // 맨 위(마지막) 겹창만 살리고 나머지 형제는 inert. 겹창이 없으면 모두 풂
+    const kids = [...parent.children], top = kids.filter((k) => k.classList.contains("overlay")).pop();
+    kids.forEach((k) => { k.inert = !!top && k !== top; });
+  }
   G.panel = function (html, buttons, opt) {
     // opt.cls: 겹창에 붙일 꾸밈 이름(예: 멈춤 창 pause-ov)
     const ov = G.h(`<div class="overlay${opt && opt.cls ? " " + opt.cls : ""}" role="dialog" aria-modal="true"><div class="panel">${html}<div class="row"></div></div></div>`);
@@ -198,7 +215,19 @@
       btn.addEventListener("click", function () { G.sfx("tap"); if (!b.keep) ov.remove(); if (b.on) b.on(); });
       row.appendChild(btn);
     });
-    (opt && opt.parent || G.app).appendChild(ov);
+    const parent = opt && opt.parent || G.app, back = document.activeElement;
+    parent.appendChild(ov);
+    // 창 이름: 첫 제목(h2/h3)을 aria-labelledby로
+    const hd = ov.querySelector(".panel h2, .panel h3"); if (hd) { hd.id = hd.id || "pn-" + (++panelN); ov.setAttribute("aria-labelledby", hd.id); }
+    // 모달: 맨 위 창 말고는 inert(Tab · 누르기가 뒤 화면으로 가지 않음 → 멈춤 창 위에 또 멈춤 창이 뜨는 일도 막음).
+    //   창이 어떤 방법으로든 빠지면(단추 · 다른 코드의 remove · 화면 바꾸기) 다시 맞추고, 열기 전 초점으로 돌려놓음
+    syncInert(parent);
+    const mo = new MutationObserver(function () {
+      if (ov.isConnected) return;
+      mo.disconnect(); syncInert(parent);
+      if (back && back.isConnected && !back.closest("[inert]") && document.activeElement === document.body) back.focus({ preventScroll: true });
+    });
+    mo.observe(parent, { childList: true });
     // 내용이 넘쳐 스크롤되는 창만 단추 줄 뒤를 막음(css .panel.scrolls). 한계: 연 뒤 화면 크기가 바뀌어도 다시 재지 않음
     const pn = ov.querySelector(".panel"); if (pn.scrollHeight > pn.clientHeight + 4) pn.classList.add("scrolls");
     const first = row.querySelector(".btn:not(.ghost-btn)") || row.querySelector(".btn"); if (first) first.focus({ preventScroll: true }); ov.querySelector(".panel").scrollTop = 0;
@@ -622,7 +651,8 @@
       el.style.transform = "translate(-50%,-50%)";
       // 바닥에 놓는 판(새내기 일주일): 하나씩 위에서 떨어져 자리 잡고(drop), 그 뒤 시간 차를 두고 살짝 흔들림(css, --di = 순서)
       //   떨어진 뒤 drop을 떼어야 틀렸을 때 흔들기(.shake)가 막히지 않고, 흔들기가 끝나도 다시 떨어지지 않음
-      if (opt.ground != null) { el.classList.add("drop"); el.style.setProperty("--di", i); el.addEventListener("animationend", function (e) { if (e.animationName === "itemDrop") el.classList.remove("drop"); }); }
+      //   동작 줄이기면 처음부터 붙이지 않음(애니메이션이 없어 animationend가 오지 않으므로)
+      if (opt.ground != null && !G.REDUCED) { el.classList.add("drop"); el.style.setProperty("--di", i); el.addEventListener("animationend", function (e) { if (e.animationName === "itemDrop") el.classList.remove("drop"); }); }
       el.classList.add("drop-target"); el.dataset.accept = "tool";
       // 준비할 단계: '준비' 글자 + 단계 수만큼 점(한 단계 끝날 때마다 하나씩 채움)
       if (st.need && opt.tools) el.appendChild(G.h(`<span class="badge prep" title="${G.esc(G.t("ui.prep"))} ${st.need}"><em>${G.esc(G.t("ui.prep"))}</em>${"<i></i>".repeat(st.need)}</span>`));

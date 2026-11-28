@@ -45,19 +45,26 @@
     const title = D.quiz ? G.t("story.quiz") : `${G.t("story.day", { n: D.n })} · ${G.t("d" + D.n + ".t")}`;
     // 위쪽 날짜 표시 = 날짜 고르기 단추(달력 아이콘). 누르면 하던 날 위에 날짜 고르기 창(닫기로 돌아옴)
     const fr = G.frame(G.t("mode.story"), `<button class="chip chip-btn" data-days aria-label="${G.esc(G.t("story.pick"))}: ${G.esc(title)}" title="${G.esc(G.t("story.pick"))}">${G.ICON.cal}<b>${G.esc(title)}</b></button>`, { bg: D.bg });
-    fr.hud.querySelector("[data-days]").addEventListener("click", function () { if (G.app.querySelector(".week")) return; G.sfx("tap"); weekPanel(dayIndex); });
+    // 늦게 오는 넘어가기(마지막 물건 뒤 1.2초 · 고르기 · 퀴즈 다음 문제): 화면을 떠났으면 버리고, 날짜 고르기 창이 떠 있으면 닫힐 때까지 미룸
+    //   (안 그러면 날짜 창 위에 규칙 창이 겹치거나, 다른 날로 간 뒤 이전 날의 창이 뜸)
+    let alive = true, held = null;
+    const later = (fn) => function () { const a = arguments; if (!alive) return; if (G.app.querySelector(".week")) { held = () => fn.apply(null, a); return; } fn.apply(null, a); };
+    const release = () => { const f = held; held = null; if (f && alive) f(); };
+    fr.hud.querySelector("[data-days]").addEventListener("click", function () { if (G.app.querySelector(".week")) return; G.sfx("tap"); weekPanel(dayIndex, release); });
     const field = fr.field;
     G.fitScene(field);
     // 배경 움직임: 골목은 구름 · 가로등 · 날마다 다른 하늘빛(아침 → 저녁), 방은 햇빛 · 떠다니는 먼지
     if (D.bg === "bg/alley.webp") G.alleySky(field, true)(DUSK[D.n] || 0);
     else G.roomLight(field).style.setProperty("--sun", SUN[D.n] || 1);
-    // 하루 시작 띠: 'N일째 · 제목'이 잠깐 떴다 사라짐(누르기 막지 않음)
-    const ban = G.h(`<div class="day-banner" aria-hidden="true"><b>${G.esc(D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n }))}</b>${D.quiz ? "" : `<span>${G.esc(G.t("d" + D.n + ".t"))}</span>`}</div>`);
-    field.appendChild(ban); ban.addEventListener("animationend", () => ban.remove());
+    // 하루 시작 띠: 'N일째 · 제목'이 잠깐 떴다 사라짐(누르기 막지 않음). 동작 줄이기면 만들지 않음(animationend가 오지 않아 남으므로)
+    if (!G.REDUCED) {
+      const ban = G.h(`<div class="day-banner" aria-hidden="true"><b>${G.esc(D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n }))}</b>${D.quiz ? "" : `<span>${G.esc(G.t("d" + D.n + ".t"))}</span>`}</div>`);
+      field.appendChild(ban); ban.addEventListener("animationend", () => ban.remove());
+    }
     let mistakes = 0, si = 0;
     if (D.sticker) field.appendChild(G.h(`<div class="miss-sticker"><b>${G.t("d6.s")}</b>${G.t("d6.sp")}</div>`));
     next();
-    return {};
+    return { stop() { alive = false; held = null; } };
 
     function hideTalk() { const tk = field.querySelector(".talk"); if (tk) { clearTimeout(tk._t); tk.classList.add("hide"); } }
     function next() {
@@ -68,7 +75,7 @@
       else if (s.board) {
         G.prompt(field, G.t(s.board.prompt));
         G.board({ field, dests: fr.dests, items: s.board.items, destIds: G.shuffle(s.board.dests), tools: s.board.tools ? G.shuffle(s.board.tools) : null,
-          ground: GROUND[D.bg], srcOf: (id) => s.board.src && s.board.src[id], onDone: (m) => { mistakes += m; next(); } });
+          ground: GROUND[D.bg], srcOf: (id) => s.board.src && s.board.src[id], onDone: later((m) => { mistakes += m; next(); }) });
       }
       else if (s.choice) choice(s.choice, next);
       // 규칙 카드: 앞 장면 말풍선("좋아요!" 등)이 카드 뒤에 남지 않게 먼저 닫음
@@ -127,7 +134,7 @@
       let finished = false;
       G.draggable({ el: tok, kind: "item", can: () => !finished, onDrop: function (t) {
         const cd = c.cards[+t.dataset.i]; if (!cd) return;
-        if (cd.ok) { finished = true; G.flash(t, "ok"); G.sfx("ok"); tok.classList.add("gone"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b>`, { ms: 1800 }); setTimeout(done, 1200); }
+        if (cd.ok) { finished = true; G.flash(t, "ok"); G.sfx("ok"); tok.classList.add("gone"); G.talk(field, "girl-laugh", `<b>${G.t("ui.great")}</b>`, { ms: 1800 }); setTimeout(later(done), 1200); }
         else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t(cd.why)), { stop: true, ms: 4000 }); }
       } });
     }
@@ -153,7 +160,7 @@
         card.classList.add("answered", ok ? "right" : "wrong"); card.removeAttribute("role"); card.removeAttribute("tabindex");
         card.innerHTML = `<span class="q">${G.esc(G.t("ui.correct"))} <b>${truth ? "O" : "X"}</b></span>${G.esc(G.t(key + "w"))}`;
         lay();
-        setTimeout(() => quiz(list, k + 1, done), ok ? 1500 : 2600);
+        setTimeout(later(() => quiz(list, k + 1, done)), ok ? 1500 : 2600);
       } });
     }
     // 고르기 · 퀴즈 배치: 카드 줄은 아래, 고를 것은 안내문과 카드 사이 가운데. 높이가 넉넉하면 맨 아래에 말풍선 자리를 비움
@@ -215,7 +222,8 @@
 
   // 날짜 고르기: 1일째 → 6일째 → 마지막 퀴즈로 이어지는 길. 끝낸 날은 ✓와 별, 다음 차례는 표시(아무 날이나 골라도 됨)
   //   cur: 하던 날 위에서 열었을 때 그 날(지금 표시 · '닫기'로 돌아감). 없으면 날짜 고르기 화면 자체(처음으로만)
-  function weekPanel(cur) {
+  //   onClose: '닫기'로 하던 날에 돌아갈 때(미뤄 둔 넘어가기를 이어 함)
+  function weekPanel(cur, onClose) {
     const inDay = cur !== undefined;
     const nextI = DAYS.findIndex((D) => !G.store.story[D.n]);
     const nodes = DAYS.map(function (D, i) {
@@ -226,7 +234,7 @@
         <span class="txt"><span class="n">${D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n })}</span>${D.quiz ? "" : `<b>${G.esc(G.t("d" + D.n + ".t"))}</b>`}<span class="st">${G.stars(s)}</span></span>
         ${tag}</button></li>`;
     }).join("");
-    const btns = inDay ? [{ label: G.t("ui.close"), primary: true }, { label: G.t("ui.home"), on: () => G.go("title") }] : [{ label: G.t("ui.home"), on: () => G.go("title") }];
+    const btns = inDay ? [{ label: G.t("ui.close"), primary: true, on: onClose }, { label: G.t("ui.home"), on: () => G.go("title") }] : [{ label: G.t("ui.home"), on: () => G.go("title") }];
     const ov = G.panel(`${G.ttl("cal", G.t("mode.story"))}<p class="lead">${G.t("story.how")}</p><ol class="week">${nodes}</ol>`, btns);
     ov.querySelectorAll(".day").forEach((b) => b.addEventListener("click", () => { G.sfx("tap"); G.go("story", +b.dataset.i); }));
     const nb = inDay ? null : ov.querySelector("li.next .day"); if (nb) nb.focus({ preventScroll: true });
