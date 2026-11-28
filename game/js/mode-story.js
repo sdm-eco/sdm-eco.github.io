@@ -143,10 +143,14 @@
       field.querySelectorAll(".statement, .cards").forEach((e) => e.remove());
       if (k >= list.length) return done();
       const [key, truth] = list[k];
+      if (k === 0) list._res = [];   // 이번 판의 맞힘 여부(진행 점 색)
+      const res = list._res;
       G.prompt(field, `${G.t("q.p")} (${k + 1} / ${list.length})`);
-      const card = G.h(`<div class="statement" role="button" tabindex="0"><span class="q">Q${k + 1}</span>${G.esc(G.t(key))}</div>`);
+      // 진행 점: 푼 문제(맞음 초록 · 틀림 산호) · 지금 문제(길쭉) · 남은 문제(연한 점). res = 지금까지 맞힘 여부 목록
+      const dots = (now) => `<span class="q-dots" aria-hidden="true">${list.map((_, i) => `<i class="${i < k ? (res[i] ? "ok" : "no") : i === k ? "cur" + (now ? " " + now : "") : ""}"></i>`).join("")}</span>`;
+      const card = G.h(`<div class="statement" role="button" tabindex="0"><span class="q">Q${k + 1}</span><span class="s">${G.esc(G.t(key))}</span>${dots()}</div>`);
       field.appendChild(card);
-      const cards = G.h(`<div class="cards"><div class="card-drop ox drop-target" data-accept="card" data-v="1" role="button" tabindex="0">O</div><div class="card-drop ox drop-target" data-accept="card" data-v="0" role="button" tabindex="0">X</div></div>`);
+      const cards = G.h(`<div class="cards"><div class="card-drop ox o drop-target" data-accept="card" data-v="1" role="button" tabindex="0"><span class="mk">O</span></div><div class="card-drop ox x drop-target" data-accept="card" data-v="0" role="button" tabindex="0"><span class="mk">X</span></div></div>`);
       field.appendChild(cards); cards.querySelectorAll(".card-drop").forEach((e) => G.dropTarget(e));
       const lay = stack(card, cards);
       let over = false;
@@ -158,7 +162,8 @@
         else { mistakes++; G.flash(t, "no"); G.sfx("no"); G.talk(field, "boy-stop", G.esc(G.t("q.again")), { stop: true, ms: 2400 }); }
         // 답하면 문제 카드를 바로 '정답 O/X + 풀이'로 바꿈(전에는 답한 뒤에도 같은 문제가 2초쯤 그대로 남아 있었음)
         card.classList.add("answered", ok ? "right" : "wrong"); card.removeAttribute("role"); card.removeAttribute("tabindex");
-        card.innerHTML = `<span class="q">${G.esc(G.t("ui.correct"))} <b>${truth ? "O" : "X"}</b></span>${G.esc(G.t(key + "w"))}`;
+        card.innerHTML = `<span class="q">${G.esc(G.t("ui.correct"))} <b>${truth ? "O" : "X"}</b></span><span class="s">${G.esc(G.t(key + "w"))}</span>${dots(ok ? "ok" : "no")}`;
+        res[k] = ok;
         lay();
         setTimeout(later(() => quiz(list, k + 1, done)), ok ? 1500 : 2600);
       } });

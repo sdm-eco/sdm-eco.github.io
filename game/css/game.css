@@ -587,25 +587,46 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .day-end .stars-big { justify-content: flex-start; margin: 0 0 .3em; }
 .day-end .res-say { max-width: 22em; }
 .cards { position: absolute; left: 0; right: 0; bottom: calc(var(--u)*14); z-index: 3; display: flex; justify-content: center; gap: calc(var(--u)*14); padding: 0 calc(var(--u)*14); flex-wrap: wrap; }
-.card-drop { display: grid; justify-items: center; align-content: center; gap: 6px; width: max(130px, calc(var(--u)*230)); min-height: max(96px, calc(var(--u)*150)); padding: 12px; border-radius: 20px;
-  background: rgba(255, 255, 255, .94); box-shadow: 0 6px 16px rgba(11, 46, 34, .12), inset 0 0 0 2px var(--line); text-align: center; font-weight: 800; line-height: 1.35; transition: transform .28s var(--ease), box-shadow .28s var(--ease); cursor: pointer; }
-.card-drop svg { width: 2.2em; height: 2.2em; color: var(--forest); }
+/* 고르기 · O/X 카드(11/28 창 디자인에 맞춤): 흰 → 연민트 카드 · 흰 안쪽 테두리 · 아이콘은 연민트 원 안에 */
+.card-drop { display: grid; justify-items: center; align-content: center; gap: 6px; width: max(130px, calc(var(--u)*230)); min-height: max(96px, calc(var(--u)*150)); padding: 12px; border-radius: 22px;
+  background: linear-gradient(170deg, #ffffff 0%, #f3faf5 60%, #e6f5eb 100%);
+  box-shadow: 0 10px 24px rgba(11, 46, 34, .18), inset 0 0 0 1.5px #d3e8da, inset 0 2px 0 rgba(255, 255, 255, .9);
+  text-align: center; font-weight: 800; line-height: 1.35; transition: transform .28s var(--ease), box-shadow .28s var(--ease); cursor: pointer; }
+.card-drop > svg { width: 2.7em; height: 2.7em; padding: .5em; border-radius: 50%; background: var(--mint); color: var(--fresh-strong); box-shadow: inset 0 0 0 1.5px var(--mint-hi); }
 .card-drop .t { font-size: 1.15em; color: var(--forest); }
 .card-drop .p { font-size: .86em; color: var(--ink-2); }
-.card-drop.hot { transform: translateY(-4px) scale(1.04); box-shadow: 0 0 0 3px var(--fresh), 0 10px 24px rgba(11, 46, 34, .14); }
-.card-drop.ok { animation: pop .5s var(--ease); box-shadow: 0 0 0 3px var(--fresh); }
-.card-drop.no { animation: shake .45s var(--ease); box-shadow: 0 0 0 3px #f3a9a0; }
-.card-drop.ox { width: max(120px, calc(var(--u)*200)); font-size: 2.6em; color: var(--forest); }
-.statement { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 4; width: min(80%, calc(var(--u)*640)); padding: 1em 1.3em; border-radius: 22px; background: #fff;
-  box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 2px var(--line); font-weight: 800; font-size: 1.12em; line-height: 1.45; text-align: center; cursor: grab; touch-action: none; word-break: keep-all; }
-.statement .q { display: block; font-size: .72em; color: var(--fresh-strong); margin-bottom: .2em; }
-/* 답한 뒤: 문제 대신 '정답 O/X + 풀이'(맞으면 초록, 틀리면 빨강 테두리) */
+.card-drop.hot { transform: translateY(-4px) scale(1.04); box-shadow: 0 0 0 3px var(--fresh), 0 14px 28px rgba(11, 46, 34, .2); }
+.card-drop.ok { animation: pop .5s var(--ease); box-shadow: 0 0 0 3px var(--fresh), 0 10px 24px rgba(11, 46, 34, .18); }
+.card-drop.no { animation: shake .45s var(--ease); box-shadow: 0 0 0 3px #f3a9a0, 0 10px 24px rgba(11, 46, 34, .18); }
+/* O/X: 큰 원 배지(제목 아이콘과 같은 모양) — O 초록, X 산호. 카드 바탕도 살짝 그 색 */
+.card-drop.ox { width: max(120px, calc(var(--u)*200)); font-size: 2.6em; }
+.card-drop.ox.o { background: linear-gradient(170deg, #ffffff 0%, #eef9f1 55%, #dcf1e3 100%); }
+.card-drop.ox.x { background: linear-gradient(170deg, #ffffff 0%, #fff4f1 55%, #fde3dd 100%); box-shadow: 0 10px 24px rgba(11, 46, 34, .18), inset 0 0 0 1.5px #f6d3cb, inset 0 2px 0 rgba(255, 255, 255, .9); }
+.card-drop.ox .mk { display: grid; place-items: center; width: 1.45em; height: 1.45em; border-radius: 50%; font-weight: 900; line-height: 1; color: #fff;
+  background: linear-gradient(160deg, #36aa64, #1d7a43); box-shadow: 0 6px 14px rgba(29, 122, 67, .35), inset 0 2px 0 rgba(255, 255, 255, .28); }
+.card-drop.ox.x .mk { background: linear-gradient(160deg, #f08b78, #d4503f); box-shadow: 0 6px 14px rgba(212, 80, 63, .32), inset 0 2px 0 rgba(255, 255, 255, .28); }
+.card-drop.ox.x.hot { box-shadow: 0 0 0 3px #e46a57, 0 14px 28px rgba(11, 46, 34, .2); }
+/* 문제 카드: 창과 같은 흰 → 연민트 카드, 'Q1'은 초록 알약 배지, 아래에 5칸 진행 점 */
+.statement { position: absolute; left: 50%; top: 30%; transform: translate(-50%, -50%); z-index: 4; width: min(80%, calc(var(--u)*640)); padding: .85em 1.3em .8em; border-radius: 24px;
+  background: linear-gradient(170deg, #ffffff 0%, #f4fbf6 55%, #e4f5ea 100%);
+  box-shadow: 0 16px 36px rgba(11, 46, 34, .24), inset 0 0 0 1.5px #d3e8da, inset 0 2px 0 rgba(255, 255, 255, .9);
+  font-weight: 800; font-size: 1.12em; line-height: 1.45; text-align: center; color: var(--forest); cursor: grab; touch-action: none; word-break: keep-all; }
+.statement .q { display: table; margin: 0 auto .45em; padding: .22em .85em; border-radius: 999px; font-size: .72em; font-weight: 900; letter-spacing: .02em; color: #fff;
+  background: linear-gradient(160deg, #36aa64, #1d7a43); box-shadow: 0 4px 10px rgba(29, 122, 67, .3), inset 0 2px 0 rgba(255, 255, 255, .25); }
+.statement .s { display: block; }
+.q-dots { display: flex; justify-content: center; gap: 6px; margin-top: .6em; }
+.q-dots i { width: 8px; height: 8px; border-radius: 99px; background: #d3e8da; }
+.q-dots i.ok { background: var(--fresh); }
+.q-dots i.no { background: #e46a57; }
+.q-dots i.cur { width: 22px; background: var(--fresh-strong); }
+.q-dots i.cur.no { background: #e46a57; }
+/* 답한 뒤: 문제 대신 '정답 O/X + 풀이'(맞으면 초록, 틀리면 산호 테두리 · 배지) */
 .statement.answered { cursor: default; animation: pop .4s var(--ease); }
 .statement.answered .q { font-size: .8em; }
-.statement.answered .q b { margin-left: .15em; font-size: 1.6em; vertical-align: -.08em; }
-.statement.answered.right { background: #f2fbf4; box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 3px var(--fresh); }
-.statement.answered.wrong { background: #fff6f4; box-shadow: 0 10px 26px rgba(11, 46, 34, .16), inset 0 0 0 3px #f3a9a0; }
-.statement.answered.wrong .q { color: var(--danger); }
+.statement.answered .q b { margin-left: .15em; font-size: 1.35em; vertical-align: -.06em; }
+.statement.answered.right { background: linear-gradient(170deg, #ffffff 0%, #eef9f1 55%, #dcf1e3 100%); box-shadow: 0 16px 36px rgba(11, 46, 34, .24), inset 0 0 0 3px var(--fresh); }
+.statement.answered.wrong { background: linear-gradient(170deg, #ffffff 0%, #fff4f1 55%, #fde3dd 100%); box-shadow: 0 16px 36px rgba(11, 46, 34, .24), inset 0 0 0 3px #e46a57; }
+.statement.answered.wrong .q { background: linear-gradient(160deg, #f08b78, #d4503f); box-shadow: 0 4px 10px rgba(212, 80, 63, .3), inset 0 2px 0 rgba(255, 255, 255, .25); }
 .miss-sticker { position: absolute; z-index: 4; left: 3%; top: 16%; transform: rotate(-3deg); max-width: 34%; padding: .55em .9em; border-radius: 10px; background: #ffd34d; color: #3d2f00; font-weight: 800;
   box-shadow: 0 6px 14px rgba(0, 0, 0, .2); text-align: center; line-height: 1.4; max-width: 80%; }
 .miss-sticker b { display: block; font-size: 1.05em; }
@@ -721,7 +742,7 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   .mode-card .mt { padding: 5px 10px 7px; }
   .title-foot { padding: 0 24px 6px; }
   .card-drop { min-height: 76px; padding: 6px; gap: 2px; }
-  .card-drop svg { width: 1.6em; height: 1.6em; }
+  .card-drop > svg { width: 2em; height: 2em; padding: .38em; }
   .card-drop.ox { font-size: 2em; }
 }
 /* 빈 귀퉁이가 없을 때: 얼굴 없이 안내문 자리에 한 줄 말풍선 */
