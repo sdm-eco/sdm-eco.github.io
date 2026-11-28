@@ -480,6 +480,24 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .field.scene .rush-sky .c2 { top: 16%; width: 14%; opacity: .8; animation: cloudCross2 68s linear infinite; animation-delay: -50s; }
 @keyframes cloudCross1 { from { transform: translateX(-110%); } to { transform: translateX(510%); } }
 @keyframes cloudCross2 { from { transform: translateX(-110%); } to { transform: translateX(720%); } }
+/*   저녁(--dusk, 5일째 .45 · 6일째 .65 · 퀴즈 .72): 하늘 가림판 안에 노을(위 보랏빛 → 지평선 주황) · 산 뒤 해 빛무리 · 별(.55부터 반짝),
+     구름은 노을빛으로 물듦, 남색 막은 조금 옅게(노을색이 탁해지지 않게), 가로등 아래 빛 원뿔 · 불빛 웅덩이 */
+.rush-sky .clouds > .sunset, .rush-sky .clouds > .sunglow { position: absolute; inset: 0; }
+.rush-sky .sunset { opacity: calc(var(--dusk) * 1.25);
+  background: linear-gradient(180deg, rgba(58, 48, 128, .5) 0%, rgba(150, 90, 160, .34) 20%, rgba(255, 140, 105, .55) 34%, rgba(255, 168, 96, .9) 46%); }
+.rush-sky .sunglow { opacity: calc(var(--dusk) * 1.1); mix-blend-mode: screen;
+  background: radial-gradient(28% 22% at 52% 46%, rgba(255, 206, 130, .9), rgba(255, 160, 100, .35) 45%, rgba(255, 150, 100, 0) 100%); }
+.rush-sky .star { position: absolute; width: max(2px, .22%); aspect-ratio: 1; border-radius: 50%; translate: -50% -50%; background: #fff8e6; box-shadow: 0 0 4px 1px rgba(255, 250, 230, .8);
+  opacity: calc((var(--dusk) - .55) * 4); animation: starTwinkle 3.1s ease-in-out infinite; }
+@keyframes starTwinkle { 0%, 100% { scale: .7; } 50% { scale: 1.35; } }
+.field.scene .rush-sky[data-eve] .cloud { filter: blur(.6px) drop-shadow(0 3px 6px rgba(90, 60, 120, .18)) sepia(.55) saturate(2.4) hue-rotate(-30deg) brightness(1.02); }   /* 저녁(.4 이상): 복숭앗빛 구름 */
+.field.scene .rush-sky .dusk { opacity: calc(var(--dusk) * .5); }
+.rush-sky .cone { position: absolute; left: 26%; top: 33%; width: 17%; height: 50%; clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%); mix-blend-mode: screen;
+  background: radial-gradient(60% 100% at 50% 0%, rgba(255, 210, 140, .45), rgba(255, 200, 120, .12) 60%, rgba(255, 200, 120, 0) 100%); opacity: calc((var(--dusk) - .3) * .9); filter: blur(10px); }
+.rush-sky .pool { position: absolute; translate: -50% -50%; border-radius: 50%; mix-blend-mode: screen;
+  background: radial-gradient(closest-side, rgba(255, 210, 140, .8), rgba(255, 190, 110, .3) 55%, rgba(255, 190, 110, 0)); opacity: calc(var(--dusk) * 1.3);
+  animation: poolBreath 2.6s ease-in-out infinite; }
+@keyframes poolBreath { 0%, 100% { scale: .94; } 50% { scale: 1.05; } }
 /*   세로 화면(배경 150% · 아래 맞춤): 그림 위쪽 1/3이 잘리고 가로는 가운데(그림 약 40 ~ 60%)만 보임 → 구름을 보이는 하늘 띠로 내리고 그 구간만 지나가게 */
 @media (orientation: portrait) {
   .field.scene .rush-sky .c1 { top: 33%; width: 11%; animation-name: cloudCrossP1; animation-duration: 40s; }
@@ -513,6 +531,7 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 @media (prefers-reduced-motion: reduce) {
   .room-light .cloud, .room-light .leafshade, .room-light .floorlight, .room-light .curtain { animation: none; }
   .room-light .wbirds { display: none; }
+  .rush-sky .star, .rush-sky .pool { animation: none; }
   .room-light .sun, .room-light .mote, .field.scene .item.drop, .field.scene .item.grounded img, .dest.sel-target .fig, .dest.ok .fig, .dest.no .fig { animation: none; }
   .room-light .mote, .day-banner { display: none; }
   .field.scene > .bg, .field.scene > .amb, .talk .face img, .talk .face.talk-pop, .field.scene .rush-sky .cloud, .field.scene .rush-sky .lamp { animation: none; }

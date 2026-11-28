@@ -37,7 +37,8 @@
   // 배경 그림에서 바닥이 시작하는 높이(0~1): 방은 벽과 마루가 만나는 선 아래, 골목은 대문 앞 길
   const GROUND = { "bg/room.webp": 0.72, "bg/alley.webp": 0.81 };
   // 날마다 다른 빛: 골목 저녁 정도(0 아침 ~ 1 밤, 창문 불은 .3부터 켜짐) · 방 햇빛 세기
-  const DUSK = { 1: 0, 5: .2, 6: .38, 7: .55 }, SUN = { 2: 1, 3: .8, 4: .6 }, TIME = { 2: "morning", 3: "noon", 4: "evening" };
+  //   5 · 6일째 · 퀴즈는 저녁 분위기를 진하게(11/28 의견): 노을 하늘 · 별 · 가로등 불빛 웅덩이 · 창문 불(engine.js G.alleySky)
+  const DUSK = { 1: 0, 5: .45, 6: .65, 7: .72 }, SUN = { 2: 1, 3: .8, 4: .6 }, TIME = { 2: "morning", 3: "noon", 4: "evening" };
 
   G.screens.story = function (dayIndex) {
     if (dayIndex === undefined) return map();
