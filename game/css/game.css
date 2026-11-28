@@ -246,6 +246,13 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   .title-left .brand-title { height: max(40px, calc(var(--u)*74)); }
   .title-chars { height: max(84px, calc(var(--u)*150)); }
 }
+/* 넓은 가로 화면: 언어 단추를 제목 줄 오른쪽(캐릭터 왼쪽)으로 → 홈페이지처럼 언어는 오른쪽에, 한 줄 아낀 만큼 미리보기가 커짐
+   (휴대폰 세로 · 좁은 화면은 제목 옆에 자리가 없어 제목 아래 그대로) */
+@media (orientation: landscape) and (min-width: 720px) {
+  .title-left { grid-template-columns: minmax(0, 1fr) auto auto; column-gap: calc(var(--u)*28); }
+  .title-left .langs { grid-column: 2; grid-row: 2; align-self: end; justify-self: end; flex-wrap: nowrap; }
+  .title-chars { grid-column: 3; }
+}
 /* 낮은 가로 화면(홈페이지 게임 창 · 작은 노트북): 소개 문장을 빼 미리보기 타일이 잘리지 않게 */
 @media (orientation: landscape) and (max-height: 700px) {
   .title-left p { display: none; }
