@@ -154,7 +154,15 @@
       field.appendChild(cards); cards.querySelectorAll(".card-drop").forEach((e) => G.dropTarget(e));
       const lay = stack(card, cards);
       let over = false;
-      G.draggable({ el: card, kind: "card", can: () => !over, onDrop: function (t) {
+      G.draggable({ el: card, kind: "card", can: () => !over, onDrop: answer });
+      // O · X를 바로 눌러도 답이 됨(전에는 문제 카드를 먼저 고르거나 끌어야만 해서, O · X만 누르면 아무 반응이 없었음).
+      //   문제 카드를 골라 둔 상태면 G.dropTarget 쪽이 먼저 처리하고 over가 되므로 두 번 답하지 않음
+      cards.querySelectorAll(".card-drop").forEach(function (t) {
+        const direct = () => { if (over || G.selected) return; answer(t); };
+        t.addEventListener("click", direct);
+        t.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); direct(); } });
+      });
+      function answer(t) {
         const said = t.dataset.v === "1";
         over = true;
         const ok = said === truth;
@@ -166,7 +174,7 @@
         res[k] = ok;
         lay();
         setTimeout(later(() => quiz(list, k + 1, done)), ok ? 1500 : 2600);
-      } });
+      }
     }
     // 고르기 · 퀴즈 배치: 카드 줄은 아래, 고를 것은 안내문과 카드 사이 가운데. 높이가 넉넉하면 맨 아래에 말풍선 자리를 비움
     function stack(mid, cards) {
