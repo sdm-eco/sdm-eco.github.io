@@ -306,6 +306,8 @@
     let el = field.querySelector(".talk");
     if (!el) { el = G.h(`<div class="talk hide"><div class="face"><img alt=""></div><div class="say"></div></div>`); field.appendChild(el); }
     el.querySelector(".face img").src = G.img(FACE[who] || FACE.girl);
+    // 말이 바뀔 때마다 얼굴이 통통 튐(css .talk-pop), 평소에는 css로 숨쉬듯 들썩임
+    const fc = el.querySelector(".face"); fc.classList.remove("talk-pop"); void fc.offsetWidth; fc.classList.add("talk-pop");
     const say = el.querySelector(".say");
     say.innerHTML = html;
     el.classList.toggle("stop", !!opt.stop);
@@ -489,12 +491,22 @@
   // 골목: 흐르는 구름 · 숨 쉬는 가로등 빛 · 저녁 빛(--dusk 0 → 1)과 켜지는 창문. 돌려준 함수 set(d)로 저녁 정도를 바꿈
   const LAMPS = [[34.4, 32], [35.4, 52.3]];                                                  // 가로등 머리(그림 기준 %)
   const WINS = [[75.6, 41, .3], [8.2, 34, .45], [96.6, 28.5, .6], [40.6, 56, .72], [93.5, 29, .84]];   // 창문(x, y, 켜지는 저녁 정도)
+  //   새내기 일주일(scene)에는 가끔 하늘을 가로지르는 새 떼(.birds)와 왼쪽 나무에서 떨어지는 잎(.leaf, 그림 기준 %)도 둠
+  const LEAVES = [[24, 26, 0], [30, 20, -4.5], [19, 33, -9], [27, 35, -13], [53, 41, -2.5], [56, 45, -10]];   // 잎(x, y, 시작 시각 s) — 왼쪽 나무 넷 · 가운데 나무 둘(세로 화면에서 보임)
+  const BIRD = `<svg viewBox="0 0 24 10"><path d="M1 7 Q6 1 12 7 Q18 1 23 7" fill="none" stroke="#3d4b5e" stroke-width="2.2" stroke-linecap="round"/></svg>`;
   G.alleySky = function (field, scene) {
-    const el = G.h(`<div class="rush-sky amb" aria-hidden="true"><i class="cloud c1"></i><i class="cloud c2"></i><i class="dusk"></i>
-      <div class="sky-map">${LAMPS.map((p, i) => `<i class="lamp l${i + 1}" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}${WINS.map((p) => `<i class="win" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}</div></div>`);
+    const extra = scene ? `<div class="birds" style="--by:12%"><div class="flock"><i class="bird">${BIRD}</i><i class="bird b2">${BIRD}</i><i class="bird b3">${BIRD}</i></div></div>` : "";
+    const leaves = scene ? LEAVES.map((p) => `<i class="leaf" style="left:${p[0]}%;top:${p[1]}%;animation-delay:${p[2]}s"></i>`).join("") : "";
+    // 구름은 그림 속 하늘에만 보이게(img/bg/alley-sky.png 가림판, 그림과 같은 상자) → 나무 · 지붕 · 가로등 뒤로 지나감. 저녁빛(.dusk)보다 아래
+    const el = G.h(`<div class="rush-sky amb" aria-hidden="true"><div class="sky-map"><div class="clouds"><i class="cloud c1"></i><i class="cloud c2"></i></div></div><i class="dusk"></i>${extra}
+      <div class="sky-map">${LAMPS.map((p, i) => `<i class="lamp l${i + 1}" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}${WINS.map((p) => `<i class="win" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}${leaves}</div></div>`);
     field.querySelector(".bg").after(el);
-    const map = el.querySelector(".sky-map"), wins = [...el.querySelectorAll(".win")];
-    const fit = () => { map.style.cssText = ambBox(field, scene); };
+    const maps = [...el.querySelectorAll(".sky-map")], map = maps[1], wins = [...el.querySelectorAll(".win")];
+    // 새 떼: 한 번 지나갈 때마다 높이를 바꿈(하늘 8 ~ 22%)
+    const birds = el.querySelector(".birds");
+    if (birds) birds.addEventListener("animationiteration", (e) => { if (e.target === birds) birds.style.setProperty("--by", (8 + Math.random() * 14).toFixed(1) + "%"); });
+    // 잎이 떨어지는 거리 = 그림 높이의 30%(px로 넣어 transform으로 움직임)
+    const fit = () => { maps.forEach((m) => { m.style.cssText = ambBox(field, scene); }); if (scene) map.style.setProperty("--fall", (map.offsetHeight * 0.3).toFixed(0) + "px"); };
     fit(); G.onFieldResize(field, fit);
     return function set(d) { el.style.setProperty("--dusk", d); wins.forEach((w, i) => w.classList.toggle("on", d >= WINS[i][2])); };
   };
