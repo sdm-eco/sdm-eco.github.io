@@ -37,7 +37,7 @@
   // 배경 그림에서 바닥이 시작하는 높이(0~1): 방은 벽과 마루가 만나는 선 아래, 골목은 대문 앞 길
   const GROUND = { "bg/room.webp": 0.72, "bg/alley.webp": 0.81 };
   // 날마다 다른 빛: 골목 저녁 정도(0 아침 ~ 1 밤, 창문 불은 .3부터 켜짐) · 방 햇빛 세기
-  const DUSK = { 1: 0, 5: .2, 6: .38, 7: .55 }, SUN = { 2: 1, 3: .8, 4: .6 };
+  const DUSK = { 1: 0, 5: .2, 6: .38, 7: .55 }, SUN = { 2: 1, 3: .8, 4: .6 }, TIME = { 2: "morning", 3: "noon", 4: "evening" };
 
   G.screens.story = function (dayIndex) {
     if (dayIndex === undefined) return map();
@@ -55,7 +55,7 @@
     G.fitScene(field);
     // 배경 움직임: 골목은 구름 · 가로등 · 날마다 다른 하늘빛(아침 → 저녁), 방은 햇빛 · 떠다니는 먼지
     if (D.bg === "bg/alley.webp") G.alleySky(field, true)(DUSK[D.n] || 0);
-    else G.roomLight(field).style.setProperty("--sun", SUN[D.n] || 1);
+    else G.roomLight(field, TIME[D.n]).style.setProperty("--sun", SUN[D.n] || 1);
     // 하루 시작 띠: 'N일째 · 제목'이 잠깐 떴다 사라짐(누르기 막지 않음). 동작 줄이기면 만들지 않음(animationend가 오지 않아 남으므로)
     if (!G.REDUCED) {
       const ban = G.h(`<div class="day-banner" aria-hidden="true"><b>${G.esc(D.quiz ? G.t("story.quiz") : G.t("story.day", { n: D.n }))}</b>${D.quiz ? "" : `<span>${G.esc(G.t("d" + D.n + ".t"))}</span>`}</div>`);

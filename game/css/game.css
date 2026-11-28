@@ -367,18 +367,71 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 .field.rush.halt .belt-top, .field.rush.halt .rush-sky .cloud, .field.rush.halt .rush-sky .lamp, .field.rush.halt::after, .field.rush.halt .fever-banner { animation-play-state: paused; }
 
 /* ---------- 새내기 일주일 움직임(engine.js G.alleySky · G.roomLight · G.board ground · G.toolFx, mode-story.js) ---------- */
-/* 방: 오른쪽 벽 햇빛이 천천히 밝아졌다 흐려짐(--sun 날마다 세기), 창문 빛줄기 속 먼지 */
+/* 방: 오른쪽 벽 햇빛이 천천히 밝아졌다 흐려짐(--sun 날마다 세기), 창문 빛줄기 속 먼지
+   11/28 보강: 창밖 구름 · 새(창 유리 가림판) · 벽 햇빛 속 나뭇잎 그림자 · 바닥 햇빛 일렁임 · 반짝이는 먼지 · 커튼 · 날마다 시간(data-time) */
 .room-light { position: absolute; inset: 0; overflow: hidden; pointer-events: none; --sun: 1; }
 .room-light .sky-map { position: absolute; }
-.room-light .sun { position: absolute; left: 60%; top: 18%; width: 42%; height: 46%; border-radius: 40%;
+.room-light .sky-map > * { position: absolute; }
+.room-light .sun { left: 60%; top: 18%; width: 42%; height: 46%; border-radius: 40%;
   background: radial-gradient(closest-side, rgba(255, 222, 160, .55), rgba(255, 210, 140, 0)); mix-blend-mode: soft-light;
   opacity: calc(var(--sun) * .9); animation: sunBreath 7s ease-in-out infinite; }
 @keyframes sunBreath { 0%, 100% { transform: scale(.96); opacity: calc(var(--sun) * .55); } 50% { transform: scale(1.04); opacity: var(--sun); } }
-.room-light .beam { position: absolute; left: 12%; top: 12%; width: 48%; height: 80%; transform-origin: 0 0; transform: skewX(28deg);
-  background: linear-gradient(180deg, rgba(255, 236, 190, .22), rgba(255, 236, 190, 0) 85%); mix-blend-mode: screen; opacity: calc(var(--sun) * .8); }
-.room-light .mote { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: rgba(255, 246, 220, .9); box-shadow: 0 0 6px rgba(255, 236, 190, .9);
-  opacity: 0; animation: moteFloat 9s ease-in-out infinite; animation-delay: var(--md, 0s); will-change: transform; }
-@keyframes moteFloat { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .8; } 80% { opacity: .6; } 100% { transform: translate(var(--mx, 10px), -46px); opacity: 0; } }
+.room-light .beam { left: 12%; top: 12%; width: 48%; height: 80%; transform-origin: 0 0; transform: skewX(28deg);
+  background: linear-gradient(180deg, rgba(255, 236, 190, .28), rgba(255, 236, 190, 0) 85%); mix-blend-mode: screen; opacity: calc(var(--sun) * .85); }
+/* 먼지: 크고 많게 + 가끔 반짝(scale) */
+.room-light .mote { width: max(3px, .32%); aspect-ratio: 1; border-radius: 50%; background: rgba(255, 248, 225, .95); box-shadow: 0 0 6px 1px rgba(255, 236, 190, .9);
+  opacity: 0; animation: moteFloat 9s ease-in-out infinite, moteTwinkle 2.8s ease-in-out infinite; animation-delay: var(--md, 0s), var(--tw, 0s); will-change: transform; }
+.room-light .mote.big { width: max(5px, .5%); }
+@keyframes moteFloat { 0% { transform: translate(0, 0); opacity: 0; } 20% { opacity: .9; } 80% { opacity: .7; } 100% { transform: translate(var(--mx, 10px), -60px); opacity: 0; } }
+@keyframes moteTwinkle { 0%, 70%, 100% { scale: 1; } 82% { scale: 1.9; } }
+/* 창밖: 창 유리 모양 가림판 안에 하늘빛(시간별) · 뭉게구름 둘 · 가끔 새 두 마리 */
+.room-light .win-sky { inset: 0; overflow: hidden;
+  -webkit-mask: url(../img/bg/room-sky.png) 0 0 / 100% 100% no-repeat; mask: url(../img/bg/room-sky.png) 0 0 / 100% 100% no-repeat; }
+.room-light .win-sky > * { position: absolute; }
+/*   시간별 하늘빛은 창 유리 전체(img/bg/room-glass.png: 하늘 + 건물 · 산)에 칠함 → 저녁엔 건너편 풍경도 함께 어두워짐 */
+.room-light .win-glass { inset: 0; -webkit-mask: url(../img/bg/room-glass.png) 0 0 / 100% 100% no-repeat; mask: url(../img/bg/room-glass.png) 0 0 / 100% 100% no-repeat; }
+.room-light .wtint { position: absolute; inset: 0; background: rgba(170, 210, 255, .12); transition: background 1s; }
+.room-light .cloud { left: 0; aspect-ratio: 2.5; opacity: .9; filter: blur(.4px); }
+.room-light .w1 { top: 14%; width: 8%; animation: winCloud1 46s linear infinite; animation-delay: -12s; }
+.room-light .w2 { top: 25%; width: 5.5%; opacity: .75; animation: winCloud2 64s linear infinite; animation-delay: -44s; }
+@keyframes winCloud1 { from { transform: translateX(140%); } to { transform: translateX(530%); } }
+@keyframes winCloud2 { from { transform: translateX(220%); } to { transform: translateX(770%); } }
+.room-light .wbirds { left: 12%; top: 13%; width: 30%; height: 22%; animation: winBirds 19s linear infinite; animation-delay: 5s; transform: translateX(-30%); }
+.room-light .wbirds .flock { position: absolute; left: 0; top: 18%; display: flex; gap: 4px; }
+.room-light .wbirds .bird { display: block; width: max(9px, calc(var(--u) * 15)); }
+.room-light .wbirds .bird.b2 { margin-top: 8px; width: max(7px, calc(var(--u) * 11)); }
+.room-light .wbirds .bird svg { display: block; width: 100%; height: auto; transform-origin: 50% 70%; animation: wingFlap .3s ease-in-out infinite alternate; }
+.room-light .wbirds .bird.b2 svg { animation-delay: -.14s; }
+@keyframes winBirds { 0% { transform: translate(-30%, 0); } 45% { transform: translate(115%, -12%); } 100% { transform: translate(115%, -12%); } }
+/* 건너편 건물 창: 저녁에만 불이 켜짐 */
+.room-light .bl { width: .55%; aspect-ratio: 1.3; translate: -50% -50%; border-radius: 1px; background: #ffd98c; box-shadow: 0 0 5px 1px rgba(255, 200, 110, .8); opacity: 0; transition: opacity 1.2s; }
+/* 벽 햇빛 속 나뭇잎 그림자: 창밖 나뭇가지가 바람에 흔들리듯(두 겹, 다른 박자) */
+.room-light .leafshade { left: 63%; top: 15%; width: 35%; height: 42%; transform-origin: 0 0; mix-blend-mode: multiply; filter: blur(5px);
+  opacity: calc(var(--sun) * .2); animation: leafSway 6.5s ease-in-out infinite alternate;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 200'%3E%3Cg fill='%2366452a'%3E%3Cpath d='M-10 20C70 30 150 70 310 150' stroke='%2366452a' stroke-width='5' fill='none'/%3E%3Cellipse cx='40' cy='18' rx='20' ry='8' transform='rotate(-25 40 18)'/%3E%3Cellipse cx='60' cy='42' rx='18' ry='7' transform='rotate(35 60 42)'/%3E%3Cellipse cx='95' cy='30' rx='22' ry='8' transform='rotate(-15 95 30)'/%3E%3Cellipse cx='118' cy='62' rx='20' ry='8' transform='rotate(40 118 62)'/%3E%3Cellipse cx='150' cy='52' rx='22' ry='9' transform='rotate(-10 150 52)'/%3E%3Cellipse cx='170' cy='88' rx='20' ry='8' transform='rotate(45 170 88)'/%3E%3Cellipse cx='205' cy='80' rx='23' ry='9' transform='rotate(5 205 80)'/%3E%3Cellipse cx='222' cy='118' rx='20' ry='8' transform='rotate(50 222 118)'/%3E%3Cellipse cx='255' cy='112' rx='22' ry='8' transform='rotate(15 255 112)'/%3E%3Cellipse cx='275' cy='150' rx='19' ry='7' transform='rotate(55 275 150)'/%3E%3Cellipse cx='80' cy='70' rx='16' ry='6' transform='rotate(60 80 70)'/%3E%3Cellipse cx='190' cy='130' rx='16' ry='6' transform='rotate(70 190 130)'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+.room-light .leafshade.s2 { left: 70%; top: 26%; width: 26%; height: 30%; opacity: calc(var(--sun) * .14); animation-duration: 4.4s; animation-delay: -2s; scale: -1 1; }
+@keyframes leafSway { from { transform: rotate(-1.5deg) translate(0, 0) skewX(0deg); } to { transform: rotate(2deg) translate(1.2%, 2%) skewX(-4deg); } }
+/* 바닥 햇빛: 창에서 떨어진 빛 조각이 천천히 일렁임 */
+.room-light .floorlight { left: 13%; top: 71%; width: 42%; height: 19%; clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%); mix-blend-mode: soft-light;
+  background: linear-gradient(90deg, rgba(255, 244, 210, 0), rgba(255, 244, 210, .9) 30%, rgba(255, 238, 195, .8) 70%, rgba(255, 244, 210, 0));
+  opacity: calc(var(--sun) * .55); animation: floorShimmer 5.5s ease-in-out infinite alternate; }
+@keyframes floorShimmer { from { opacity: calc(var(--sun) * .3); transform: translateX(-1%); } to { opacity: calc(var(--sun) * .7); transform: translateX(1%); } }
+/* 커튼(ChatGPT로 그린 한 폭을 양쪽에, 오른쪽은 뒤집음) + 나무 막대. 위를 축으로 살랑 */
+.room-light .rod { left: 9%; top: 5.4%; width: 36%; height: .55%; border-radius: 99px; background: linear-gradient(180deg, #c99158, #8a5a2c); box-shadow: 0 2px 3px rgba(80, 50, 20, .25); }
+.room-light .curtain { top: 5.6%; height: 59%; width: 9%; opacity: .9; transform-origin: 50% 0; filter: drop-shadow(2px 4px 6px rgba(120, 80, 40, .18));
+  animation: curtainSway 5.6s ease-in-out infinite; }
+.room-light .curtain.cl { left: 9%; }
+.room-light .curtain.cr { left: 36%; scale: -1 1; animation-duration: 6.3s; animation-delay: -2.4s; }
+@keyframes curtainSway { 0%, 100% { transform: skewX(0deg) scaleX(1); } 50% { transform: skewX(-2.4deg) scaleX(1.04); } }
+/* 저녁 방: 전체를 살짝 어둡게(보랏빛) + 가운데 따뜻한 조명빛 */
+.room-light .eve { position: absolute; inset: 0; opacity: 0; transition: opacity 1s; background: linear-gradient(180deg, rgba(60, 45, 110, .30), rgba(110, 60, 50, .14)); mix-blend-mode: multiply; }
+.room-light .eve::after { content: ""; position: absolute; inset: 0; background: radial-gradient(55% 50% at 55% 40%, rgba(255, 196, 120, .45), rgba(255, 196, 120, 0) 70%); mix-blend-mode: screen; }
+/* 날마다 시간: 아침(맑은 하늘빛) · 낮(그대로) · 저녁(창밖 노을 · 건물 불 · 방 노을빛) */
+.room-light[data-time="morning"] .wtint { background: linear-gradient(180deg, rgba(140, 195, 255, .45), rgba(255, 245, 230, .15)); }
+.room-light[data-time="evening"] .wtint { background: linear-gradient(180deg, rgba(80, 60, 150, .6), rgba(255, 130, 80, .55)); }
+.room-light[data-time="evening"] .cloud { filter: blur(.4px) sepia(.5) hue-rotate(-25deg) brightness(.95); }
+.room-light[data-time="evening"] .bl { opacity: .95; }
+.room-light[data-time="evening"] .eve { opacity: 1; }
 
 /* 물건: 하나씩 위에서 떨어져 자리 잡음(--di = 순서) → 그 뒤 발 밑을 축으로 아주 살짝 흔들림 */
 .field.scene .item.drop { animation: itemDrop .55s cubic-bezier(.3, 1.4, .5, 1) backwards; animation-delay: calc(.15s + var(--di, 0) * .09s); }
@@ -421,8 +474,8 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 @keyframes facePop { 0% { scale: .86; } 100% { scale: 1; } }
 /* ③ 새내기 일주일 골목: 구름은 더 또렷하고 2배 빠르게, 가로등은 낮에도 보이게 · 더 크게 숨쉬기 */
 /*   구름: 뭉게구름 모양(아래쪽이 살짝 보랏빛 그늘) · 그림 하늘 위를 가로질러 감(폭이 작아 이동 거리를 따로 잡음) */
-.field.scene .rush-sky .cloud { height: auto; aspect-ratio: 2.5; border-radius: 0; opacity: .92; filter: blur(.6px) drop-shadow(0 3px 6px rgba(90, 80, 140, .12));
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='.35' stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23e4e0f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M30 72Q6 72 9 56Q12 41 32 43Q33 22 58 24Q70 5 96 13Q114 1 132 18Q157 13 161 36Q187 34 189 55Q191 72 167 72Z' fill='url(%23g)'/%3E%3C/svg%3E") center / contain no-repeat; }
+.field.scene .rush-sky .cloud { height: auto; aspect-ratio: 2.5; border-radius: 0; opacity: .92; filter: blur(.6px) drop-shadow(0 3px 6px rgba(90, 80, 140, .12)); }
+.field.scene .rush-sky .cloud, .room-light .cloud { background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 80'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='.35' stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23e4e0f1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M30 72Q6 72 9 56Q12 41 32 43Q33 22 58 24Q70 5 96 13Q114 1 132 18Q157 13 161 36Q187 34 189 55Q191 72 167 72Z' fill='url(%23g)'/%3E%3C/svg%3E") center / contain no-repeat; }
 .field.scene .rush-sky .c1 { top: 5%; width: 20%; animation: cloudCross1 50s linear infinite; animation-delay: -22s; }
 .field.scene .rush-sky .c2 { top: 16%; width: 14%; opacity: .8; animation: cloudCross2 68s linear infinite; animation-delay: -50s; }
 @keyframes cloudCross1 { from { transform: translateX(-110%); } to { transform: translateX(510%); } }
@@ -458,6 +511,8 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
 #app:has(.overlay) .amb *, #app:has(.overlay) .field.scene > .bg, #app:has(.overlay) .field.scene > .amb, #app:has(.overlay) .talk .face img, #app:has(.overlay) .field.scene .item.drop, #app:has(.overlay) .field.scene .item.grounded img, #app:has(.overlay) .dest.sel-target .fig, #app:has(.overlay) .day-banner { animation-play-state: paused; }
 /* 움직임 줄이기: 배경 · 흔들림 · 기다림 · 띠는 아예 없앰(아래 전역 규칙은 길이만 줄이므로 반복 동작을 따로 끔) */
 @media (prefers-reduced-motion: reduce) {
+  .room-light .cloud, .room-light .leafshade, .room-light .floorlight, .room-light .curtain { animation: none; }
+  .room-light .wbirds { display: none; }
   .room-light .sun, .room-light .mote, .field.scene .item.drop, .field.scene .item.grounded img, .dest.sel-target .fig, .dest.ok .fig, .dest.no .fig { animation: none; }
   .room-light .mote, .day-banner { display: none; }
   .field.scene > .bg, .field.scene > .amb, .talk .face img, .talk .face.talk-pop, .field.scene .rush-sky .cloud, .field.scene .rush-sky .lamp { animation: none; }

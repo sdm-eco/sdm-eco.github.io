@@ -510,13 +510,23 @@
     fit(); G.onFieldResize(field, fit);
     return function set(d) { el.style.setProperty("--dusk", d); wins.forEach((w, i) => w.classList.toggle("on", d >= WINS[i][2])); };
   };
-  // 방: 오른쪽 벽의 햇빛이 천천히 밝아졌다 흐려지고, 창문에서 들어오는 빛줄기 속에 먼지가 떠다님
-  G.roomLight = function (field) {
+  // 방(11/28 보강): 창밖 하늘(구름 · 새, img/bg/room-sky.png 가림판으로 창 유리 안에만) · 오른쪽 벽 햇빛과 그 안에서 흔들리는 나뭇잎 그림자 ·
+  //   바닥 햇빛 일렁임 · 빛줄기 속 반짝이는 먼지 · 창 양옆 커튼(img/bg/curtain.webp, 바람에 살랑).
+  //   time: 날마다 시간(morning 2일째 · noon 3일째 · evening 4일째) — 창밖 하늘색, 저녁엔 건너편 건물 창에 불 · 방이 노을빛으로
+  const BLD_LIGHTS = [[14.6, 37.6], [16.3, 37.6], [14.6, 40.2], [35.4, 39], [36.8, 41.2]];   // 창밖 건물 창(그림 기준 %)
+  G.roomLight = function (field, time) {
     let dust = "";
-    for (let i = 0; i < 12; i++) dust += `<i class="mote" style="left:${(20 + Math.random() * 38).toFixed(1)}%;top:${(30 + Math.random() * 50).toFixed(1)}%;--md:${(-Math.random() * 9).toFixed(2)}s;--mx:${(Math.random() * 30 - 15).toFixed(0)}px"></i>`;
-    const el = G.h(`<div class="room-light amb" aria-hidden="true"><div class="sky-map"><i class="sun"></i><i class="beam"></i>${dust}</div></div>`);
+    for (let i = 0; i < 18; i++) dust += `<i class="mote${i % 4 === 0 ? " big" : ""}" style="left:${(18 + Math.random() * 40).toFixed(1)}%;top:${(28 + Math.random() * 52).toFixed(1)}%;--md:${(-Math.random() * 9).toFixed(2)}s;--mx:${(Math.random() * 40 - 20).toFixed(0)}px;--tw:${(-Math.random() * 5).toFixed(2)}s"></i>`;
+    const flock = `<div class="flock"><i class="bird">${BIRD}</i><i class="bird b2">${BIRD}</i></div>`;
+    const curtain = G.img("bg/curtain.webp");
+    const el = G.h(`<div class="room-light amb" data-time="${time || "noon"}" aria-hidden="true">
+      <div class="sky-map"><div class="win-glass"><i class="wtint"></i></div><div class="win-sky"><i class="cloud w1"></i><i class="cloud w2"></i><div class="wbirds">${flock}</div></div></div>
+      <div class="sky-map">${BLD_LIGHTS.map((p) => `<i class="bl" style="left:${p[0]}%;top:${p[1]}%"></i>`).join("")}
+        <i class="sun"></i><i class="leafshade"></i><i class="leafshade s2"></i><i class="beam"></i><i class="floorlight"></i>
+        <i class="rod"></i><img class="curtain cl" src="${curtain}" alt=""><img class="curtain cr" src="${curtain}" alt="">${dust}</div>
+      <i class="eve"></i></div>`);
     field.querySelector(".bg").after(el);
-    const map = el.querySelector(".sky-map"), fit = () => { map.style.cssText = ambBox(field, true); };
+    const maps = [...el.querySelectorAll(".sky-map")], fit = () => { maps.forEach((m) => { m.style.cssText = ambBox(field, true); }); };
     fit(); G.onFieldResize(field, fit);
     return el;
   };
