@@ -770,6 +770,11 @@
     player.controls = true;
     player.playsInline = true;
     player.preload = "auto";
+    // 조작 막대 ⋮ 메뉴에서 다운로드 · 재생 속도 · PIP · 전송을 뺌(구청 11/27: 휴대폰 카카오톡 안 브라우저에서 이 메뉴 창이 닫히지 않음).
+    // 자막은 영상 아래 '자막' 단추로 고름. 한계: 브라우저가 이 표시를 무시하면 메뉴가 그대로 나옴(크롬 계열은 따름)
+    player.setAttribute("controlslist", "nodownload noplaybackrate noremoteplayback");
+    player.disablePictureInPicture = true;
+    player.disableRemotePlayback = true;
     var poster = sameSite(v.cfg.poster);
     if (poster) player.poster = poster;
     player.setAttribute("aria-label", frame._card.querySelector("h3").textContent);
@@ -812,7 +817,7 @@
     });
     // 아이폰은 영상 전체 화면이 따로 있어(document의 fullscreenchange가 오지 않음) 영상이 직접 알려 줌
     player.addEventListener("webkitbeginfullscreen", function () { frame._iosFull = true; applyCaption(frame); });
-    player.addEventListener("webkitendfullscreen", function () { frame._iosFull = null; applyCaption(frame); });
+    player.addEventListener("webkitendfullscreen", function () { frame._iosFull = null; applyCaption(frame); keepInView(frame); });
     var counted = false;
     player.addEventListener("timeupdate", function () {
       if (!counted && player.duration && player.currentTime / player.duration >= 0.9) {
@@ -1067,10 +1072,27 @@
       if (window.ResizeObserver) new ResizeObserver(function () { fitSubs(frame); }).observe(frame);
     });
     // 영상이 전체 화면에 들어가고 나올 때: 브라우저 자막 ↔ 직접 그린 자막
+    // 나올 때는 영상 칸이 화면에 보이게 되돌림(keepInView)
+    var fullFrame = null;
     ["fullscreenchange", "webkitfullscreenchange"].forEach(function (name) {
       document.addEventListener(name, function () {
         document.querySelectorAll(".video-frame").forEach(function (frame) { if (frame._subs) applyCaption(frame); });
+        var el = document.fullscreenElement || document.webkitFullscreenElement;
+        if (el) { fullFrame = el.closest ? el.closest(".video-frame") : null; return; }
+        if (fullFrame) { keepInView(fullFrame); fullFrame = null; }
       });
+    });
+  }
+  // 휴대폰에서 영상 전체 화면을 나오면 브라우저가 페이지를 맨 위로 돌려 영상이 안 보이는 경우가 있음(구청 11/27)
+  // → 나온 직후와 화면 크기가 돌아온 뒤(가로 → 세로) 두 번, 영상 칸이 화면 밖이면 칸을 가운데로 데려옴
+  function keepInView(frame) {
+    [120, 600].forEach(function (ms) {
+      setTimeout(function () {
+        if (!frame.isConnected || document.fullscreenElement || document.webkitFullscreenElement) return;
+        var r = frame.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < window.innerHeight) return;
+        frame.scrollIntoView({ block: "center", behavior: "instant" });
+      }, ms);
     });
   }
 
