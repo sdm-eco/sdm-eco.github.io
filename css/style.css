@@ -525,37 +525,6 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .game-start:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:6px}
 .game-start svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .game-status{margin:0;font-size:15px;font-weight:700;color:var(--fresh-hover)}
-/* 게임 고르기 창(#game-pick, main.js setupGame): 게임 칸과 같은 연초록 바탕 + 게임 카드 두 장
-   아이콘 색은 게임 첫 화면과 같게(분리배출 러시 파랑 · 서대문 새내기 일주일 초록) */
-.game-pick{width:min(620px,calc(100% - 32px));max-height:calc(100% - 32px);padding:0;border:0;border-radius:28px;background:transparent;overflow:auto;overscroll-behavior:none}
-.game-pick::backdrop{background:color-mix(in srgb,var(--forest) 72%,transparent);backdrop-filter:blur(3px)}
-.game-pick-panel{position:relative;padding:32px 32px 30px;border-radius:28px;background:radial-gradient(ellipse 70% 90% at 70% 120%,#bfe5cc,transparent 60%),linear-gradient(180deg,#f2faf5,#e1f3e7)}
-.game-pick .eco-close{position:absolute}
-.game-pick-title{margin:0 52px 6px 0;color:var(--ink);font-size:26px;line-height:1.35;letter-spacing:-.6px;text-wrap:balance}
-.game-pick-lead{margin:0 0 22px;color:var(--ink-2);font-size:16px;line-height:1.6}
-.game-pick-list{display:grid;gap:12px}
-.game-pick-card{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:16px;min-height:96px;padding:16px 18px;border:1.5px solid var(--card-line);border-radius:20px;background:var(--white);color:var(--ink);text-decoration:none;transition:transform .2s,border-color .2s,box-shadow .2s}
-@media(hover:hover){.game-pick-card:hover{transform:scale(1.02);border-color:var(--fresh);box-shadow:0 10px 26px -12px color-mix(in srgb,var(--forest) 35%,transparent)}}
-.game-pick-card:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:3px}
-.game-pick-icon{display:grid;place-items:center;width:64px;height:64px;border-radius:18px;background:var(--fresh-strong);color:var(--white)}
-.game-pick-card.is-rush .game-pick-icon{background:#2f6fb8}
-.game-pick-icon svg{width:36px;height:36px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
-.game-pick-text{display:grid;gap:4px}
-.game-pick-text strong{font-size:19px;line-height:1.35;letter-spacing:-.4px}
-.game-pick-text small{color:var(--ink-2);font-size:15px;line-height:1.5;text-wrap:pretty}
-.game-pick-go{width:40px;height:40px;padding:10px;border-radius:50%;background:var(--mint);fill:none;stroke:var(--fresh-strong);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-@media(max-width:560px){
-  .game-pick-panel{padding:24px 18px 20px}
-  .game-pick-title{font-size:22px}
-  .game-pick-lead{margin-bottom:18px;font-size:15px}
-  .game-pick-card{gap:12px;min-height:84px;padding:14px}
-  .game-pick-icon{width:52px;height:52px;border-radius:14px}
-  .game-pick-icon svg{width:30px;height:30px}
-  .game-pick-text strong{font-size:17px}
-  .game-pick-text small{font-size:14px}
-  .game-pick-go{width:32px;height:32px;padding:7px}
-}
-@media(prefers-reduced-motion:reduce){.game-pick-card{transition:none}.game-pick-card:hover{transform:none}}
 .action-link{display:inline-flex;align-items:center;gap:10px;margin-top:24px;min-height:48px;padding:6px 24px;border:1.5px solid var(--link);border-radius:999px;background:var(--link);color:var(--on-dark);font-size:17px;font-weight:700;transition:background-color .2s,border-color .2s}
 .action-link:hover{background:var(--link-dark);border-color:var(--link-dark)}
 

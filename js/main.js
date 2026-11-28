@@ -1109,18 +1109,17 @@
   }
 
   // 게임 주소가 있어도 실제로 올라와 있는지(파일이 있는지) 먼저 확인. 같은 사이트 주소일 때만 확인 가능(다른 사이트면 있다고 봄)
-  // '게임 시작' → 고르기 창(#game-pick)에서 분리배출 러시 · 서대문 새내기 일주일 중 하나를 누르면 그 게임 화면으로 바로 열림
+  // '게임 시작' → 게임 첫 화면(분리배출 러시 · 서대문 새내기 일주일 고르기)이 새 창에서 열림
+  // (예전에는 이 페이지에 고르기 창이 따로 있었으나 게임 첫 화면과 같은 선택을 두 번 해서 뺌, 11/28)
   function setupGame() {
     var button = document.getElementById("game-play");
     var status = document.getElementById("game-status");
     var stage = document.getElementById("game-stage");
-    var pick = document.getElementById("game-pick");
     var game = config.game || {};
     var url = gameUrl(), live = false;
-    // 고른 게임의 주소: 설정 주소 + ?mode=rush|story&lang=지금 언어 (게임이 홈페이지와 같은 언어로 시작)
-    function modeUrl(mode) {
+    // 게임 주소 + ?lang=지금 언어 (게임이 홈페이지와 같은 언어로 시작)
+    function langUrl() {
       var u = new URL(url);
-      u.searchParams.set("mode", mode);
       u.searchParams.set("lang", current);
       return u.href;
     }
@@ -1137,28 +1136,15 @@
       }).catch(function () { /* 확인 실패: 준비 중으로 둠 */ });
     }
 
-    // 고르기 창의 게임 카드는 링크(새 창). 이 페이지 안에 띄우는 설정(embed)이면 링크 대신 이 칸에 띄움
-    pick.querySelectorAll("[data-game-mode]").forEach(function (card) {
-      card.addEventListener("click", function (e) {
-        card.href = modeUrl(card.dataset.gameMode); // 창을 연 뒤 언어를 바꿨을 수도 있어 누를 때 다시 맞춤
-        if (progress) progress.mark("game");
-        if (game.embed) {
-          e.preventDefault();
-          embed(card.href);
-        }
-        pick.close();
-      });
-    });
-    pick.querySelector("[data-game-pick-close]").addEventListener("click", function () { pick.close(); });
-    pick.addEventListener("click", function (e) { if (e.target === pick) pick.close(); }); // 창 바깥(어두운 곳)을 누르면 닫힘
-
+    // 새 창으로 열기. 이 페이지 안에 띄우는 설정(embed)이면 이 칸에 띄움
     button.addEventListener("click", function () {
       if (!live) {
         status.hidden = false;
         return;
       }
-      pick.querySelectorAll("[data-game-mode]").forEach(function (card) { card.href = modeUrl(card.dataset.gameMode); });
-      pick.showModal();
+      if (progress) progress.mark("game");
+      if (game.embed) embed(langUrl());
+      else window.open(langUrl(), "_blank", "noopener");
     });
 
     function embed(src) {
