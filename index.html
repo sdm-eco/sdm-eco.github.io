@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" integrity="sha384-uR1wgObmx89ZQ4VVXHdzjbDJZ1PvBK01K+E3GebmaBKdZ87qRJvBWPoPbzWeEd5T" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard-std@1.3.9/dist/web/variable/pretendardvariable-std-dynamic-subset.css" integrity="sha384-5IBh7S8Oxkrzh/DiG0wr4k8P/pveAMuAc4p5+MngFt0UdX+0TtqTaExSFpZL1NfK" crossorigin="anonymous">
 <!-- ?v= : 배포 뒤 브라우저가 예전 CSS·JS를 쓰지 않게 하는 표시. 이 파일들을 고치면 값을 올릴 것 -->
-<link rel="stylesheet" href="css/style.css?v=20261128a">
+<link rel="stylesheet" href="css/style.css?v=20261128b">
 </head>
 <body>
 <a class="skip-link" href="#main" data-i18n="skip">본문 바로가기</a>
@@ -218,7 +218,7 @@
 
   <section class="section" id="game">
     <div class="wrap">
-      <!-- 게임: 문구 · 캐릭터 · 큰 시작 버튼 (팀원 사이트 sdm-eco.vercel.app 구성 참고). 시작 버튼 → 게임 첫 화면(두 게임 고르기)이 새 창에서 열림(main.js setupGame) -->
+      <!-- 게임: 문구 · 캐릭터 · 큰 시작 버튼 (팀원 사이트 sdm-eco.vercel.app 구성 참고). 시작 버튼 → 게임 크게 보기 창(#game-dialog) 안에 게임 첫 화면(두 게임 고르기)(main.js setupGame) -->
       <div class="game-stage" id="game-stage">
         <div class="game-hero">
           <div class="game-copy">
@@ -237,7 +237,7 @@
             <span class="game-say say-girl" data-i18n="game.say.ok">정답!</span>
           </div>
           <div class="game-cta">
-            <button type="button" class="game-start" id="game-play"><span data-i18n="game.play">게임 시작</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
+            <button type="button" class="game-start" id="game-play" aria-haspopup="dialog" aria-controls="game-dialog"><span data-i18n="game.play">게임 시작</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></button>
             <p class="game-status" id="game-status" role="status" hidden data-i18n="common.soon">준비 중</p>
           </div>
         </div>
@@ -625,6 +625,17 @@
   </div>
 </dialog>
 
+<!-- 게임 크게 보기 창(main.js setupGame): '게임 시작'을 누르면 이 창 안에 게임 첫 화면(game/)을 띄움. 영상 크게 보기 창과 같은 모양
+     '전체 화면'은 게임만 화면 가득(넓은 화면만). ✕ · Esc · 바깥 누르기 · 뒤로 가기로 닫으면 게임을 끝내고 보던 자리로 -->
+<dialog class="video-dialog game-dialog" id="game-dialog" aria-labelledby="game-dialog-title">
+  <div class="video-dialog-panel">
+    <p class="video-dialog-head"><span class="video-dialog-title" id="game-dialog-title" data-i18n="game.title">분리배출 게임</span>
+      <button type="button" class="game-full" data-game-full><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg><span data-i18n="video.full">전체 화면</span></button></p>
+    <button type="button" class="eco-close" data-game-close data-i18n-attr="aria-label:common.close" aria-label="닫기">×</button>
+    <div class="game-dialog-slot"></div>
+  </div>
+</dialog>
+
 <footer class="footer">
   <div class="wrap footer-inner">
     <div>
@@ -649,9 +660,9 @@
 <!-- 맨 위로(main.js setupToTop): 조금 내려가면 화면 오른쪽 아래에 나타남 -->
 <button type="button" class="to-top" data-i18n-attr="aria-label:top.label" aria-label="맨 위로" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
-<script src="js/config.js?v=20261127a"></script>
+<script src="js/config.js?v=20261128a"></script>
 <script src="js/i18n.js?v=20261128b"></script>
-<script src="js/main.js?v=20261128b"></script>
+<script src="js/main.js?v=20261128c"></script>
 <script type="module" src="js/eco3d.js?v=20261121a"></script>
 </body>
 </html>

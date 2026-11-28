@@ -246,6 +246,12 @@ img { display: block; -webkit-user-drag: none; user-select: none; }
   .title-left .brand-title { height: max(40px, calc(var(--u)*74)); }
   .title-chars { height: max(84px, calc(var(--u)*150)); }
 }
+/* 낮은 가로 화면(홈페이지 게임 창 · 작은 노트북): 소개 문장을 빼 미리보기 타일이 잘리지 않게 */
+@media (orientation: landscape) and (max-height: 700px) {
+  .title-left p { display: none; }
+  .title-chars { height: max(72px, calc(var(--u)*120)); }
+  .mode-card .pv { height: clamp(calc(100cqw * .36), calc(100cqh - 4.6em), calc(100cqw * .75)); }
+}
 
 /* ---------- 러시: 컨베이어(배경은 선명하게, 벨트는 수거함 바로 위) ---------- */
 .field.rush .bg::after { background: linear-gradient(180deg, rgba(255, 255, 255, 0) 45%, rgba(11, 46, 34, .14)); }

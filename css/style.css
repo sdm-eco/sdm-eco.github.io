@@ -476,6 +476,25 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 .video-dialog-ep{flex:none;padding:3px 12px;border-radius:999px;background:var(--mint);color:var(--fresh-strong);font-size:14px;letter-spacing:0}
 .video-dialog .eco-close{top:16px;right:18px}
 .video-dialog .video-caps{margin:12px 2px 0}
+/* 게임 크게 보기 창(#game-dialog, main.js setupGame): 영상 크게 보기 창(.video-dialog)과 같은 모양 · 크기, 칸은 게임 설계 비율 16:9
+   1000px 이하(휴대폰 · 세로 태블릿)는 화면 전체를 덮음(게임은 세로 화면 배치로 바뀜). '전체 화면' 단추는 넓은 화면만 */
+/* 영상 창보다 크게(최대 1280px, 화면 높이에 맞춤): 게임 첫 화면이 작은 칸에서는 넘쳐 스크롤이 생김 */
+.game-dialog{width:min(1280px,calc(100% - 64px),calc((100vh - 136px) * 16 / 9 + 40px))}
+.game-dialog-slot{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;background:var(--paper)}
+.game-dialog-slot iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.game-full{display:inline-flex;align-items:center;gap:6px;min-height:40px;margin-left:auto;padding:6px 14px;border:0;border-radius:999px;background:var(--mint);color:var(--fresh-strong);font:inherit;font-size:14px;font-weight:700;line-height:1.2;letter-spacing:0;white-space:nowrap;cursor:pointer;transition:background-color .2s}
+.game-full:hover{background:var(--mint-hi)}
+.game-full:focus-visible{outline:3px solid var(--fresh-strong);outline-offset:2px}
+.game-full[hidden]{display:none}
+.game-full svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:1000px){
+  .game-dialog{width:100%;max-width:none;height:100%;max-height:none;margin:0;border-radius:0}
+  .game-dialog .video-dialog-panel{display:flex;flex-direction:column;height:100%;padding:8px 10px 10px;border-radius:0;box-shadow:none}
+  .game-dialog .video-dialog-head{margin:0 54px 8px 6px;font-size:17px}
+  .game-dialog .eco-close{top:8px;right:10px}
+  .game-dialog-slot{flex:1;min-height:0;aspect-ratio:auto;border-radius:12px}
+  .game-full{display:none}
+}
 .video-card h3{margin:18px 8px 6px;font-size:24px;line-height:1.35;letter-spacing:-.6px} /* 두 줄이 될 때 줄 사이가 벌어지지 않게(본문 1.7보다 좁게) */
 .video-desc{margin:0 8px;color:var(--ink-2);font-size:16px}
 /* 주제 태그는 한 줄로: 칸보다 길면(좁은 화면·긴 언어) 옆으로 밀어서 봄, 넘칠 때만 오른쪽 끝을 흐려 더 있음을 알림(main.js setupTagRows) */
@@ -487,8 +506,6 @@ html:has(.eco-dialog[open]){overscroll-behavior:none}
 /* 게임: 밝은 초록 띠 + 왼쪽 문구 · 가운데 캐릭터(바닥에 붙음) · 오른쪽 큰 동그라미 시작 버튼 (팀원 사이트 구성 참고) */
 /* 위 배출방법 칸(민트 바탕)과 구분되도록 바탕은 흰색, 연한 초록은 둥근 카드 안에만 */
 .game-stage{position:relative;border:1.5px solid var(--card-line);border-radius:28px;overflow:hidden;background:radial-gradient(ellipse 70% 90% at 70% 120%,#bfe5cc,transparent 60%),linear-gradient(180deg,#f2faf5,#e1f3e7)}
-.game-stage.is-playing{aspect-ratio:16/9;background:var(--night)}
-.game-stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 .game-hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr) auto;align-items:end;gap:20px;min-height:330px;padding:0 44px}
 .game-copy{align-self:center;padding:44px 0}
 .game-stage .eyebrow{color:var(--link-dark)} /* 연한 초록 바탕 위라 기본 초록(#1d7a43, 대비 3.9)보다 진하게: #bfe5cc 위에서 6.9 */

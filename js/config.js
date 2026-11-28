@@ -23,10 +23,8 @@ window.SITE_CONFIG = {
   ],
   game: {
     // 게임 주소: 이 사이트 안의 game/ 폴더(분리배출 러시 · 서대문 새내기 일주일 두 가지)
-    //   '게임 시작' → 고르기 창에서 고른 게임으로 바로 열림: 이 주소 뒤에 ?mode=rush 또는 ?mode=story 와 지금 언어(&lang=)를 붙임
+    //   '게임 시작' → 크게 보기 창 안에 이 주소 + 지금 언어(?lang=)를 띄움(다른 사이트 주소면 index.html의 frame-src에도 그 주소를 넣어야 함)
     // 이 사이트 안 주소일 때만 페이지를 열 때 있는지 확인하고, 없으면 "준비 중"으로 보임
-    url: "game/",
-    // true: 이 페이지 안에 띄우기(다른 사이트 주소면 index.html의 frame-src에도 그 주소를 넣어야 함), false: 새 창으로 열기
-    embed: false
+    url: "game/"
   }
 };

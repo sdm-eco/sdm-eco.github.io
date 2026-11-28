@@ -1109,14 +1109,21 @@
   }
 
   // 게임 주소가 있어도 실제로 올라와 있는지(파일이 있는지) 먼저 확인. 같은 사이트 주소일 때만 확인 가능(다른 사이트면 있다고 봄)
-  // '게임 시작' → 게임 첫 화면(분리배출 러시 · 서대문 새내기 일주일 고르기)이 새 창에서 열림
-  // (예전에는 이 페이지에 고르기 창이 따로 있었으나 게임 첫 화면과 같은 선택을 두 번 해서 뺌, 11/28)
+  // '게임 시작' → 게임 크게 보기 창(#game-dialog) 안에 게임 첫 화면(분리배출 러시 · 서대문 새내기 일주일 고르기)
+  //  - 영상 크게 보기 창과 같은 모양. '전체 화면'은 게임만 화면 가득(넓은 화면 · 브라우저가 지원할 때만)
+  //  - 체험 창처럼 열면 주소에 #play가 붙어 휴대폰 · 브라우저의 뒤로 가기로 닫힘
+  //  - 닫으면 게임을 끝냄(iframe을 지워 러시 시간 · 소리가 멈춤). 새내기 일주일 별 · 도감은 게임이 저장해 둠
+  //  (예전: 새 창 → 영상과 같은 방식으로 통일, 11/28)
   function setupGame() {
     var button = document.getElementById("game-play");
     var status = document.getElementById("game-status");
     var stage = document.getElementById("game-stage");
-    var game = config.game || {};
+    var dlg = document.getElementById("game-dialog");
+    var slot = dlg.querySelector(".game-dialog-slot");
+    var fullBtn = dlg.querySelector("[data-game-full]");
     var url = gameUrl(), live = false;
+    function ours() { return !!history.state && history.state.gameDialog === true; }
+    if (location.hash === "#play") history.replaceState(null, "", location.pathname + location.search); // #play로 들어오면 창 없이 시작
     // 게임 주소 + ?lang=지금 언어 (게임이 홈페이지와 같은 언어로 시작)
     function langUrl() {
       var u = new URL(url);
@@ -1136,29 +1143,55 @@
       }).catch(function () { /* 확인 실패: 준비 중으로 둠 */ });
     }
 
-    // 새 창으로 열기. 이 페이지 안에 띄우는 설정(embed)이면 이 칸에 띄움
+    function openGame(push) {
+      if (dlg.open) return;
+      var iframe = document.createElement("iframe");
+      iframe.src = langUrl();
+      iframe.title = t("game.title");
+      iframe.allow = "fullscreen; autoplay";
+      // 게임 화면이 이 페이지를 다른 곳으로 옮기거나 새 창·양식 제출을 못 하게 제한 (게임 실행·저장·마우스 잠금만 허용)
+      // 한계: 게임이 이 사이트와 같은 주소(sdm-eco.github.io)에 있으면 allow-same-origin 때문에 제한을 풀 수 있음 → 다른 주소에 둘 때 효과가 큼
+      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock");
+      iframe.addEventListener("load", function () {
+        if (dlg.open) iframe.focus(); // 키보드로 바로 게임을 다룰 수 있게
+        // 초점이 게임 안에 있으면 Esc가 이 창까지 오지 않아 게임 쪽에서 받아 닫음(게임은 Esc를 쓰지 않음, 같은 사이트라 접근 가능)
+        // 전체 화면 중의 Esc는 브라우저가 전체 화면만 풂
+        try {
+          iframe.contentWindow.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" && !(document.fullscreenElement || document.webkitFullscreenElement)) dlg.close();
+          });
+        } catch (err) { /* 다른 사이트 주소의 게임: Esc는 ✕ · 바깥 누르기로 대신 */ }
+      });
+      slot.appendChild(iframe);
+      fullBtn.hidden = !(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+      dlg.showModal();
+      if (push) history.pushState({ gameDialog: true }, "", location.pathname + location.search + "#play");
+    }
     button.addEventListener("click", function () {
       if (!live) {
         status.hidden = false;
         return;
       }
       if (progress) progress.mark("game");
-      if (game.embed) embed(langUrl());
-      else window.open(langUrl(), "_blank", "noopener");
+      openGame(true);
     });
-
-    function embed(src) {
-      var iframe = document.createElement("iframe");
-      iframe.src = src;
-      iframe.title = t("game.title");
-      iframe.allow = "fullscreen; autoplay";
-      // 게임 화면이 이 페이지를 다른 곳으로 옮기거나 새 창·양식 제출을 못 하게 제한 (게임 실행·저장·마우스 잠금만 허용)
-      // 한계: 게임이 이 사이트와 같은 주소(sdm-eco.github.io)에 있으면 allow-same-origin 때문에 제한을 풀 수 있음 → 다른 주소에 둘 때 효과가 큼
-      iframe.setAttribute("sandbox", "allow-scripts allow-same-origin allow-pointer-lock");
-      stage.innerHTML = "";
-      stage.classList.add("is-playing");
-      stage.appendChild(iframe);
-    }
+    fullBtn.addEventListener("click", function () {
+      var iframe = slot.querySelector("iframe");
+      var full = iframe && (iframe.requestFullscreen || iframe.webkitRequestFullscreen);
+      if (full) Promise.resolve(full.call(iframe)).catch(function () { /* 전체 화면이 막힌 브라우저: 창 크기 그대로 */ });
+    });
+    dlg.querySelector("[data-game-close]").addEventListener("click", function () { dlg.close(); });
+    dlg.addEventListener("click", function (e) { if (e.target === dlg) dlg.close(); }); // 창 바깥(어두운 곳)
+    dlg.addEventListener("close", function () {
+      slot.innerHTML = "";
+      if (ours()) history.back(); // ✕ · Esc · 바깥 누르기로 닫으면 열 때 붙인 #play 기록도 되돌림
+      button.focus({ preventScroll: true });
+    });
+    // 뒤로 가기: 열린 창을 닫음 / 앞으로 가기: 다시 엶
+    window.addEventListener("popstate", function () {
+      if (dlg.open && !ours()) dlg.close();
+      else if (!dlg.open && ours() && live) openGame(false);
+    });
   }
 
   // 게임 칸 캐릭터의 표정 · 말풍선 (눈 깜빡임은 setupBlink가 따로 맡음)
